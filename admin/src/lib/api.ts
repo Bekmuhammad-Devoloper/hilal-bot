@@ -61,7 +61,7 @@ export const getUserPayments = async (telegramId: number) => (await api.get(`/pa
 
 // ========= SETTINGS =========
 export const getSettings = async () => (await api.get("/settings")).data;
-export const updateSettings = async (data: any) => (await api.put("/settings", data)).data;
+export const updateSettings = async (key: string, value: any) => (await api.put("/settings", { [key]: value })).data;
 
 // ========= BROADCAST =========
 export const broadcastAll = async (message: string, photo?: string) => (await api.post("/broadcast/all", { message, photo })).data;
