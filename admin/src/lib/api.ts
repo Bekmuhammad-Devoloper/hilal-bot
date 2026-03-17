@@ -31,6 +31,7 @@ export const blockUser = async (userId: number, isBlocked: boolean) => (await ap
 // ========= PLANS =========
 export const getPlans = async () => (await api.get("/plans")).data;
 export const getPlansAdmin = async () => (await api.get("/plans/admin")).data;
+export const getAdminPlans = async () => (await api.get("/plans/admin")).data;
 export const createPlan = async (data: any) => (await api.post("/plans", data)).data;
 export const updatePlan = async (id: number, data: any) => (await api.put(`/plans/${id}`, data)).data;
 export const deletePlan = async (id: number) => (await api.delete(`/plans/${id}`)).data;
@@ -44,10 +45,12 @@ export const getSubscriptions = async (page = 1, limit = 20, status?: string) =>
 };
 export const getSubStats = async () => (await api.get("/subscriptions/stats")).data;
 export const cancelSubscription = async (telegramId: number) => (await api.post(`/subscriptions/cancel/${telegramId}`)).data;
+export const checkExpired = async () => (await api.post("/subscriptions/check-expired")).data;
 
 // ========= PAYMENTS =========
 export const createPayment = async (telegramId: number, planId: number, method?: string) => (await api.post("/payments/create", { telegramId, planId, method })).data;
 export const confirmPayment = async (id: number, cardLast4?: string) => (await api.post(`/payments/confirm/${id}`, { cardLast4 })).data;
+export const cancelPayment = async (id: number) => (await api.post(`/payments/cancel/${id}`)).data;
 export const getPayments = async (page = 1, limit = 20, status?: string) => {
   const params: any = { page, limit };
   if (status) params.status = status;
