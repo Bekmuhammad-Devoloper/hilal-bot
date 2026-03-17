@@ -1,0 +1,78 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         Int      @id @default(autoincrement())
+  telegramId BigInt   @unique
+  username   String?
+  firstName  String?
+  lastName   String?
+  phone      String?
+  isAdmin    Boolean  @default(false)
+  isBlocked  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  subscriptions Subscription[]
+  payments      Payment[]
+}
+
+model Plan {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  price       Int      // so'mda
+  duration    Int      @default(30) // kunlarda
+  features    String?  // JSON array string
+  isActive    Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  subscriptions Subscription[]
+  payments      Payment[]
+}
+
+model Subscription {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  planId    Int
+  status    String   @default("active") // active, expired, cancelled
+  startDate DateTime @default(now())
+  endDate   DateTime
+  autoRenew Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan Plan @relation(fields: [planId], references: [id])
+}
+
+model Payment {
+  id            Int      @id @default(autoincrement())
+  userId        Int
+  planId        Int
+  amount        Int
+  status        String   @default("pending") // pending, completed, failed, cancelled
+  method        String   @default("click")   // click, uzcard, humo, visa
+  transactionId String?
+  cardLast4     String?
+  metadata      String?  // JSON
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan Plan @relation(fields: [planId], references: [id])
+}
+
+model Settings {
+  id    Int    @id @default(autoincrement())
+  key   String @unique
+  value String
+}
