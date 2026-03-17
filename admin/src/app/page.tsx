@@ -11,7 +11,7 @@ export default function LoginPage() {
     setError("");
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:3001/api/auth/login-telegram", {
+      const res = await fetch("http://localhost:1001/api/auth/login-telegram", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ telegramId: parseInt(telegramId) }),

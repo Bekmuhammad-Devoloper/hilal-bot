@@ -12,7 +12,7 @@ async function bootstrap() {
   });
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
 
-  const port = process.env.PORT || 3001;
+  const port = process.env.PORT || 1001;
   await app.listen(port);
   console.log(`🚀 Backend ishga tushdi: http://localhost:${port}`);
   console.log(`📄 API: http://localhost:${port}/api`);

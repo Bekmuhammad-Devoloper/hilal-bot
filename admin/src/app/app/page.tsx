@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
 const API = typeof window !== "undefined" && window.location.hostname === "localhost"
-  ? "http://localhost:3001/api"
+  ? "http://localhost:1001/api"
   : "/api";
 
 export default function MiniApp() {

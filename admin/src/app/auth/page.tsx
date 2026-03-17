@@ -9,7 +9,7 @@ export default function AuthCallback() {
   useEffect(() => {
     const code = searchParams.get("code");
     if (!code) { setStatus("error"); return; }
-    fetch("http://localhost:3001/api/auth/login-code", {
+    fetch("http://localhost:1001/api/auth/login-code", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ code }),
