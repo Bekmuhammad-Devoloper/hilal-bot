@@ -1,12 +1,12 @@
 "use client";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
 const API = typeof window !== "undefined" && window.location.hostname === "localhost"
   ? "http://localhost:1001/api"
   : "/api";
 
-export default function MiniApp() {
+function MiniAppInner() {
   const searchParams = useSearchParams();
   const userId = searchParams.get("user");
 
@@ -413,4 +413,12 @@ export default function MiniApp() {
   }
 
   return null;
+}
+
+export default function MiniApp() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-900 to-purple-900"><p className="text-white text-xl">⏳ Yuklanmoqda...</p></div>}>
+      <MiniAppInner />
+    </Suspense>
+  );
 }
