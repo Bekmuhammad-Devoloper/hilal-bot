@@ -147,7 +147,7 @@ function MiniAppInner() {
     return dd + "." + mm + "." + yyyy;
   };
 
-  const daysLeft = subscription
+  const daysLeft = subscription && subscription.status === "active"
     ? Math.max(0, Math.ceil((new Date(subscription.endDate).getTime() - Date.now()) / 86400000))
     : 0;
 
@@ -253,7 +253,7 @@ function MiniAppInner() {
             <button className="w-full px-5 py-4 flex items-center justify-between border-b border-gray-50 active:bg-gray-50 transition-colors">
               <div className="flex items-center gap-3.5">
                 <div className="w-9 h-9 bg-indigo-50 rounded-xl flex items-center justify-center float-icon">
-                  <span className="text-base">✏️</span>
+                  <svg className="w-[18px] h-[18px] text-indigo-600" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
                 </div>
                 <span className="font-medium text-gray-800 text-sm">Ma{"'"}lumotlarni o{"'"}zgartirish</span>
               </div>
@@ -265,7 +265,7 @@ function MiniAppInner() {
             >
               <div className="flex items-center gap-3.5">
                 <div className="w-9 h-9 bg-emerald-50 rounded-xl flex items-center justify-center float-icon" style={{ animationDelay: "0.5s" }}>
-                  <span className="text-base">💳</span>
+                  <svg className="w-[18px] h-[18px] text-emerald-600" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>
                 </div>
                 <span className="font-medium text-gray-800 text-sm">To{"'"}lovlar tarixi</span>
               </div>
@@ -278,7 +278,7 @@ function MiniAppInner() {
             <button className="w-full px-5 py-4 flex items-center justify-between border-b border-gray-50 active:bg-gray-50 transition-colors">
               <div className="flex items-center gap-3.5">
                 <div className="w-9 h-9 bg-amber-50 rounded-xl flex items-center justify-center float-icon" style={{ animationDelay: "1s" }}>
-                  <span className="text-base">📄</span>
+                  <svg className="w-[18px] h-[18px] text-amber-600" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
                 </div>
                 <span className="font-medium text-gray-800 text-sm">Shartnoma</span>
               </div>
@@ -287,7 +287,7 @@ function MiniAppInner() {
             <button className="w-full px-5 py-4 flex items-center justify-between border-b border-gray-50 active:bg-gray-50 transition-colors">
               <div className="flex items-center gap-3.5">
                 <div className="w-9 h-9 bg-rose-50 rounded-xl flex items-center justify-center float-icon" style={{ animationDelay: "1.5s" }}>
-                  <span className="text-base">❓</span>
+                  <svg className="w-[18px] h-[18px] text-rose-500" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01" /></svg>
                 </div>
                 <span className="font-medium text-gray-800 text-sm">FAQ</span>
               </div>
@@ -296,7 +296,7 @@ function MiniAppInner() {
             <button className="w-full px-5 py-4 flex items-center justify-between active:bg-gray-50 transition-colors">
               <div className="flex items-center gap-3.5">
                 <div className="w-9 h-9 bg-sky-50 rounded-xl flex items-center justify-center float-icon" style={{ animationDelay: "2s" }}>
-                  <span className="text-base">💬</span>
+                  <svg className="w-[18px] h-[18px] text-sky-500" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
                 </div>
                 <span className="font-medium text-gray-800 text-sm">Aloqa</span>
               </div>
