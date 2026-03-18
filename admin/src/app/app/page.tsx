@@ -348,29 +348,35 @@ function MiniAppInner() {
                 <div className="grid grid-cols-2 gap-3">
                   <button
                     onClick={() => setPaymentMethod("payme")}
-                    className={"relative p-4 rounded-2xl border transition-all active:scale-[0.97] " + (paymentMethod === "payme" ? "border-[#33CCCC] bg-[#33CCCC]/10" : "border-white/[0.08] bg-white/[0.05]")}
+                    className={"relative overflow-hidden rounded-2xl border-2 transition-all duration-300 active:scale-[0.96] " + (paymentMethod === "payme" ? "border-[#00CCCC] bg-gradient-to-br from-[#00CCCC]/20 to-[#009999]/10 shadow-lg shadow-[#00CCCC]/20" : "border-white/[0.08] bg-white/[0.04] hover:bg-white/[0.06]")}
                   >
-                    <div className="flex items-center justify-center mb-3">
-                      <img src="/payme-icon.svg" alt="Payme" className="h-8" />
+                    {paymentMethod === "payme" && <div className="absolute inset-0 bg-gradient-to-br from-[#00CCCC]/10 to-transparent" />}
+                    <div className="relative p-4 flex flex-col items-center">
+                      <div className={"w-14 h-14 rounded-2xl flex items-center justify-center mb-3 transition-all duration-300 " + (paymentMethod === "payme" ? "bg-white shadow-md" : "bg-white/10")}>
+                        <img src="/payme-01.png" alt="Payme" className="w-10 h-10 object-contain" />
+                      </div>
+                      <p className={"text-sm font-bold transition-colors " + (paymentMethod === "payme" ? "text-[#00CCCC]" : "text-white")}>Payme</p>
+                      <p className="text-[10px] text-indigo-300/40 mt-0.5">Payme orqali</p>
                     </div>
-                    <p className="text-sm font-semibold text-white text-center">Payme</p>
-                    <p className="text-[11px] text-indigo-300/40 text-center mt-0.5">Payme orqali</p>
-                    <div className={"absolute top-3.5 right-3.5 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors " + (paymentMethod === "payme" ? "border-[#33CCCC] bg-[#33CCCC]" : "border-white/20")}>
-                      {paymentMethod === "payme" && <div className="w-2 h-2 bg-white rounded-full" />}
+                    <div className={"absolute top-3 right-3 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all duration-300 " + (paymentMethod === "payme" ? "border-[#00CCCC] bg-[#00CCCC] scale-100" : "border-white/20 scale-90")}>
+                      {paymentMethod === "payme" && <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" strokeWidth={3} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>}
                     </div>
                   </button>
 
                   <button
                     onClick={() => setPaymentMethod("click")}
-                    className={"relative p-4 rounded-2xl border transition-all active:scale-[0.97] " + (paymentMethod === "click" ? "border-[#00B4FF] bg-[#00B4FF]/10" : "border-white/[0.08] bg-white/[0.05]")}
+                    className={"relative overflow-hidden rounded-2xl border-2 transition-all duration-300 active:scale-[0.96] " + (paymentMethod === "click" ? "border-[#00B4FF] bg-gradient-to-br from-[#00B4FF]/20 to-[#0088CC]/10 shadow-lg shadow-[#00B4FF]/20" : "border-white/[0.08] bg-white/[0.04] hover:bg-white/[0.06]")}
                   >
-                    <div className="flex items-center justify-center mb-3">
-                      <img src="/click-icon.svg" alt="Click" className="h-8" />
+                    {paymentMethod === "click" && <div className="absolute inset-0 bg-gradient-to-br from-[#00B4FF]/10 to-transparent" />}
+                    <div className="relative p-4 flex flex-col items-center">
+                      <div className={"w-14 h-14 rounded-2xl flex items-center justify-center mb-3 transition-all duration-300 " + (paymentMethod === "click" ? "bg-white shadow-md" : "bg-white/10")}>
+                        <img src="/click-01.png" alt="Click" className="w-10 h-10 object-contain" />
+                      </div>
+                      <p className={"text-sm font-bold transition-colors " + (paymentMethod === "click" ? "text-[#00B4FF]" : "text-white")}>Click</p>
+                      <p className="text-[10px] text-indigo-300/40 mt-0.5">Click orqali</p>
                     </div>
-                    <p className="text-sm font-semibold text-white text-center">Click</p>
-                    <p className="text-[11px] text-indigo-300/40 text-center mt-0.5">Click orqali</p>
-                    <div className={"absolute top-3.5 right-3.5 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors " + (paymentMethod === "click" ? "border-[#00B4FF] bg-[#00B4FF]" : "border-white/20")}>
-                      {paymentMethod === "click" && <div className="w-2 h-2 bg-white rounded-full" />}
+                    <div className={"absolute top-3 right-3 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all duration-300 " + (paymentMethod === "click" ? "border-[#00B4FF] bg-[#00B4FF] scale-100" : "border-white/20 scale-90")}>
+                      {paymentMethod === "click" && <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" strokeWidth={3} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>}
                     </div>
                   </button>
                 </div>
@@ -457,8 +463,8 @@ function MiniAppInner() {
           <div className="flex items-center justify-center gap-3 text-xs text-indigo-300/30">
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
             <span>Xavfsiz to{"'"}lov</span>
-            <img src="/payme-icon.svg" alt="Payme" className="h-4 opacity-50" />
-            <img src="/click-icon.svg" alt="Click" className="h-4 opacity-50" />
+            <img src="/payme-01.png" alt="Payme" className="h-5 opacity-40 object-contain" />
+            <img src="/click-01.png" alt="Click" className="h-5 opacity-40 object-contain" />
           </div>
         </div>
 

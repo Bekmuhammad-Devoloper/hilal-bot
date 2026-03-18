@@ -96,7 +96,7 @@ export default function PaymentsPage() {
                 <td className="px-4 py-3 font-medium text-gray-800">{fmt(p.amount)}</td>
                 <td className="px-4 py-3">
                   <span className={`inline-flex items-center gap-1.5 text-xs px-2 py-1 rounded ${p.method === "payme" ? "bg-cyan-50 text-cyan-700" : "bg-blue-50 text-blue-700"}`}>
-                    <img src={p.method === "payme" ? "/payme-icon.svg" : "/click-icon.svg"} alt={p.method} className="h-4" />
+                    <img src={p.method === "payme" ? "/payme-01.png" : "/click-01.png"} alt={p.method} className="h-5 w-5 object-contain" />
                     {p.method === "payme" ? "Payme" : "Click"}
                   </span>
                 </td>
