@@ -143,7 +143,10 @@ function MiniAppInner() {
   const formatPrice = (n: number) => new Intl.NumberFormat("uz-UZ").format(n);
   const formatDate = (d: string) => {
     const date = new Date(d);
-    return \`\${String(date.getDate()).padStart(2, "0")}.\${String(date.getMonth() + 1).padStart(2, "0")}.\${date.getFullYear()}\`;
+    const dd = String(date.getDate()).padStart(2, "0");
+    const mm = String(date.getMonth() + 1).padStart(2, "0");
+    const yyyy = date.getFullYear();
+    return dd + "." + mm + "." + yyyy;
   };
 
   const daysLeft = subscription
