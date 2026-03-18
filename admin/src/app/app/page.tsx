@@ -352,8 +352,8 @@ function MiniAppInner() {
                   >
                     {paymentMethod === "payme" && <div className="absolute inset-0 bg-gradient-to-br from-[#00CCCC]/10 to-transparent" />}
                     <div className="relative p-4 flex flex-col items-center">
-                      <div className={"w-14 h-14 rounded-2xl flex items-center justify-center mb-3 transition-all duration-300 " + (paymentMethod === "payme" ? "bg-white shadow-md" : "bg-white/10")}>
-                        <img src="/payme-01.png" alt="Payme" className="w-10 h-10 object-contain" />
+                      <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-3 bg-white shadow-md">
+                        <img src="/payme-01.png" alt="Payme" className="w-12 h-12 object-contain" />
                       </div>
                       <p className={"text-sm font-bold transition-colors " + (paymentMethod === "payme" ? "text-[#00CCCC]" : "text-white")}>Payme</p>
                       <p className="text-[10px] text-indigo-300/40 mt-0.5">Payme orqali</p>
@@ -369,8 +369,8 @@ function MiniAppInner() {
                   >
                     {paymentMethod === "click" && <div className="absolute inset-0 bg-gradient-to-br from-[#00B4FF]/10 to-transparent" />}
                     <div className="relative p-4 flex flex-col items-center">
-                      <div className={"w-14 h-14 rounded-2xl flex items-center justify-center mb-3 transition-all duration-300 " + (paymentMethod === "click" ? "bg-white shadow-md" : "bg-white/10")}>
-                        <img src="/click-01.png" alt="Click" className="w-10 h-10 object-contain" />
+                      <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-3 bg-white shadow-md">
+                        <img src="/click-01.png" alt="Click" className="w-12 h-12 object-contain" />
                       </div>
                       <p className={"text-sm font-bold transition-colors " + (paymentMethod === "click" ? "text-[#00B4FF]" : "text-white")}>Click</p>
                       <p className="text-[10px] text-indigo-300/40 mt-0.5">Click orqali</p>
