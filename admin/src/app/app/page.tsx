@@ -134,19 +134,23 @@ function MiniAppInner() {
   if (screen === "loading") {
     return (
       <div className="min-h-screen bg-gradient-to-b from-indigo-50 to-white flex items-center justify-center">
-        <div className="text-center fade-in-up">
+        <div className="flex flex-col items-center fade-in-up">
           {/* Logo with spinning ring */}
-          <div className="relative w-28 h-28 mx-auto mb-6">
+          <div className="relative flex items-center justify-center" style={{ width: 120, height: 120 }}>
             {/* Spinning ring around logo */}
-            <div className="absolute inset-0 rounded-full border-[3px] border-indigo-100 border-t-indigo-600 logo-ring-spin" />
+            <div
+              className="absolute rounded-full border-[3px] border-indigo-100 border-t-indigo-600 logo-ring-spin"
+              style={{ width: 120, height: 120 }}
+            />
             {/* Logo */}
             <img
               src="/logo.jpg"
               alt="Hilal Bot"
-              className="w-24 h-24 rounded-full object-cover absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 logo-pulse shadow-lg"
+              className="rounded-full object-cover logo-pulse shadow-lg"
+              style={{ width: 96, height: 96 }}
             />
           </div>
-          <h2 className="text-xl font-bold text-gray-800 mb-1">Hilal Bot</h2>
+          <h2 className="text-xl font-bold text-gray-800 mt-5 mb-1">Hilal Bot</h2>
           <p className="text-sm text-gray-400">Yuklanmoqda...</p>
         </div>
       </div>
@@ -431,16 +435,20 @@ export default function MiniApp() {
     <Suspense
       fallback={
         <div className="min-h-screen bg-gradient-to-b from-indigo-50 to-white flex items-center justify-center">
-          <div className="text-center fade-in-up">
-            <div className="relative w-28 h-28 mx-auto mb-6">
-              <div className="absolute inset-0 rounded-full border-[3px] border-indigo-100 border-t-indigo-600 logo-ring-spin" />
+          <div className="flex flex-col items-center fade-in-up">
+            <div className="relative flex items-center justify-center" style={{ width: 120, height: 120 }}>
+              <div
+                className="absolute rounded-full border-[3px] border-indigo-100 border-t-indigo-600 logo-ring-spin"
+                style={{ width: 120, height: 120 }}
+              />
               <img
                 src="/logo.jpg"
                 alt="Hilal Bot"
-                className="w-24 h-24 rounded-full object-cover absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 logo-pulse shadow-lg"
+                className="rounded-full object-cover logo-pulse shadow-lg"
+                style={{ width: 96, height: 96 }}
               />
             </div>
-            <h2 className="text-xl font-bold text-gray-800 mb-1">Hilal Bot</h2>
+            <h2 className="text-xl font-bold text-gray-800 mt-5 mb-1">Hilal Bot</h2>
             <p className="text-sm text-gray-400">Yuklanmoqda...</p>
           </div>
         </div>
