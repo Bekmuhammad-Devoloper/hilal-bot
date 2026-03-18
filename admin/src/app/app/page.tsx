@@ -154,22 +154,22 @@ function MiniAppInner() {
   // ========== SPLASH ==========
   if (screen === "splash") {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-indigo-50 to-white flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-b from-[#0f0a2a] via-[#1a1145] to-[#0f0a2a] flex items-center justify-center">
         <div className="flex flex-col items-center fade-in-up">
           <div className="relative flex items-center justify-center" style={{ width: 120, height: 120 }}>
             <div
-              className="absolute rounded-full border-[3px] border-indigo-100 border-t-indigo-600 logo-ring-spin"
+              className="absolute rounded-full border-[3px] border-indigo-800/40 border-t-indigo-400 logo-ring-spin"
               style={{ width: 120, height: 120 }}
             />
             <img
               src="/logo.jpg"
               alt="Hilal Bot"
-              className="rounded-full object-cover logo-pulse shadow-lg"
+              className="rounded-full object-cover logo-pulse shadow-lg shadow-indigo-900/50"
               style={{ width: 96, height: 96 }}
             />
           </div>
-          <h2 className="text-xl font-bold text-gray-800 mt-5 mb-1">Hilal Bot</h2>
-          <p className="text-sm text-gray-400">Yuklanmoqda...</p>
+          <h2 className="text-xl font-bold text-white mt-5 mb-1">Hilal Bot</h2>
+          <p className="text-sm text-indigo-300/60">Yuklanmoqda...</p>
         </div>
       </div>
     );
@@ -178,10 +178,10 @@ function MiniAppInner() {
   // ========== LOADING (data yuklanmoqda) ==========
   if (screen === "loading") {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-indigo-50 to-white flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-b from-[#0f0a2a] via-[#1a1145] to-[#0f0a2a] flex items-center justify-center">
         <div className="flex flex-col items-center">
-          <div className="w-10 h-10 border-[3px] border-gray-200 border-t-indigo-600 rounded-full logo-ring-spin" />
-          <p className="text-sm text-gray-400 mt-4">Yuklanmoqda...</p>
+          <div className="w-10 h-10 border-[3px] border-indigo-800/40 border-t-indigo-400 rounded-full logo-ring-spin" />
+          <p className="text-sm text-indigo-300/60 mt-4">Yuklanmoqda...</p>
         </div>
       </div>
     );
@@ -193,26 +193,26 @@ function MiniAppInner() {
     const progressPercent = Math.max(0, Math.min(100, (daysLeft / totalDays) * 100));
 
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-50">
+      <div className="min-h-screen bg-gradient-to-b from-[#0f0a2a] via-[#1a1145] to-[#0f0a2a]">
         {/* Hero card */}
         <div className="px-5 pt-8 pb-4 scale-in">
-          <div className="bg-gradient-to-br from-indigo-900 via-indigo-800 to-purple-900 rounded-3xl p-6 text-white shadow-xl relative overflow-hidden">
+          <div className="bg-white/[0.07] backdrop-blur-sm rounded-3xl p-6 text-white border border-white/[0.08] relative overflow-hidden">
             {/* Decorative circles */}
-            <div className="absolute -top-8 -right-8 w-32 h-32 bg-white/5 rounded-full" />
-            <div className="absolute -bottom-4 -left-4 w-24 h-24 bg-white/5 rounded-full" />
+            <div className="absolute -top-8 -right-8 w-32 h-32 bg-indigo-500/10 rounded-full" />
+            <div className="absolute -bottom-4 -left-4 w-24 h-24 bg-purple-500/10 rounded-full" />
             
             <div className="relative z-10">
               <div className="flex items-center gap-3 mb-4">
-                <img src="/logo.jpg" alt="" className="w-10 h-10 rounded-full border-2 border-white/30" />
+                <img src="/logo.jpg" alt="" className="w-10 h-10 rounded-full border-2 border-white/20" />
                 <div>
-                  <p className="font-bold text-base">{subscription?.plan?.name || "Oson Turk Tili"}</p>
-                  <p className="text-indigo-200 text-xs">Faol obuna</p>
+                  <p className="font-bold text-base text-white">{subscription?.plan?.name || "Oson Turk Tili"}</p>
+                  <p className="text-indigo-300/70 text-xs">Faol obuna</p>
                 </div>
               </div>
 
               <div className="mt-2">
-                <p className="text-indigo-200 text-xs mb-1">Obuna tugashiga</p>
-                <p className="text-5xl font-black count-pulse">{daysLeft} <span className="text-lg font-medium text-indigo-200">kun</span></p>
+                <p className="text-indigo-300/70 text-xs mb-1">Obuna tugashiga</p>
+                <p className="text-5xl font-black count-pulse text-white">{daysLeft} <span className="text-lg font-medium text-indigo-300/70">kun</span></p>
               </div>
 
               <div className="mt-4">
@@ -220,8 +220,8 @@ function MiniAppInner() {
                   <div className="bg-gradient-to-r from-emerald-400 to-cyan-300 h-1.5 rounded-full progress-fill" style={{ width: progressPercent + "%" }} />
                 </div>
                 <div className="flex justify-between mt-1.5">
-                  <p className="text-[10px] text-indigo-300">Boshlangan</p>
-                  <p className="text-[10px] text-indigo-300">{daysLeft}/{totalDays} kun</p>
+                  <p className="text-[10px] text-indigo-300/50">Boshlangan</p>
+                  <p className="text-[10px] text-indigo-300/50">{daysLeft}/{totalDays} kun</p>
                 </div>
               </div>
             </div>
@@ -230,18 +230,18 @@ function MiniAppInner() {
 
         <div className="px-5 space-y-3 pb-8">
           {/* Obunani yangilash */}
-          <div className="bg-white rounded-2xl p-5 shadow-sm fade-in-up stagger-1">
-            <p className="font-semibold text-gray-900 text-center mb-4">Obunani yangilaysizmi?</p>
+          <div className="bg-white/[0.07] backdrop-blur-sm rounded-2xl p-5 border border-white/[0.08] fade-in-up stagger-1">
+            <p className="font-semibold text-white text-center mb-4">Obunani yangilaysizmi?</p>
             <div className="grid grid-cols-2 gap-3">
               <button
                 onClick={() => { setScreen("subscribe"); setSubscription(null); }}
-                className="py-3.5 bg-indigo-900 text-white rounded-xl font-semibold text-sm active:scale-95 transition-transform"
+                className="py-3.5 bg-indigo-500 text-white rounded-xl font-semibold text-sm active:scale-95 transition-transform"
               >
                 Ha
               </button>
               <button
                 onClick={handleCancel}
-                className="py-3.5 bg-gray-50 text-gray-500 rounded-xl font-semibold text-sm border border-gray-200 active:scale-95 transition-transform"
+                className="py-3.5 bg-white/[0.08] text-indigo-200 rounded-xl font-semibold text-sm border border-white/[0.1] active:scale-95 transition-transform"
               >
                 Yo{"'"}q
               </button>
@@ -249,58 +249,58 @@ function MiniAppInner() {
           </div>
 
           {/* Menyular 1 */}
-          <div className="bg-white rounded-2xl shadow-sm overflow-hidden fade-in-up stagger-2">
-            <button className="w-full px-5 py-4 flex items-center justify-between border-b border-gray-50 active:bg-gray-50 transition-colors">
+          <div className="bg-white/[0.07] backdrop-blur-sm rounded-2xl border border-white/[0.08] overflow-hidden fade-in-up stagger-2">
+            <button className="w-full px-5 py-4 flex items-center justify-between border-b border-white/[0.06] active:bg-white/[0.05] transition-colors">
               <div className="flex items-center gap-3.5">
-                <div className="w-9 h-9 bg-indigo-50 rounded-xl flex items-center justify-center float-icon">
-                  <svg className="w-[18px] h-[18px] text-indigo-600" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                <div className="w-9 h-9 bg-indigo-500/15 rounded-xl flex items-center justify-center float-icon">
+                  <svg className="w-[18px] h-[18px] text-indigo-400" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
                 </div>
-                <span className="font-medium text-gray-800 text-sm">Ma{"'"}lumotlarni o{"'"}zgartirish</span>
+                <span className="font-medium text-indigo-100 text-sm">Ma{"'"}lumotlarni o{"'"}zgartirish</span>
               </div>
-              <svg className="w-4 h-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" /></svg>
+              <svg className="w-4 h-4 text-indigo-400/30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" /></svg>
             </button>
             <button
               onClick={() => setScreen("subscribe")}
-              className="w-full px-5 py-4 flex items-center justify-between active:bg-gray-50 transition-colors"
+              className="w-full px-5 py-4 flex items-center justify-between active:bg-white/[0.05] transition-colors"
             >
               <div className="flex items-center gap-3.5">
-                <div className="w-9 h-9 bg-emerald-50 rounded-xl flex items-center justify-center float-icon" style={{ animationDelay: "0.5s" }}>
-                  <svg className="w-[18px] h-[18px] text-emerald-600" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>
+                <div className="w-9 h-9 bg-emerald-500/15 rounded-xl flex items-center justify-center float-icon" style={{ animationDelay: "0.5s" }}>
+                  <svg className="w-[18px] h-[18px] text-emerald-400" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>
                 </div>
-                <span className="font-medium text-gray-800 text-sm">To{"'"}lovlar tarixi</span>
+                <span className="font-medium text-indigo-100 text-sm">To{"'"}lovlar tarixi</span>
               </div>
-              <svg className="w-4 h-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" /></svg>
+              <svg className="w-4 h-4 text-indigo-400/30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" /></svg>
             </button>
           </div>
 
           {/* Menyular 2 */}
-          <div className="bg-white rounded-2xl shadow-sm overflow-hidden fade-in-up stagger-3">
-            <button className="w-full px-5 py-4 flex items-center justify-between border-b border-gray-50 active:bg-gray-50 transition-colors">
+          <div className="bg-white/[0.07] backdrop-blur-sm rounded-2xl border border-white/[0.08] overflow-hidden fade-in-up stagger-3">
+            <button className="w-full px-5 py-4 flex items-center justify-between border-b border-white/[0.06] active:bg-white/[0.05] transition-colors">
               <div className="flex items-center gap-3.5">
-                <div className="w-9 h-9 bg-amber-50 rounded-xl flex items-center justify-center float-icon" style={{ animationDelay: "1s" }}>
-                  <svg className="w-[18px] h-[18px] text-amber-600" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                <div className="w-9 h-9 bg-amber-500/15 rounded-xl flex items-center justify-center float-icon" style={{ animationDelay: "1s" }}>
+                  <svg className="w-[18px] h-[18px] text-amber-400" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
                 </div>
-                <span className="font-medium text-gray-800 text-sm">Shartnoma</span>
+                <span className="font-medium text-indigo-100 text-sm">Shartnoma</span>
               </div>
-              <svg className="w-4 h-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" /></svg>
+              <svg className="w-4 h-4 text-indigo-400/30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" /></svg>
             </button>
-            <button className="w-full px-5 py-4 flex items-center justify-between border-b border-gray-50 active:bg-gray-50 transition-colors">
+            <button className="w-full px-5 py-4 flex items-center justify-between border-b border-white/[0.06] active:bg-white/[0.05] transition-colors">
               <div className="flex items-center gap-3.5">
-                <div className="w-9 h-9 bg-rose-50 rounded-xl flex items-center justify-center float-icon" style={{ animationDelay: "1.5s" }}>
-                  <svg className="w-[18px] h-[18px] text-rose-500" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01" /></svg>
+                <div className="w-9 h-9 bg-rose-500/15 rounded-xl flex items-center justify-center float-icon" style={{ animationDelay: "1.5s" }}>
+                  <svg className="w-[18px] h-[18px] text-rose-400" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01" /></svg>
                 </div>
-                <span className="font-medium text-gray-800 text-sm">FAQ</span>
+                <span className="font-medium text-indigo-100 text-sm">FAQ</span>
               </div>
-              <svg className="w-4 h-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" /></svg>
+              <svg className="w-4 h-4 text-indigo-400/30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" /></svg>
             </button>
-            <button className="w-full px-5 py-4 flex items-center justify-between active:bg-gray-50 transition-colors">
+            <button className="w-full px-5 py-4 flex items-center justify-between active:bg-white/[0.05] transition-colors">
               <div className="flex items-center gap-3.5">
-                <div className="w-9 h-9 bg-sky-50 rounded-xl flex items-center justify-center float-icon" style={{ animationDelay: "2s" }}>
-                  <svg className="w-[18px] h-[18px] text-sky-500" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
+                <div className="w-9 h-9 bg-sky-500/15 rounded-xl flex items-center justify-center float-icon" style={{ animationDelay: "2s" }}>
+                  <svg className="w-[18px] h-[18px] text-sky-400" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
                 </div>
-                <span className="font-medium text-gray-800 text-sm">Aloqa</span>
+                <span className="font-medium text-indigo-100 text-sm">Aloqa</span>
               </div>
-              <svg className="w-4 h-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" /></svg>
+              <svg className="w-4 h-4 text-indigo-400/30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" /></svg>
             </button>
           </div>
         </div>
@@ -311,32 +311,32 @@ function MiniAppInner() {
   // ========== SUBSCRIBE — reja tanlash ==========
   if (screen === "subscribe") {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-50">
+      <div className="min-h-screen bg-gradient-to-b from-[#0f0a2a] via-[#1a1145] to-[#0f0a2a]">
         {plans.map((plan, planIdx) => {
           const features = plan.features ? JSON.parse(plan.features) : [];
           return (
             <div key={plan.id} className="px-5 pt-6 pb-8">
               {/* Narx */}
               <div className="mb-5 scale-in">
-                <p className="text-xs font-medium text-gray-400 tracking-wider uppercase mb-1">Obuna narxi</p>
+                <p className="text-xs font-medium text-indigo-300/50 tracking-wider uppercase mb-1">Obuna narxi</p>
                 <div className="flex items-baseline gap-1.5">
-                  <span className="text-4xl font-black text-gray-900">{formatPrice(plan.price)}</span>
-                  <span className="text-lg font-semibold text-gray-400">UZS</span>
+                  <span className="text-4xl font-black text-white">{formatPrice(plan.price)}</span>
+                  <span className="text-lg font-semibold text-indigo-300/50">UZS</span>
                 </div>
               </div>
 
               {/* Feature card */}
-              <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 mb-6 fade-in-up stagger-1">
-                <h2 className="text-lg font-bold text-gray-900 mb-5">{plan.name}</h2>
+              <div className="bg-white/[0.07] backdrop-blur-sm rounded-3xl p-6 border border-white/[0.08] mb-6 fade-in-up stagger-1">
+                <h2 className="text-lg font-bold text-white mb-5">{plan.name}</h2>
                 <div className="space-y-4">
                   {features.map((f: string, i: number) => (
                     <div key={i} className="flex items-start gap-3 fade-in-up" style={{ animationDelay: (0.15 + i * 0.1) + "s" }}>
-                      <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-sm">
+                      <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-xl flex items-center justify-center">
                         <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                         </svg>
                       </div>
-                      <p className="text-[15px] text-gray-700 leading-snug pt-1">{f}</p>
+                      <p className="text-[15px] text-indigo-100/80 leading-snug pt-1">{f}</p>
                     </div>
                   ))}
                 </div>
@@ -344,34 +344,34 @@ function MiniAppInner() {
 
               {/* To'lov turi */}
               <div className="mb-6 fade-in-up stagger-2">
-                <p className="text-xs font-medium text-gray-400 tracking-wider uppercase mb-3">To{"'"}lov turi</p>
+                <p className="text-xs font-medium text-indigo-300/50 tracking-wider uppercase mb-3">To{"'"}lov turi</p>
                 <div className="grid grid-cols-2 gap-3">
                   <button
                     onClick={() => setPaymentMethod("visa")}
-                    className={"relative p-4 rounded-2xl border-2 transition-all active:scale-[0.97] " + (paymentMethod === "visa" ? "border-indigo-500 bg-indigo-50/50 shadow-sm" : "border-gray-100 bg-white")}
+                    className={"relative p-4 rounded-2xl border transition-all active:scale-[0.97] " + (paymentMethod === "visa" ? "border-indigo-400 bg-indigo-500/15" : "border-white/[0.08] bg-white/[0.05]")}
                   >
                     <div className="flex items-center gap-1.5 mb-2.5">
-                      <span className="text-[11px] font-extrabold text-red-500 tracking-tight">MC</span>
-                      <span className="text-[11px] font-extrabold text-blue-600 tracking-tight">VISA</span>
+                      <span className="text-[11px] font-extrabold text-red-400 tracking-tight">MC</span>
+                      <span className="text-[11px] font-extrabold text-blue-400 tracking-tight">VISA</span>
                     </div>
-                    <p className="text-sm font-semibold text-gray-900 text-left">Chet-el kartasi</p>
-                    <p className="text-[11px] text-gray-400 text-left mt-0.5">Tribute orqali</p>
-                    <div className={"absolute top-3.5 right-3.5 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors " + (paymentMethod === "visa" ? "border-indigo-500 bg-indigo-500" : "border-gray-200")}>
+                    <p className="text-sm font-semibold text-white text-left">Chet-el kartasi</p>
+                    <p className="text-[11px] text-indigo-300/40 text-left mt-0.5">Tribute orqali</p>
+                    <div className={"absolute top-3.5 right-3.5 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors " + (paymentMethod === "visa" ? "border-indigo-400 bg-indigo-500" : "border-white/20")}>
                       {paymentMethod === "visa" && <div className="w-2 h-2 bg-white rounded-full" />}
                     </div>
                   </button>
 
                   <button
                     onClick={() => setPaymentMethod("uzcard")}
-                    className={"relative p-4 rounded-2xl border-2 transition-all active:scale-[0.97] " + (paymentMethod === "uzcard" ? "border-indigo-500 bg-indigo-50/50 shadow-sm" : "border-gray-100 bg-white")}
+                    className={"relative p-4 rounded-2xl border transition-all active:scale-[0.97] " + (paymentMethod === "uzcard" ? "border-indigo-400 bg-indigo-500/15" : "border-white/[0.08] bg-white/[0.05]")}
                   >
                     <div className="flex items-center gap-1.5 mb-2.5">
-                      <span className="text-[11px] font-extrabold text-green-600 tracking-tight">UZ</span>
-                      <span className="text-[11px] font-extrabold text-yellow-500 tracking-tight">HUMO</span>
+                      <span className="text-[11px] font-extrabold text-green-400 tracking-tight">UZ</span>
+                      <span className="text-[11px] font-extrabold text-yellow-400 tracking-tight">HUMO</span>
                     </div>
-                    <p className="text-sm font-semibold text-gray-900 text-left">UZCARD / Humo</p>
-                    <p className="text-[11px] text-gray-400 text-left mt-0.5">Click orqali</p>
-                    <div className={"absolute top-3.5 right-3.5 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors " + (paymentMethod === "uzcard" ? "border-indigo-500 bg-indigo-500" : "border-gray-200")}>
+                    <p className="text-sm font-semibold text-white text-left">UZCARD / Humo</p>
+                    <p className="text-[11px] text-indigo-300/40 text-left mt-0.5">Click orqali</p>
+                    <div className={"absolute top-3.5 right-3.5 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors " + (paymentMethod === "uzcard" ? "border-indigo-400 bg-indigo-500" : "border-white/20")}>
                       {paymentMethod === "uzcard" && <div className="w-2 h-2 bg-white rounded-full" />}
                     </div>
                   </button>
@@ -382,7 +382,7 @@ function MiniAppInner() {
               <div className="fade-in-up stagger-3">
                 <button
                   onClick={() => handleSelectPlan(plan)}
-                  className="w-full py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-2xl font-bold text-base shadow-lg shadow-indigo-200 active:scale-[0.98] transition-transform"
+                  className="w-full py-4 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-2xl font-bold text-base shadow-lg shadow-indigo-900/30 active:scale-[0.98] transition-transform"
                 >
                   Davom etish
                 </button>
@@ -397,21 +397,21 @@ function MiniAppInner() {
   // ========== PAYMENT ==========
   if (screen === "payment") {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-50 p-5 flex flex-col">
+      <div className="min-h-screen bg-gradient-to-b from-[#0f0a2a] via-[#1a1145] to-[#0f0a2a] p-5 flex flex-col">
         {/* Header */}
         <div className="mb-6 scale-in">
-          <button onClick={() => setScreen("subscribe")} className="flex items-center gap-1.5 text-gray-400 text-sm mb-4 active:text-gray-600 transition-colors">
+          <button onClick={() => setScreen("subscribe")} className="flex items-center gap-1.5 text-indigo-300/50 text-sm mb-4 active:text-indigo-200 transition-colors">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
             Orqaga
           </button>
-          <h1 className="text-2xl font-bold text-gray-900">Karta ma{"'"}lumotlari</h1>
-          <p className="text-sm text-gray-400 mt-1">Xavfsiz to{"'"}lov</p>
+          <h1 className="text-2xl font-bold text-white">Karta ma{"'"}lumotlari</h1>
+          <p className="text-sm text-indigo-300/50 mt-1">Xavfsiz to{"'"}lov</p>
         </div>
 
         {/* Card inputs */}
         <div className="space-y-3 mb-6 fade-in-up stagger-1">
           <div>
-            <label className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-1.5 block">Karta raqami</label>
+            <label className="text-xs font-medium text-indigo-300/50 uppercase tracking-wider mb-1.5 block">Karta raqami</label>
             <input
               type="text"
               value={cardNumber}
@@ -420,11 +420,11 @@ function MiniAppInner() {
                 setCardNumber(v.replace(/(\d{4})(?=\d)/g, "$1 "));
               }}
               placeholder="0000 0000 0000 0000"
-              className="w-full px-4 py-3.5 bg-white border border-gray-200 rounded-2xl text-base font-medium focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 outline-none text-gray-800 transition-all"
+              className="w-full px-4 py-3.5 bg-white/[0.07] border border-white/[0.1] rounded-2xl text-base font-medium focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/20 outline-none text-white placeholder-indigo-300/30 transition-all"
             />
           </div>
           <div>
-            <label className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-1.5 block">Amal qilish muddati</label>
+            <label className="text-xs font-medium text-indigo-300/50 uppercase tracking-wider mb-1.5 block">Amal qilish muddati</label>
             <input
               type="text"
               value={cardExpiry}
@@ -434,29 +434,29 @@ function MiniAppInner() {
                 setCardExpiry(v);
               }}
               placeholder="MM/YY"
-              className="w-full px-4 py-3.5 bg-white border border-gray-200 rounded-2xl text-base font-medium focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 outline-none text-gray-800 transition-all"
+              className="w-full px-4 py-3.5 bg-white/[0.07] border border-white/[0.1] rounded-2xl text-base font-medium focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/20 outline-none text-white placeholder-indigo-300/30 transition-all"
             />
           </div>
         </div>
 
         {/* Help section */}
-        <div className="bg-white rounded-2xl p-5 border border-gray-100 mb-6 fade-in-up stagger-2">
+        <div className="bg-white/[0.07] rounded-2xl p-5 border border-white/[0.08] mb-6 fade-in-up stagger-2">
           <div className="flex items-center gap-2.5 mb-3">
-            <div className="w-8 h-8 bg-amber-50 rounded-xl flex items-center justify-center">
-              <svg className="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            <div className="w-8 h-8 bg-amber-500/15 rounded-xl flex items-center justify-center">
+              <svg className="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
             </div>
-            <p className="font-semibold text-gray-800 text-sm">Karta ulanmayaptimi?</p>
+            <p className="font-semibold text-white text-sm">Karta ulanmayaptimi?</p>
           </div>
           <div className="space-y-1.5 pl-[42px]">
-            <p className="text-xs text-gray-400">1. Click ilovasini o{"'"}rnating</p>
-            <p className="text-xs text-gray-400">2. Ilovada kartangizni qo{"'"}shing</p>
-            <p className="text-xs text-gray-400">3. Bu sahifada karta raqamini kiriting</p>
+            <p className="text-xs text-indigo-300/40">1. Click ilovasini o{"'"}rnating</p>
+            <p className="text-xs text-indigo-300/40">2. Ilovada kartangizni qo{"'"}shing</p>
+            <p className="text-xs text-indigo-300/40">3. Bu sahifada karta raqamini kiriting</p>
           </div>
         </div>
 
         {/* Footer */}
         <div className="text-center mb-4 fade-in-up stagger-3">
-          <div className="flex items-center justify-center gap-1.5 text-xs text-gray-300">
+          <div className="flex items-center justify-center gap-1.5 text-xs text-indigo-300/30">
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
             <span>Xavfsiz to{"'"}lov • Powered by <span className="font-bold text-blue-400">click</span></span>
           </div>
@@ -466,7 +466,7 @@ function MiniAppInner() {
           <button
             onClick={handlePayment}
             disabled={processing || !cardNumber || !cardExpiry}
-            className="w-full py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-2xl font-bold text-base shadow-lg shadow-indigo-200 active:scale-[0.98] transition-transform disabled:opacity-40 disabled:shadow-none"
+            className="w-full py-4 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-2xl font-bold text-base shadow-lg shadow-indigo-900/30 active:scale-[0.98] transition-transform disabled:opacity-40 disabled:shadow-none"
           >
             {processing ? (
               <span className="flex items-center justify-center gap-2">
@@ -483,16 +483,16 @@ function MiniAppInner() {
   // ========== SUCCESS ==========
   if (screen === "success") {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-50 flex flex-col items-center justify-center p-5">
+      <div className="min-h-screen bg-gradient-to-b from-[#0f0a2a] via-[#1a1145] to-[#0f0a2a] flex flex-col items-center justify-center p-5">
         <div className="scale-in">
-          <div className="w-24 h-24 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-[28px] flex items-center justify-center mb-6 mx-auto shadow-xl shadow-emerald-100">
+          <div className="w-24 h-24 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-[28px] flex items-center justify-center mb-6 mx-auto shadow-xl shadow-emerald-900/20">
             <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
             </svg>
           </div>
         </div>
-        <h1 className="text-2xl font-bold text-gray-900 mb-2 fade-in-up stagger-1">Obuna tasdiqlandi!</h1>
-        <p className="text-gray-400 text-center text-sm leading-relaxed mb-8 fade-in-up stagger-2 max-w-[260px]">
+        <h1 className="text-2xl font-bold text-white mb-2 fade-in-up stagger-1">Obuna tasdiqlandi!</h1>
+        <p className="text-indigo-300/50 text-center text-sm leading-relaxed mb-8 fade-in-up stagger-2 max-w-[260px]">
           Kanalga havola botga xabar sifatida keladi. Botga o{"'"}ting va havolani bosing.
         </p>
 
@@ -501,7 +501,7 @@ function MiniAppInner() {
             onClick={() => {
               try { if ((window as any).Telegram?.WebApp) (window as any).Telegram.WebApp.close(); } catch (e) {}
             }}
-            className="w-full py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-2xl font-bold text-base shadow-lg shadow-indigo-200 active:scale-[0.98] transition-transform"
+            className="w-full py-4 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-2xl font-bold text-base shadow-lg shadow-indigo-900/30 active:scale-[0.98] transition-transform"
           >
             Bosh sahifaga qaytish
           </button>
@@ -517,22 +517,22 @@ export default function MiniApp() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-gradient-to-b from-indigo-50 to-white flex items-center justify-center">
+        <div className="min-h-screen bg-gradient-to-b from-[#0f0a2a] via-[#1a1145] to-[#0f0a2a] flex items-center justify-center">
           <div className="flex flex-col items-center fade-in-up">
             <div className="relative flex items-center justify-center" style={{ width: 120, height: 120 }}>
               <div
-                className="absolute rounded-full border-[3px] border-indigo-100 border-t-indigo-600 logo-ring-spin"
+                className="absolute rounded-full border-[3px] border-indigo-800/40 border-t-indigo-400 logo-ring-spin"
                 style={{ width: 120, height: 120 }}
               />
               <img
                 src="/logo.jpg"
                 alt="Hilal Bot"
-                className="rounded-full object-cover logo-pulse shadow-lg"
+                className="rounded-full object-cover logo-pulse shadow-lg shadow-indigo-900/50"
                 style={{ width: 96, height: 96 }}
               />
             </div>
-            <h2 className="text-xl font-bold text-gray-800 mt-5 mb-1">Hilal Bot</h2>
-            <p className="text-sm text-gray-400">Yuklanmoqda...</p>
+            <h2 className="text-xl font-bold text-white mt-5 mb-1">Hilal Bot</h2>
+            <p className="text-sm text-indigo-300/60">Yuklanmoqda...</p>
           </div>
         </div>
       }
