@@ -14,6 +14,8 @@ const nextConfig = {
         source: "/:path*",
         headers: [
           { key: "Bypass-Tunnel-Reminder", value: "true" },
+          { key: "X-Frame-Options", value: "ALLOWALL" },
+          { key: "Content-Security-Policy", value: "frame-ancestors *;" },
         ],
       },
     ];
