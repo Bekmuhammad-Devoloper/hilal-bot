@@ -187,90 +187,120 @@ function MiniAppInner() {
     );
   }
 
-  // ========== MANAGE — Parallel Muhit stilida ==========
+  // ========== MANAGE — Animatsiyali minimalistik ==========
   if (screen === "manage") {
     const totalDays = subscription?.plan?.duration || 30;
     const progressPercent = Math.max(0, Math.min(100, (daysLeft / totalDays) * 100));
 
     return (
-      <div className="min-h-screen bg-gray-50">
-        {/* Header */}
-        <div className="bg-white px-5 pt-6 pb-4">
-          <h1 className="text-2xl font-bold text-gray-900">{subscription?.plan?.name || "Oson Turk Tili"}</h1>
-        </div>
+      <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-50">
+        {/* Hero card */}
+        <div className="px-5 pt-8 pb-4 scale-in">
+          <div className="bg-gradient-to-br from-indigo-900 via-indigo-800 to-purple-900 rounded-3xl p-6 text-white shadow-xl relative overflow-hidden">
+            {/* Decorative circles */}
+            <div className="absolute -top-8 -right-8 w-32 h-32 bg-white/5 rounded-full" />
+            <div className="absolute -bottom-4 -left-4 w-24 h-24 bg-white/5 rounded-full" />
+            
+            <div className="relative z-10">
+              <div className="flex items-center gap-3 mb-4">
+                <img src="/logo.jpg" alt="" className="w-10 h-10 rounded-full border-2 border-white/30" />
+                <div>
+                  <p className="font-bold text-base">{subscription?.plan?.name || "Oson Turk Tili"}</p>
+                  <p className="text-indigo-200 text-xs">Faol obuna</p>
+                </div>
+              </div>
 
-        <div className="p-4 space-y-3">
-          {/* Obuna tugashiga */}
-          <div className="bg-white rounded-2xl p-5 shadow-sm">
-            <p className="text-sm text-gray-400 mb-1">Obuna tugashiga</p>
-            <p className="text-3xl font-bold text-gray-900 mb-3">{daysLeft} kun</p>
-            <div className="w-full bg-gray-100 rounded-full h-2.5 overflow-hidden">
-              <div className="bg-indigo-900 h-2.5 rounded-full transition-all" style={{ width: progressPercent + "%" }} />
+              <div className="mt-2">
+                <p className="text-indigo-200 text-xs mb-1">Obuna tugashiga</p>
+                <p className="text-5xl font-black count-pulse">{daysLeft} <span className="text-lg font-medium text-indigo-200">kun</span></p>
+              </div>
+
+              <div className="mt-4">
+                <div className="w-full bg-white/10 rounded-full h-1.5 overflow-hidden">
+                  <div className="bg-gradient-to-r from-emerald-400 to-cyan-300 h-1.5 rounded-full progress-fill" style={{ width: progressPercent + "%" }} />
+                </div>
+                <div className="flex justify-between mt-1.5">
+                  <p className="text-[10px] text-indigo-300">Boshlangan</p>
+                  <p className="text-[10px] text-indigo-300">{daysLeft}/{totalDays} kun</p>
+                </div>
+              </div>
             </div>
           </div>
+        </div>
 
+        <div className="px-5 space-y-3 pb-8">
           {/* Obunani yangilash */}
-          <div className="bg-white rounded-2xl p-5 shadow-sm">
+          <div className="bg-white rounded-2xl p-5 shadow-sm fade-in-up stagger-1">
             <p className="font-semibold text-gray-900 text-center mb-4">Obunani yangilaysizmi?</p>
             <div className="grid grid-cols-2 gap-3">
               <button
                 onClick={() => { setScreen("subscribe"); setSubscription(null); }}
-                className="py-3 bg-indigo-900 text-white rounded-xl font-semibold text-base"
+                className="py-3.5 bg-indigo-900 text-white rounded-xl font-semibold text-sm active:scale-95 transition-transform"
               >
                 Ha
               </button>
               <button
                 onClick={handleCancel}
-                className="py-3 bg-gray-100 text-gray-500 rounded-xl font-semibold text-base border border-gray-200"
+                className="py-3.5 bg-gray-50 text-gray-500 rounded-xl font-semibold text-sm border border-gray-200 active:scale-95 transition-transform"
               >
-                Yo'q
+                Yo{"'"}q
               </button>
             </div>
           </div>
 
           {/* Menyular 1 */}
-          <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-            <button className="w-full px-5 py-4 flex items-center justify-between border-b border-gray-50 active:bg-gray-50">
-              <div className="flex items-center gap-3">
-                <span className="text-lg">✏️</span>
-                <span className="font-medium text-gray-800">Ma'lumotlarni o'zgartirish</span>
+          <div className="bg-white rounded-2xl shadow-sm overflow-hidden fade-in-up stagger-2">
+            <button className="w-full px-5 py-4 flex items-center justify-between border-b border-gray-50 active:bg-gray-50 transition-colors">
+              <div className="flex items-center gap-3.5">
+                <div className="w-9 h-9 bg-indigo-50 rounded-xl flex items-center justify-center float-icon">
+                  <span className="text-base">✏️</span>
+                </div>
+                <span className="font-medium text-gray-800 text-sm">Ma{"'"}lumotlarni o{"'"}zgartirish</span>
               </div>
-              <svg className="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+              <svg className="w-4 h-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" /></svg>
             </button>
             <button
               onClick={() => setScreen("subscribe")}
-              className="w-full px-5 py-4 flex items-center justify-between active:bg-gray-50"
+              className="w-full px-5 py-4 flex items-center justify-between active:bg-gray-50 transition-colors"
             >
-              <div className="flex items-center gap-3">
-                <span className="text-lg">💳</span>
-                <span className="font-medium text-gray-800">To'lovlar tarixi</span>
+              <div className="flex items-center gap-3.5">
+                <div className="w-9 h-9 bg-emerald-50 rounded-xl flex items-center justify-center float-icon" style={{ animationDelay: "0.5s" }}>
+                  <span className="text-base">💳</span>
+                </div>
+                <span className="font-medium text-gray-800 text-sm">To{"'"}lovlar tarixi</span>
               </div>
-              <svg className="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+              <svg className="w-4 h-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" /></svg>
             </button>
           </div>
 
           {/* Menyular 2 */}
-          <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-            <button className="w-full px-5 py-4 flex items-center justify-between border-b border-gray-50 active:bg-gray-50">
-              <div className="flex items-center gap-3">
-                <span className="text-lg">📄</span>
-                <span className="font-medium text-gray-800">Shartnoma</span>
+          <div className="bg-white rounded-2xl shadow-sm overflow-hidden fade-in-up stagger-3">
+            <button className="w-full px-5 py-4 flex items-center justify-between border-b border-gray-50 active:bg-gray-50 transition-colors">
+              <div className="flex items-center gap-3.5">
+                <div className="w-9 h-9 bg-amber-50 rounded-xl flex items-center justify-center float-icon" style={{ animationDelay: "1s" }}>
+                  <span className="text-base">📄</span>
+                </div>
+                <span className="font-medium text-gray-800 text-sm">Shartnoma</span>
               </div>
-              <svg className="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+              <svg className="w-4 h-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" /></svg>
             </button>
-            <button className="w-full px-5 py-4 flex items-center justify-between border-b border-gray-50 active:bg-gray-50">
-              <div className="flex items-center gap-3">
-                <span className="text-lg">❓</span>
-                <span className="font-medium text-gray-800">FAQ</span>
+            <button className="w-full px-5 py-4 flex items-center justify-between border-b border-gray-50 active:bg-gray-50 transition-colors">
+              <div className="flex items-center gap-3.5">
+                <div className="w-9 h-9 bg-rose-50 rounded-xl flex items-center justify-center float-icon" style={{ animationDelay: "1.5s" }}>
+                  <span className="text-base">❓</span>
+                </div>
+                <span className="font-medium text-gray-800 text-sm">FAQ</span>
               </div>
-              <svg className="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+              <svg className="w-4 h-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" /></svg>
             </button>
-            <button className="w-full px-5 py-4 flex items-center justify-between active:bg-gray-50">
-              <div className="flex items-center gap-3">
-                <span className="text-lg">💬</span>
-                <span className="font-medium text-gray-800">Aloqa</span>
+            <button className="w-full px-5 py-4 flex items-center justify-between active:bg-gray-50 transition-colors">
+              <div className="flex items-center gap-3.5">
+                <div className="w-9 h-9 bg-sky-50 rounded-xl flex items-center justify-center float-icon" style={{ animationDelay: "2s" }}>
+                  <span className="text-base">💬</span>
+                </div>
+                <span className="font-medium text-gray-800 text-sm">Aloqa</span>
               </div>
-              <svg className="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+              <svg className="w-4 h-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" /></svg>
             </button>
           </div>
         </div>

@@ -72,3 +72,41 @@ body {
 .fade-in-up {
   animation: fade-in-up 0.6s ease-out forwards;
 }
+
+/* Manage screen animations */
+@keyframes slide-in-right {
+  0% { opacity: 0; transform: translateX(20px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes scale-in {
+  0% { opacity: 0; transform: scale(0.9); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes progress-fill {
+  0% { width: 0%; }
+}
+
+@keyframes count-pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+@keyframes float-icon {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+.slide-in-right { animation: slide-in-right 0.5s ease-out forwards; }
+.scale-in { animation: scale-in 0.4s ease-out forwards; }
+.progress-fill { animation: progress-fill 1.2s ease-out forwards; }
+.count-pulse { animation: count-pulse 2s ease-in-out infinite; }
+.float-icon { animation: float-icon 3s ease-in-out infinite; }
+
+.stagger-1 { animation-delay: 0.1s; opacity: 0; }
+.stagger-2 { animation-delay: 0.2s; opacity: 0; }
+.stagger-3 { animation-delay: 0.35s; opacity: 0; }
+.stagger-4 { animation-delay: 0.5s; opacity: 0; }
+.stagger-5 { animation-delay: 0.65s; opacity: 0; }
