@@ -311,76 +311,82 @@ function MiniAppInner() {
   // ========== SUBSCRIBE — reja tanlash ==========
   if (screen === "subscribe") {
     return (
-      <div className="min-h-screen bg-gray-50">
-        {plans.map((plan) => {
+      <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-50">
+        {plans.map((plan, planIdx) => {
           const features = plan.features ? JSON.parse(plan.features) : [];
           return (
-            <div key={plan.id} className="p-5">
-              <div className="text-sm text-gray-400 mb-1">Obuna narxi</div>
-              <div className="text-4xl font-bold text-gray-900 mb-5">
-                {formatPrice(plan.price)} UZS
+            <div key={plan.id} className="px-5 pt-6 pb-8">
+              {/* Narx */}
+              <div className="mb-5 scale-in">
+                <p className="text-xs font-medium text-gray-400 tracking-wider uppercase mb-1">Obuna narxi</p>
+                <div className="flex items-baseline gap-1.5">
+                  <span className="text-4xl font-black text-gray-900">{formatPrice(plan.price)}</span>
+                  <span className="text-lg font-semibold text-gray-400">UZS</span>
+                </div>
               </div>
 
-              <div className="bg-white rounded-2xl p-5 shadow-sm mb-5">
-                <h2 className="text-xl font-bold text-gray-900 mb-4">{plan.name}</h2>
+              {/* Feature card */}
+              <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 mb-6 fade-in-up stagger-1">
+                <h2 className="text-lg font-bold text-gray-900 mb-5">{plan.name}</h2>
                 <div className="space-y-4">
                   {features.map((f: string, i: number) => (
-                    <div key={i} className="flex gap-3">
-                      <div className="flex-shrink-0 w-7 h-7 bg-indigo-900 rounded-lg flex items-center justify-center mt-0.5">
+                    <div key={i} className="flex items-start gap-3 fade-in-up" style={{ animationDelay: (0.15 + i * 0.1) + "s" }}>
+                      <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-sm">
                         <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                         </svg>
                       </div>
-                      <div>
-                        <p className="font-semibold text-gray-900">{f}</p>
-                      </div>
+                      <p className="text-[15px] text-gray-700 leading-snug pt-1">{f}</p>
                     </div>
                   ))}
                 </div>
               </div>
 
               {/* To'lov turi */}
-              <div className="mb-5">
-                <p className="text-sm text-gray-400 mb-3">To'lov turi</p>
+              <div className="mb-6 fade-in-up stagger-2">
+                <p className="text-xs font-medium text-gray-400 tracking-wider uppercase mb-3">To{"'"}lov turi</p>
                 <div className="grid grid-cols-2 gap-3">
                   <button
                     onClick={() => setPaymentMethod("visa")}
-                    className={"p-4 rounded-xl border-2 transition " + (paymentMethod === "visa" ? "border-indigo-600 bg-indigo-50" : "border-gray-200 bg-white")}
+                    className={"relative p-4 rounded-2xl border-2 transition-all active:scale-[0.97] " + (paymentMethod === "visa" ? "border-indigo-500 bg-indigo-50/50 shadow-sm" : "border-gray-100 bg-white")}
                   >
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="text-xs font-bold text-red-500">MC</span>
-                      <span className="text-xs font-bold text-blue-600">VISA</span>
-                      <div className={"ml-auto w-5 h-5 rounded-full border-2 flex items-center justify-center " + (paymentMethod === "visa" ? "border-indigo-600 bg-indigo-600" : "border-gray-300")}>
-                        {paymentMethod === "visa" && <div className="w-2 h-2 bg-white rounded-full" />}
-                      </div>
+                    <div className="flex items-center gap-1.5 mb-2.5">
+                      <span className="text-[11px] font-extrabold text-red-500 tracking-tight">MC</span>
+                      <span className="text-[11px] font-extrabold text-blue-600 tracking-tight">VISA</span>
                     </div>
                     <p className="text-sm font-semibold text-gray-900 text-left">Chet-el kartasi</p>
-                    <p className="text-xs text-gray-400 text-left">Tribute orqali</p>
+                    <p className="text-[11px] text-gray-400 text-left mt-0.5">Tribute orqali</p>
+                    <div className={"absolute top-3.5 right-3.5 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors " + (paymentMethod === "visa" ? "border-indigo-500 bg-indigo-500" : "border-gray-200")}>
+                      {paymentMethod === "visa" && <div className="w-2 h-2 bg-white rounded-full" />}
+                    </div>
                   </button>
 
                   <button
                     onClick={() => setPaymentMethod("uzcard")}
-                    className={"p-4 rounded-xl border-2 transition " + (paymentMethod === "uzcard" ? "border-indigo-600 bg-indigo-50" : "border-gray-200 bg-white")}
+                    className={"relative p-4 rounded-2xl border-2 transition-all active:scale-[0.97] " + (paymentMethod === "uzcard" ? "border-indigo-500 bg-indigo-50/50 shadow-sm" : "border-gray-100 bg-white")}
                   >
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="text-xs font-bold text-green-600">UZ</span>
-                      <span className="text-xs font-bold text-yellow-500">HUMO</span>
-                      <div className={"ml-auto w-5 h-5 rounded-full border-2 flex items-center justify-center " + (paymentMethod === "uzcard" ? "border-indigo-600 bg-indigo-600" : "border-gray-300")}>
-                        {paymentMethod === "uzcard" && <div className="w-2 h-2 bg-white rounded-full" />}
-                      </div>
+                    <div className="flex items-center gap-1.5 mb-2.5">
+                      <span className="text-[11px] font-extrabold text-green-600 tracking-tight">UZ</span>
+                      <span className="text-[11px] font-extrabold text-yellow-500 tracking-tight">HUMO</span>
                     </div>
                     <p className="text-sm font-semibold text-gray-900 text-left">UZCARD / Humo</p>
-                    <p className="text-xs text-gray-400 text-left">Click orqali</p>
+                    <p className="text-[11px] text-gray-400 text-left mt-0.5">Click orqali</p>
+                    <div className={"absolute top-3.5 right-3.5 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors " + (paymentMethod === "uzcard" ? "border-indigo-500 bg-indigo-500" : "border-gray-200")}>
+                      {paymentMethod === "uzcard" && <div className="w-2 h-2 bg-white rounded-full" />}
+                    </div>
                   </button>
                 </div>
               </div>
 
-              <button
-                onClick={() => handleSelectPlan(plan)}
-                className="w-full py-4 bg-indigo-900 text-white rounded-2xl font-semibold text-lg active:bg-indigo-800 transition"
-              >
-                Davom etish
-              </button>
+              {/* Davom etish */}
+              <div className="fade-in-up stagger-3">
+                <button
+                  onClick={() => handleSelectPlan(plan)}
+                  className="w-full py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-2xl font-bold text-base shadow-lg shadow-indigo-200 active:scale-[0.98] transition-transform"
+                >
+                  Davom etish
+                </button>
+              </div>
             </div>
           );
         })}
@@ -391,58 +397,83 @@ function MiniAppInner() {
   // ========== PAYMENT ==========
   if (screen === "payment") {
     return (
-      <div className="min-h-screen bg-gray-50 p-5 flex flex-col">
-        <h1 className="text-2xl font-bold text-gray-900 mb-6">Bank kartasi ma'lumotlarini kiriting</h1>
-
-        <input
-          type="text"
-          value={cardNumber}
-          onChange={(e) => {
-            const v = e.target.value.replace(/\D/g, "").slice(0, 16);
-            setCardNumber(v.replace(/(\d{4})(?=\d)/g, "$1 "));
-          }}
-          placeholder="0000 0000 0000 0000"
-          className="w-full px-5 py-4 border-2 border-gray-200 rounded-2xl text-lg font-medium mb-4 focus:border-indigo-600 outline-none text-gray-800"
-        />
-
-        <input
-          type="text"
-          value={cardExpiry}
-          onChange={(e) => {
-            let v = e.target.value.replace(/\D/g, "").slice(0, 4);
-            if (v.length > 2) v = v.slice(0, 2) + "/" + v.slice(2);
-            setCardExpiry(v);
-          }}
-          placeholder="MM/YY"
-          className="w-full px-5 py-4 border-2 border-gray-200 rounded-2xl text-lg font-medium mb-6 focus:border-indigo-600 outline-none text-gray-800"
-        />
-
-        <div className="text-center mb-6">
-          <p className="font-semibold text-gray-700 mb-3">Karta ulanmayaptimi?</p>
-          <p className="text-sm text-gray-400">1. Click ilovasini o'rnating</p>
-          <p className="text-sm text-gray-400">2. Click Ilovasini ochib, kartangizni qo'shing</p>
-          <p className="text-sm text-gray-400">3. Shu sahifaga qaytib, karta ma'lumotlarini kiriting</p>
-          <p className="text-sm text-gray-500 mt-2 font-medium">Bo&apos;ldi ⚡</p>
+      <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-50 p-5 flex flex-col">
+        {/* Header */}
+        <div className="mb-6 scale-in">
+          <button onClick={() => setScreen("subscribe")} className="flex items-center gap-1.5 text-gray-400 text-sm mb-4 active:text-gray-600 transition-colors">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
+            Orqaga
+          </button>
+          <h1 className="text-2xl font-bold text-gray-900">Karta ma{"'"}lumotlari</h1>
+          <p className="text-sm text-gray-400 mt-1">Xavfsiz to{"'"}lov</p>
         </div>
 
-        <div className="text-center text-sm text-gray-400 mb-4">
-          Powered by <span className="font-bold text-blue-500">● click</span>
+        {/* Card inputs */}
+        <div className="space-y-3 mb-6 fade-in-up stagger-1">
+          <div>
+            <label className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-1.5 block">Karta raqami</label>
+            <input
+              type="text"
+              value={cardNumber}
+              onChange={(e) => {
+                const v = e.target.value.replace(/\D/g, "").slice(0, 16);
+                setCardNumber(v.replace(/(\d{4})(?=\d)/g, "$1 "));
+              }}
+              placeholder="0000 0000 0000 0000"
+              className="w-full px-4 py-3.5 bg-white border border-gray-200 rounded-2xl text-base font-medium focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 outline-none text-gray-800 transition-all"
+            />
+          </div>
+          <div>
+            <label className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-1.5 block">Amal qilish muddati</label>
+            <input
+              type="text"
+              value={cardExpiry}
+              onChange={(e) => {
+                let v = e.target.value.replace(/\D/g, "").slice(0, 4);
+                if (v.length > 2) v = v.slice(0, 2) + "/" + v.slice(2);
+                setCardExpiry(v);
+              }}
+              placeholder="MM/YY"
+              className="w-full px-4 py-3.5 bg-white border border-gray-200 rounded-2xl text-base font-medium focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 outline-none text-gray-800 transition-all"
+            />
+          </div>
         </div>
 
-        <div className="mt-auto">
+        {/* Help section */}
+        <div className="bg-white rounded-2xl p-5 border border-gray-100 mb-6 fade-in-up stagger-2">
+          <div className="flex items-center gap-2.5 mb-3">
+            <div className="w-8 h-8 bg-amber-50 rounded-xl flex items-center justify-center">
+              <svg className="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            </div>
+            <p className="font-semibold text-gray-800 text-sm">Karta ulanmayaptimi?</p>
+          </div>
+          <div className="space-y-1.5 pl-[42px]">
+            <p className="text-xs text-gray-400">1. Click ilovasini o{"'"}rnating</p>
+            <p className="text-xs text-gray-400">2. Ilovada kartangizni qo{"'"}shing</p>
+            <p className="text-xs text-gray-400">3. Bu sahifada karta raqamini kiriting</p>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="text-center mb-4 fade-in-up stagger-3">
+          <div className="flex items-center justify-center gap-1.5 text-xs text-gray-300">
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+            <span>Xavfsiz to{"'"}lov • Powered by <span className="font-bold text-blue-400">click</span></span>
+          </div>
+        </div>
+
+        <div className="mt-auto fade-in-up stagger-3">
           <button
             onClick={handlePayment}
             disabled={processing || !cardNumber || !cardExpiry}
-            className="w-full py-4 bg-indigo-900 text-white rounded-2xl font-semibold text-lg active:bg-indigo-800 transition disabled:opacity-50"
+            className="w-full py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-2xl font-bold text-base shadow-lg shadow-indigo-200 active:scale-[0.98] transition-transform disabled:opacity-40 disabled:shadow-none"
           >
-            {processing ? "To'lov amalga oshirilmoqda..." : "Kodni olish"}
-          </button>
-
-          <button
-            onClick={() => setScreen("subscribe")}
-            className="w-full py-3 text-gray-500 text-sm mt-2"
-          >
-            ← Orqaga
+            {processing ? (
+              <span className="flex items-center justify-center gap-2">
+                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full logo-ring-spin" />
+                To{"'"}lov amalga oshirilmoqda...
+              </span>
+            ) : "Kodni olish"}
           </button>
         </div>
       </div>
@@ -452,22 +483,25 @@ function MiniAppInner() {
   // ========== SUCCESS ==========
   if (screen === "success") {
     return (
-      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-5">
-        <div className="w-24 h-24 bg-indigo-900 rounded-3xl flex items-center justify-center mb-6 shadow-lg">
-          <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-          </svg>
+      <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-50 flex flex-col items-center justify-center p-5">
+        <div className="scale-in">
+          <div className="w-24 h-24 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-[28px] flex items-center justify-center mb-6 mx-auto shadow-xl shadow-emerald-100">
+            <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
         </div>
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Obuna tasdiqlandi</h1>
-        <p className="text-gray-500 text-center mb-8">
-          Kanalga havola botga xabar sifatida keladi. Botga o'ting.
+        <h1 className="text-2xl font-bold text-gray-900 mb-2 fade-in-up stagger-1">Obuna tasdiqlandi!</h1>
+        <p className="text-gray-400 text-center text-sm leading-relaxed mb-8 fade-in-up stagger-2 max-w-[260px]">
+          Kanalga havola botga xabar sifatida keladi. Botga o{"'"}ting va havolani bosing.
         </p>
-        <div className="mt-auto w-full">
+
+        <div className="w-full mt-auto fade-in-up stagger-3">
           <button
             onClick={() => {
               try { if ((window as any).Telegram?.WebApp) (window as any).Telegram.WebApp.close(); } catch (e) {}
             }}
-            className="w-full py-4 bg-indigo-900 text-white rounded-2xl font-semibold text-lg"
+            className="w-full py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-2xl font-bold text-base shadow-lg shadow-indigo-200 active:scale-[0.98] transition-transform"
           >
             Bosh sahifaga qaytish
           </button>
