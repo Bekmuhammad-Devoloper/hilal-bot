@@ -14,14 +14,14 @@ export default function SubscriptionsPage() {
   };
   useEffect(() => { load(); }, [page, status]);
 
-  const handleCancel = async (id: number) => {
+  const handleCancel = async (telegramId: number) => {
     if (!confirm("Obunani bekor qilishni tasdiqlaysizmi?")) return;
-    await cancelSubscription(id); load();
+    await cancelSubscription(telegramId); load();
   };
 
   const handleCheckExpired = async () => {
     const r = await checkExpired();
-    alert(`✅ ${r.expired || 0} ta obuna muddati tugadi`);
+    alert(`✅ ${r.expiredCount || 0} ta obuna muddati tugadi`);
     load();
   };
 
@@ -42,15 +42,15 @@ export default function SubscriptionsPage() {
 
       <div className="grid grid-cols-3 gap-4 mb-6">
         <div className="bg-green-50 rounded-xl p-4 text-center">
-          <div className="text-2xl font-bold text-green-600">{stats.active || 0}</div>
+          <div className="text-2xl font-bold text-green-600">{stats.activeSubs || 0}</div>
           <div className="text-sm text-green-500">Aktiv</div>
         </div>
         <div className="bg-gray-50 rounded-xl p-4 text-center">
-          <div className="text-2xl font-bold text-gray-600">{stats.expired || 0}</div>
+          <div className="text-2xl font-bold text-gray-600">{stats.expiredSubs || 0}</div>
           <div className="text-sm text-gray-500">Tugagan</div>
         </div>
         <div className="bg-red-50 rounded-xl p-4 text-center">
-          <div className="text-2xl font-bold text-red-600">{stats.cancelled || 0}</div>
+          <div className="text-2xl font-bold text-red-600">{stats.cancelledSubs || 0}</div>
           <div className="text-sm text-red-500">Bekor qilingan</div>
         </div>
       </div>
@@ -86,7 +86,7 @@ export default function SubscriptionsPage() {
                 <td className="px-4 py-3 text-gray-500">{new Date(s.endDate).toLocaleDateString()}</td>
                 <td className="px-4 py-3">
                   {s.status === "active" && (
-                    <button onClick={() => handleCancel(s.id)} className="px-2 py-1 rounded text-xs bg-red-100 text-red-600 hover:bg-red-200">
+                    <button onClick={() => handleCancel(s.user?.telegramId)} className="px-2 py-1 rounded text-xs bg-red-100 text-red-600 hover:bg-red-200">
                       ❌ Bekor qilish
                     </button>
                   )}

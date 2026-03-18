@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { getAdminPlans, createPlan, updatePlan, deletePlan } from "@/lib/api";
 
-const empty = { name: "", description: "", price: 0, durationDays: 30, features: "", isActive: true, sortOrder: 0 };
+const empty = { name: "", description: "", price: 0, duration: 30, features: "", isActive: true, sortOrder: 0 };
 
 export default function PlansPage() {
   const [plans, setPlans] = useState<any[]>([]);
@@ -15,12 +15,12 @@ export default function PlansPage() {
 
   const openNew = () => { setForm({ ...empty }); setEditId(null); setModal(true); };
   const openEdit = (p: any) => {
-    setForm({ name: p.name, description: p.description || "", price: p.price, durationDays: p.durationDays, features: p.features || "", isActive: p.isActive, sortOrder: p.sortOrder });
+    setForm({ name: p.name, description: p.description || "", price: p.price, duration: p.duration, features: p.features || "", isActive: p.isActive, sortOrder: p.sortOrder });
     setEditId(p.id); setModal(true);
   };
 
   const save = async () => {
-    const data = { ...form, price: Number(form.price), durationDays: Number(form.durationDays), sortOrder: Number(form.sortOrder) };
+    const data = { ...form, price: Number(form.price), duration: Number(form.duration), sortOrder: Number(form.sortOrder) };
     if (editId) await updatePlan(editId, data); else await createPlan(data);
     setModal(false); load();
   };
@@ -49,7 +49,7 @@ export default function PlansPage() {
             </div>
             <p className="text-gray-500 text-sm mb-3">{p.description}</p>
             <div className="text-2xl font-bold text-indigo-600 mb-1">{fmt(p.price)}</div>
-            <div className="text-sm text-gray-500 mb-3">📅 {p.durationDays} kun</div>
+            <div className="text-sm text-gray-500 mb-3">📅 {p.duration} kun</div>
             {p.features && <p className="text-xs text-gray-400 mb-4">{p.features}</p>}
             <div className="text-xs text-gray-400 mb-3">
               Obunalar: {p._count?.subscriptions || 0} | Tartib: {p.sortOrder}
@@ -82,7 +82,7 @@ export default function PlansPage() {
                 </div>
                 <div>
                   <label className="text-sm text-gray-600">Muddat (kun)</label>
-                  <input type="number" value={form.durationDays} onChange={(e) => setForm({ ...form, durationDays: e.target.value })} className="w-full border rounded-lg px-3 py-2 text-gray-800" />
+                  <input type="number" value={form.duration} onChange={(e) => setForm({ ...form, duration: e.target.value })} className="w-full border rounded-lg px-3 py-2 text-gray-800" />
                 </div>
               </div>
               <div>

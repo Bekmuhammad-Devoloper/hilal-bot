@@ -32,7 +32,6 @@ export const blockUser = async (userId: number, isBlocked: boolean) => (await ap
 
 // ========= PLANS =========
 export const getPlans = async () => (await api.get("/plans")).data;
-export const getPlansAdmin = async () => (await api.get("/plans/admin")).data;
 export const getAdminPlans = async () => (await api.get("/plans/admin")).data;
 export const createPlan = async (data: any) => (await api.post("/plans", data)).data;
 export const updatePlan = async (id: number, data: any) => (await api.put(`/plans/${id}`, data)).data;

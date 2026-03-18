@@ -54,7 +54,7 @@ export default function BroadcastPage() {
             <h3 className="font-bold text-green-700 mb-2">✅ Natija</h3>
             <div className="grid grid-cols-2 gap-2 text-sm">
               <div className="text-gray-600">Yuborildi:</div>
-              <div className="font-medium text-green-600">{result.success || 0}</div>
+              <div className="font-medium text-green-600">{result.sent || 0}</div>
               <div className="text-gray-600">Xato:</div>
               <div className="font-medium text-red-600">{result.failed || 0}</div>
               <div className="text-gray-600">Jami:</div>

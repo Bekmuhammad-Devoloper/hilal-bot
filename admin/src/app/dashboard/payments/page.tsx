@@ -29,11 +29,11 @@ export default function PaymentsPage() {
   const statusBadge = (s: string) => {
     const map: any = {
       pending: "bg-yellow-100 text-yellow-600",
-      confirmed: "bg-green-100 text-green-600",
+      completed: "bg-green-100 text-green-600",
       cancelled: "bg-red-100 text-red-600",
       failed: "bg-gray-100 text-gray-600",
     };
-    const label: any = { pending: "⏳ Kutilmoqda", confirmed: "✅ Tasdiqlangan", cancelled: "❌ Bekor", failed: "⚠️ Xato" };
+    const label: any = { pending: "⏳ Kutilmoqda", completed: "✅ Tasdiqlangan", cancelled: "❌ Bekor", failed: "⚠️ Xato" };
     return <span className={`text-xs px-2 py-1 rounded ${map[s] || "bg-gray-100"}`}>{label[s] || s}</span>;
   };
 
@@ -47,7 +47,7 @@ export default function PaymentsPage() {
           <div className="text-sm text-yellow-500">Kutilmoqda</div>
         </div>
         <div className="bg-green-50 rounded-xl p-4 text-center">
-          <div className="text-2xl font-bold text-green-600">{stats.confirmed || 0}</div>
+          <div className="text-2xl font-bold text-green-600">{stats.completedPayments || stats.confirmed || 0}</div>
           <div className="text-sm text-green-500">Tasdiqlangan</div>
         </div>
         <div className="bg-red-50 rounded-xl p-4 text-center">
@@ -65,10 +65,10 @@ export default function PaymentsPage() {
       </div>
 
       <div className="flex gap-2 mb-4 flex-wrap">
-        {["", "pending", "confirmed", "cancelled", "failed"].map((s) => (
+        {["", "pending", "completed", "cancelled", "failed"].map((s) => (
           <button key={s} onClick={() => { setStatus(s); setPage(1); }}
             className={`px-3 py-1 rounded-lg text-sm ${status === s ? "bg-indigo-600 text-white" : "bg-white text-gray-600 border"}`}>
-            {s === "" ? "Barchasi" : s === "pending" ? "Kutilmoqda" : s === "confirmed" ? "Tasdiqlangan" : s === "cancelled" ? "Bekor" : "Xato"}
+            {s === "" ? "Barchasi" : s === "pending" ? "Kutilmoqda" : s === "completed" ? "Tasdiqlangan" : s === "cancelled" ? "Bekor" : "Xato"}
           </button>
         ))}
       </div>
@@ -95,8 +95,9 @@ export default function PaymentsPage() {
                 <td className="px-4 py-3 text-gray-800">{p.plan?.name || "?"}</td>
                 <td className="px-4 py-3 font-medium text-gray-800">{fmt(p.amount)}</td>
                 <td className="px-4 py-3">
-                  <span className={`text-xs px-2 py-1 rounded ${p.method === "payme" ? "bg-cyan-100 text-cyan-600" : "bg-blue-100 text-blue-600"}`}>
-                    {p.method === "payme" ? "💠 Payme" : "💳 Click"}
+                  <span className={`inline-flex items-center gap-1.5 text-xs px-2 py-1 rounded ${p.method === "payme" ? "bg-cyan-50 text-cyan-700" : "bg-blue-50 text-blue-700"}`}>
+                    <img src={p.method === "payme" ? "/payme-icon.svg" : "/click-icon.svg"} alt={p.method} className="h-4" />
+                    {p.method === "payme" ? "Payme" : "Click"}
                   </span>
                 </td>
                 <td className="px-4 py-3">{statusBadge(p.status)}</td>

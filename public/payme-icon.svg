@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 40" fill="none">
+  <rect width="120" height="40" rx="8" fill="#33CCCC"/>
+  <text x="12" y="27" font-family="Arial, sans-serif" font-weight="bold" font-size="18" fill="white">payme</text>
+  <rect x="82" y="10" width="4" height="20" rx="1" fill="white"/>
+  <rect x="90" y="10" width="4" height="20" rx="1" fill="white"/>
+  <rect x="98" y="10" width="4" height="20" rx="1" fill="white"/>
+  <rect x="106" y="10" width="4" height="20" rx="1" fill="white"/>
+</svg>

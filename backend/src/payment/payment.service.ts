@@ -158,9 +158,12 @@ export class PaymentService {
 
   // Statistikalar
   async getStats() {
-    const [totalPayments, completedPayments, totalRevenue] = await Promise.all([
+    const [totalPayments, pendingPayments, completedPayments, cancelledPayments, failedPayments, totalRevenue] = await Promise.all([
       this.prisma.payment.count(),
+      this.prisma.payment.count({ where: { status: "pending" } }),
       this.prisma.payment.count({ where: { status: "completed" } }),
+      this.prisma.payment.count({ where: { status: "cancelled" } }),
+      this.prisma.payment.count({ where: { status: "failed" } }),
       this.prisma.payment.aggregate({
         where: { status: "completed" },
         _sum: { amount: true },
@@ -169,7 +172,11 @@ export class PaymentService {
 
     return {
       totalPayments,
+      pending: pendingPayments,
       completedPayments,
+      confirmed: completedPayments,
+      cancelled: cancelledPayments,
+      failed: failedPayments,
       totalRevenue: totalRevenue._sum.amount || 0,
     };
   }

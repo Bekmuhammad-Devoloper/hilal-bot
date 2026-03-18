@@ -2,7 +2,7 @@ import { Injectable, Logger } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import axios from "axios";
 
-const BOT_TOKEN = process.env.BOT_TOKEN || "8678765504:AAEMaeGLXerTqpOm2bdd6jgcB8PZKCwCAjk";
+const BOT_TOKEN = process.env.BOT_TOKEN || "";
 
 @Injectable()
 export class BroadcastService {
