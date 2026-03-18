@@ -1,86 +1,8 @@
-const fs = require('fs');
-const path = require('path');
-const base = path.join(__dirname, 'admin', 'src', 'app');
+const fs = require("fs");
+const path = require("path");
 
-// page.tsx - Login page
-fs.writeFileSync(path.join(base, 'page.tsx'), `"use client";
-import { useState } from "react";
-
-const API = typeof window !== "undefined" && window.location.hostname === "localhost"
-  ? "http://localhost:7777/api"
-  : "/api";
-
-export default function LoginPage() {
-  const [telegramId, setTelegramId] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    setLoading(true);
-    try {
-      const res = await fetch(\`\${API}/auth/login-telegram\`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ telegramId: parseInt(telegramId) }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Xatolik");
-      localStorage.setItem("token", data.token);
-      window.location.href = "/dashboard";
-    } catch (err: any) {
-      setError(err.message || "Admin huquqi yo'q!");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="bg-white rounded-2xl shadow-sm border p-8 w-full max-w-md">
-        <div className="text-center mb-8">
-          <img src="/logo.jpg" alt="Hilal Bot" className="w-20 h-20 rounded-full object-cover mx-auto mb-4 shadow-md" />
-          <h1 className="text-2xl font-bold text-gray-900">Hilal Bot</h1>
-          <p className="text-gray-400 mt-1">Admin Panel</p>
-        </div>
-        <form onSubmit={handleLogin}>
-          {error && (
-            <div className="bg-red-50 text-red-600 p-3 rounded-xl mb-4 text-sm text-center">
-              {error}
-            </div>
-          )}
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-600 mb-2">Telegram ID</label>
-            <input
-              type="number"
-              value={telegramId}
-              onChange={(e) => setTelegramId(e.target.value)}
-              className="w-full px-5 py-4 border-2 border-gray-200 rounded-2xl focus:border-indigo-900 outline-none text-gray-800 text-lg"
-              placeholder="Telegram ID kiriting"
-              required
-            />
-          </div>
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-indigo-900 text-white py-4 rounded-2xl font-semibold text-lg hover:bg-indigo-800 transition disabled:opacity-50"
-          >
-            {loading ? "Tekshirilmoqda..." : "Kirish"}
-          </button>
-        </form>
-        <p className="text-xs text-gray-400 mt-4 text-center">
-          Botda /admin komandasini yozing — avtomatik kirasiz
-        </p>
-      </div>
-    </div>
-  );
-}
-`);
-console.log('✅ page.tsx written');
-
-// auth/page.tsx
-fs.writeFileSync(path.join(base, 'auth', 'page.tsx'), `"use client";
+// MiniApp — Parallel Muhit stilida
+const miniapp = `"use client";
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
@@ -88,227 +10,477 @@ const API = typeof window !== "undefined" && window.location.hostname === "local
   ? "http://localhost:7777/api"
   : "/api";
 
-function AuthCallbackInner() {
+function MiniAppInner() {
   const searchParams = useSearchParams();
-  const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
+  const paramUser = searchParams.get("user");
+
+  const [userId, setUserId] = useState<string | null>(paramUser);
+  const [screen, setScreen] = useState<"splash" | "loading" | "subscribe" | "payment" | "success" | "manage">("splash");
+  const [plans, setPlans] = useState<any[]>([]);
+  const [selectedPlan, setSelectedPlan] = useState<any>(null);
+  const [subscription, setSubscription] = useState<any>(null);
+  const [paymentMethod, setPaymentMethod] = useState<"uzcard" | "visa">("uzcard");
+  const [cardNumber, setCardNumber] = useState("");
+  const [cardExpiry, setCardExpiry] = useState("");
+  const [processing, setProcessing] = useState(false);
+  const [paymentResult, setPaymentResult] = useState<any>(null);
+  const [payments, setPayments] = useState<any[]>([]);
+
+  // Telegram WebApp init + userId olish
+  useEffect(() => {
+    let uid = paramUser;
+    try {
+      const tg = (window as any).Telegram?.WebApp;
+      if (tg) {
+        tg.ready();
+        tg.expand();
+        if (!uid) {
+          const tgUser = tg.initDataUnsafe?.user;
+          if (tgUser?.id) uid = String(tgUser.id);
+        }
+      }
+    } catch (e) {}
+    if (uid) setUserId(uid);
+
+    // 2 sekund splash, keyin data yuklash
+    const timer = setTimeout(() => {
+      if (uid) {
+        setScreen("loading");
+      } else {
+        setScreen("subscribe");
+      }
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, [paramUser]);
 
   useEffect(() => {
-    const code = searchParams.get("code");
-    if (!code) { setStatus("error"); return; }
-    fetch(\`\${API}/auth/login-code\`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ code }),
-    })
-      .then((r) => r.json())
-      .then((data) => {
-        if (data.token) {
-          localStorage.setItem("token", data.token);
-          setStatus("success");
-          setTimeout(() => (window.location.href = "/dashboard"), 1000);
-        } else {
-          setStatus("error");
+    if (screen === "loading" && userId) loadData();
+  }, [screen, userId]);
+
+  const loadData = async () => {
+    try {
+      const timeout = (ms: number) => new Promise((_, rej) => setTimeout(() => rej(new Error("timeout")), ms));
+      const [plansRes, subRes, paymentsRes] = await Promise.all([
+        Promise.race([fetch(API + "/plans").then(r => r.json()), timeout(8000)]),
+        Promise.race([fetch(API + "/subscriptions/active/" + userId).then(r => r.json()), timeout(8000)]).catch(() => null),
+        Promise.race([fetch(API + "/payments/user/" + userId).then(r => r.json()), timeout(8000)]).catch(() => []),
+      ]) as [any[], any, any[]];
+      setPlans(plansRes || []);
+      setPayments(paymentsRes || []);
+      if (subRes && subRes.id) {
+        setSubscription(subRes);
+        setScreen("manage");
+      } else {
+        setScreen("subscribe");
+      }
+    } catch (e) {
+      setScreen("subscribe");
+    }
+  };
+
+  const handleSelectPlan = (plan: any) => {
+    setSelectedPlan(plan);
+    setScreen("payment");
+  };
+
+  const handlePayment = async () => {
+    if (!selectedPlan || !userId) return;
+    if (paymentMethod === "uzcard" && (!cardNumber || !cardExpiry)) return;
+    setProcessing(true);
+    try {
+      const paymentRes = await fetch(API + "/payments/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ telegramId: parseInt(userId), planId: selectedPlan.id, method: paymentMethod }),
+      }).then(r => r.json());
+
+      await new Promise(r => setTimeout(r, 2000));
+
+      const last4 = cardNumber.replace(/\\s/g, "").slice(-4) || "0001";
+      const result = await fetch(API + "/payments/confirm/" + paymentRes.id, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ cardLast4: last4 }),
+      }).then(r => r.json());
+
+      setPaymentResult(result);
+      setSubscription(result.subscription);
+      setScreen("success");
+
+      try {
+        if ((window as any).Telegram?.WebApp) {
+          (window as any).Telegram.WebApp.sendData(JSON.stringify({
+            action: "payment_success",
+            planId: selectedPlan.id,
+            cardLast4: last4,
+          }));
         }
-      })
-      .catch(() => setStatus("error"));
-  }, [searchParams]);
+      } catch (e) {}
+    } catch (e) {
+      alert("To'lovda xatolik yuz berdi. Qaytadan urinib ko'ring.");
+    } finally {
+      setProcessing(false);
+    }
+  };
 
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="bg-white rounded-2xl p-8 w-full max-w-md text-center shadow-sm border">
-        {status === "loading" && (
-          <>
-            <div className="relative w-20 h-20 mx-auto mb-5">
-              <div className="absolute inset-0 rounded-full border-[3px] border-gray-100 border-t-indigo-900 logo-ring-spin" />
-              <img src="/logo.jpg" alt="Hilal Bot" className="w-16 h-16 rounded-full object-cover absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
-            </div>
-            <p className="text-gray-500">Tekshirilmoqda...</p>
-          </>
-        )}
-        {status === "success" && (
-          <>
-            <div className="w-20 h-20 bg-indigo-900 rounded-2xl flex items-center justify-center mx-auto mb-5">
-              <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
-            <p className="text-green-600 font-bold text-lg">Muvaffaqiyatli!</p>
-            <p className="text-gray-400 text-sm mt-1">{"Yo'naltirilmoqda..."}</p>
-          </>
-        )}
-        {status === "error" && (
-          <>
-            <div className="w-20 h-20 bg-red-100 rounded-2xl flex items-center justify-center mx-auto mb-5">
-              <span className="text-3xl">❌</span>
-            </div>
-            <p className="text-red-600 font-bold text-lg mb-2">Kod yaroqsiz!</p>
-            <p className="text-gray-400 text-sm mb-4">Botda /admin komandasini qayta yuboring</p>
-            <a href="/" className="text-indigo-600 font-medium text-sm">← Bosh sahifaga</a>
-          </>
-        )}
-      </div>
-    </div>
-  );
-}
+  const handleCancel = async () => {
+    if (!userId) return;
+    if (!confirm("Obunani bekor qilmoqchimisiz?")) return;
+    try {
+      await fetch(API + "/subscriptions/cancel/" + userId, { method: "POST" });
+      try {
+        if ((window as any).Telegram?.WebApp) {
+          (window as any).Telegram.WebApp.sendData(JSON.stringify({
+            action: "subscription_cancelled",
+            endDate: subscription?.endDate,
+          }));
+        }
+      } catch (e) {}
+      setSubscription(null);
+      setScreen("subscribe");
+      await loadData();
+    } catch (e) {
+      alert("Xatolik yuz berdi");
+    }
+  };
 
-export default function AuthCallback() {
-  return (
-    <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="relative w-20 h-20">
-          <div className="absolute inset-0 rounded-full border-[3px] border-gray-100 border-t-indigo-900 logo-ring-spin" />
-          <img src="/logo.jpg" alt="Hilal Bot" className="w-16 h-16 rounded-full object-cover absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+  const formatPrice = (n: number) => new Intl.NumberFormat("uz-UZ").format(n);
+  const formatDate = (d: string) => {
+    const date = new Date(d);
+    return \\\`\\\${String(date.getDate()).padStart(2, "0")}.\\\${String(date.getMonth() + 1).padStart(2, "0")}.\\\${date.getFullYear()}\\\`;
+  };
+
+  const daysLeft = subscription
+    ? Math.max(0, Math.ceil((new Date(subscription.endDate).getTime() - Date.now()) / 86400000))
+    : 0;
+
+  // ========== SPLASH ==========
+  if (screen === "splash") {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-indigo-50 to-white flex items-center justify-center">
+        <div className="flex flex-col items-center fade-in-up">
+          <div className="relative flex items-center justify-center" style={{ width: 120, height: 120 }}>
+            <div
+              className="absolute rounded-full border-[3px] border-indigo-100 border-t-indigo-600 logo-ring-spin"
+              style={{ width: 120, height: 120 }}
+            />
+            <img
+              src="/logo.jpg"
+              alt="Hilal Bot"
+              className="rounded-full object-cover logo-pulse shadow-lg"
+              style={{ width: 96, height: 96 }}
+            />
+          </div>
+          <h2 className="text-xl font-bold text-gray-800 mt-5 mb-1">Hilal Bot</h2>
+          <p className="text-sm text-gray-400">Yuklanmoqda...</p>
         </div>
       </div>
-    }>
-      <AuthCallbackInner />
+    );
+  }
+
+  // ========== LOADING (data yuklanmoqda) ==========
+  if (screen === "loading") {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-indigo-50 to-white flex items-center justify-center">
+        <div className="flex flex-col items-center">
+          <div className="w-10 h-10 border-[3px] border-gray-200 border-t-indigo-600 rounded-full logo-ring-spin" />
+          <p className="text-sm text-gray-400 mt-4">Yuklanmoqda...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // ========== MANAGE — Parallel Muhit stilida ==========
+  if (screen === "manage") {
+    const totalDays = subscription?.plan?.duration || 30;
+    const progressPercent = Math.max(0, Math.min(100, (daysLeft / totalDays) * 100));
+
+    return (
+      <div className="min-h-screen bg-gray-50">
+        {/* Header */}
+        <div className="bg-white px-5 pt-6 pb-4">
+          <h1 className="text-2xl font-bold text-gray-900">{subscription?.plan?.name || "Oson Turk Tili"}</h1>
+        </div>
+
+        <div className="p-4 space-y-3">
+          {/* Obuna tugashiga */}
+          <div className="bg-white rounded-2xl p-5 shadow-sm">
+            <p className="text-sm text-gray-400 mb-1">Obuna tugashiga</p>
+            <p className="text-3xl font-bold text-gray-900 mb-3">{daysLeft} kun</p>
+            <div className="w-full bg-gray-100 rounded-full h-2.5 overflow-hidden">
+              <div className="bg-indigo-900 h-2.5 rounded-full transition-all" style={{ width: progressPercent + "%" }} />
+            </div>
+          </div>
+
+          {/* Obunani yangilash */}
+          <div className="bg-white rounded-2xl p-5 shadow-sm">
+            <p className="font-semibold text-gray-900 text-center mb-4">Obunani yangilaysizmi?</p>
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                onClick={() => { setScreen("subscribe"); setSubscription(null); }}
+                className="py-3 bg-indigo-900 text-white rounded-xl font-semibold text-base"
+              >
+                Ha
+              </button>
+              <button
+                onClick={handleCancel}
+                className="py-3 bg-gray-100 text-gray-500 rounded-xl font-semibold text-base border border-gray-200"
+              >
+                Yo'q
+              </button>
+            </div>
+          </div>
+
+          {/* Menyular 1 */}
+          <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+            <button className="w-full px-5 py-4 flex items-center justify-between border-b border-gray-50 active:bg-gray-50">
+              <div className="flex items-center gap-3">
+                <span className="text-lg">✏️</span>
+                <span className="font-medium text-gray-800">Ma'lumotlarni o'zgartirish</span>
+              </div>
+              <svg className="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+            </button>
+            <button
+              onClick={() => setScreen("subscribe")}
+              className="w-full px-5 py-4 flex items-center justify-between active:bg-gray-50"
+            >
+              <div className="flex items-center gap-3">
+                <span className="text-lg">💳</span>
+                <span className="font-medium text-gray-800">To'lovlar tarixi</span>
+              </div>
+              <svg className="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+            </button>
+          </div>
+
+          {/* Menyular 2 */}
+          <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+            <button className="w-full px-5 py-4 flex items-center justify-between border-b border-gray-50 active:bg-gray-50">
+              <div className="flex items-center gap-3">
+                <span className="text-lg">📄</span>
+                <span className="font-medium text-gray-800">Shartnoma</span>
+              </div>
+              <svg className="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+            </button>
+            <button className="w-full px-5 py-4 flex items-center justify-between border-b border-gray-50 active:bg-gray-50">
+              <div className="flex items-center gap-3">
+                <span className="text-lg">❓</span>
+                <span className="font-medium text-gray-800">FAQ</span>
+              </div>
+              <svg className="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+            </button>
+            <button className="w-full px-5 py-4 flex items-center justify-between active:bg-gray-50">
+              <div className="flex items-center gap-3">
+                <span className="text-lg">💬</span>
+                <span className="font-medium text-gray-800">Aloqa</span>
+              </div>
+              <svg className="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ========== SUBSCRIBE — reja tanlash ==========
+  if (screen === "subscribe") {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        {plans.map((plan) => {
+          const features = plan.features ? JSON.parse(plan.features) : [];
+          return (
+            <div key={plan.id} className="p-5">
+              <div className="text-sm text-gray-400 mb-1">Obuna narxi</div>
+              <div className="text-4xl font-bold text-gray-900 mb-5">
+                {formatPrice(plan.price)} UZS
+              </div>
+
+              <div className="bg-white rounded-2xl p-5 shadow-sm mb-5">
+                <h2 className="text-xl font-bold text-gray-900 mb-4">{plan.name}</h2>
+                <div className="space-y-4">
+                  {features.map((f: string, i: number) => (
+                    <div key={i} className="flex gap-3">
+                      <div className="flex-shrink-0 w-7 h-7 bg-indigo-900 rounded-lg flex items-center justify-center mt-0.5">
+                        <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                        </svg>
+                      </div>
+                      <div>
+                        <p className="font-semibold text-gray-900">{f}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* To'lov turi */}
+              <div className="mb-5">
+                <p className="text-sm text-gray-400 mb-3">To'lov turi</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    onClick={() => setPaymentMethod("visa")}
+                    className={"p-4 rounded-xl border-2 transition " + (paymentMethod === "visa" ? "border-indigo-600 bg-indigo-50" : "border-gray-200 bg-white")}
+                  >
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-xs font-bold text-red-500">MC</span>
+                      <span className="text-xs font-bold text-blue-600">VISA</span>
+                      <div className={"ml-auto w-5 h-5 rounded-full border-2 flex items-center justify-center " + (paymentMethod === "visa" ? "border-indigo-600 bg-indigo-600" : "border-gray-300")}>
+                        {paymentMethod === "visa" && <div className="w-2 h-2 bg-white rounded-full" />}
+                      </div>
+                    </div>
+                    <p className="text-sm font-semibold text-gray-900 text-left">Chet-el kartasi</p>
+                    <p className="text-xs text-gray-400 text-left">Tribute orqali</p>
+                  </button>
+
+                  <button
+                    onClick={() => setPaymentMethod("uzcard")}
+                    className={"p-4 rounded-xl border-2 transition " + (paymentMethod === "uzcard" ? "border-indigo-600 bg-indigo-50" : "border-gray-200 bg-white")}
+                  >
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-xs font-bold text-green-600">UZ</span>
+                      <span className="text-xs font-bold text-yellow-500">HUMO</span>
+                      <div className={"ml-auto w-5 h-5 rounded-full border-2 flex items-center justify-center " + (paymentMethod === "uzcard" ? "border-indigo-600 bg-indigo-600" : "border-gray-300")}>
+                        {paymentMethod === "uzcard" && <div className="w-2 h-2 bg-white rounded-full" />}
+                      </div>
+                    </div>
+                    <p className="text-sm font-semibold text-gray-900 text-left">UZCARD / Humo</p>
+                    <p className="text-xs text-gray-400 text-left">Click orqali</p>
+                  </button>
+                </div>
+              </div>
+
+              <button
+                onClick={() => handleSelectPlan(plan)}
+                className="w-full py-4 bg-indigo-900 text-white rounded-2xl font-semibold text-lg active:bg-indigo-800 transition"
+              >
+                Davom etish
+              </button>
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
+
+  // ========== PAYMENT ==========
+  if (screen === "payment") {
+    return (
+      <div className="min-h-screen bg-gray-50 p-5 flex flex-col">
+        <h1 className="text-2xl font-bold text-gray-900 mb-6">Bank kartasi ma'lumotlarini kiriting</h1>
+
+        <input
+          type="text"
+          value={cardNumber}
+          onChange={(e) => {
+            const v = e.target.value.replace(/\\D/g, "").slice(0, 16);
+            setCardNumber(v.replace(/(\\d{4})(?=\\d)/g, "$1 "));
+          }}
+          placeholder="0000 0000 0000 0000"
+          className="w-full px-5 py-4 border-2 border-gray-200 rounded-2xl text-lg font-medium mb-4 focus:border-indigo-600 outline-none text-gray-800"
+        />
+
+        <input
+          type="text"
+          value={cardExpiry}
+          onChange={(e) => {
+            let v = e.target.value.replace(/\\D/g, "").slice(0, 4);
+            if (v.length > 2) v = v.slice(0, 2) + "/" + v.slice(2);
+            setCardExpiry(v);
+          }}
+          placeholder="MM/YY"
+          className="w-full px-5 py-4 border-2 border-gray-200 rounded-2xl text-lg font-medium mb-6 focus:border-indigo-600 outline-none text-gray-800"
+        />
+
+        <div className="text-center mb-6">
+          <p className="font-semibold text-gray-700 mb-3">Karta ulanmayaptimi?</p>
+          <p className="text-sm text-gray-400">1. Click ilovasini o'rnating</p>
+          <p className="text-sm text-gray-400">2. Click Ilovasini ochib, kartangizni qo'shing</p>
+          <p className="text-sm text-gray-400">3. Shu sahifaga qaytib, karta ma'lumotlarini kiriting</p>
+          <p className="text-sm text-gray-500 mt-2 font-medium">Bo'ldi \\u26A1</p>
+        </div>
+
+        <div className="text-center text-sm text-gray-400 mb-4">
+          Powered by <span className="font-bold text-blue-500">\\u25CF click</span>
+        </div>
+
+        <div className="mt-auto">
+          <button
+            onClick={handlePayment}
+            disabled={processing || !cardNumber || !cardExpiry}
+            className="w-full py-4 bg-indigo-900 text-white rounded-2xl font-semibold text-lg active:bg-indigo-800 transition disabled:opacity-50"
+          >
+            {processing ? "To'lov amalga oshirilmoqda..." : "Kodni olish"}
+          </button>
+
+          <button
+            onClick={() => setScreen("subscribe")}
+            className="w-full py-3 text-gray-500 text-sm mt-2"
+          >
+            \\u2190 Orqaga
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // ========== SUCCESS ==========
+  if (screen === "success") {
+    return (
+      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-5">
+        <div className="w-24 h-24 bg-indigo-900 rounded-3xl flex items-center justify-center mb-6 shadow-lg">
+          <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+          </svg>
+        </div>
+        <h1 className="text-2xl font-bold text-gray-900 mb-2">Obuna tasdiqlandi</h1>
+        <p className="text-gray-500 text-center mb-8">
+          Kanalga havola botga xabar sifatida keladi. Botga o'ting.
+        </p>
+        <div className="mt-auto w-full">
+          <button
+            onClick={() => {
+              try { if ((window as any).Telegram?.WebApp) (window as any).Telegram.WebApp.close(); } catch (e) {}
+            }}
+            className="w-full py-4 bg-indigo-900 text-white rounded-2xl font-semibold text-lg"
+          >
+            Bosh sahifaga qaytish
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return null;
+}
+
+export default function MiniApp() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-gradient-to-b from-indigo-50 to-white flex items-center justify-center">
+          <div className="flex flex-col items-center fade-in-up">
+            <div className="relative flex items-center justify-center" style={{ width: 120, height: 120 }}>
+              <div
+                className="absolute rounded-full border-[3px] border-indigo-100 border-t-indigo-600 logo-ring-spin"
+                style={{ width: 120, height: 120 }}
+              />
+              <img
+                src="/logo.jpg"
+                alt="Hilal Bot"
+                className="rounded-full object-cover logo-pulse shadow-lg"
+                style={{ width: 96, height: 96 }}
+              />
+            </div>
+            <h2 className="text-xl font-bold text-gray-800 mt-5 mb-1">Hilal Bot</h2>
+            <p className="text-sm text-gray-400">Yuklanmoqda...</p>
+          </div>
+        </div>
+      }
+    >
+      <MiniAppInner />
     </Suspense>
   );
 }
-`);
-console.log('✅ auth/page.tsx written');
+`;
 
-// dashboard/layout.tsx
-fs.writeFileSync(path.join(base, 'dashboard', 'layout.tsx'), `"use client";
-import { useEffect, useState } from "react";
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { getMe } from "@/lib/api";
-
-const menu = [
-  { href: "/dashboard", icon: "📊", label: "Dashboard" },
-  { href: "/dashboard/users", icon: "👥", label: "Foydalanuvchilar" },
-  { href: "/dashboard/subscriptions", icon: "💎", label: "Obunalar" },
-  { href: "/dashboard/payments", icon: "💳", label: "To\\'lovlar" },
-  { href: "/dashboard/plans", icon: "📋", label: "Tariflar" },
-  { href: "/dashboard/broadcast", icon: "📢", label: "Xabar yuborish" },
-  { href: "/dashboard/settings", icon: "⚙️", label: "Sozlamalar" },
-];
-
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
-  const router = useRouter();
-  const [open, setOpen] = useState(true);
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) { router.push("/"); return; }
-    getMe()
-      .then((u) => {
-        if (!u?.isAdmin) { localStorage.clear(); router.push("/"); return; }
-        setUser(u);
-      })
-      .catch(() => { localStorage.clear(); router.push("/"); })
-      .finally(() => setLoading(false));
-  }, []);
-
-  if (loading) return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="relative w-20 h-20">
-        <div className="absolute inset-0 rounded-full border-[3px] border-gray-100 border-t-indigo-900 logo-ring-spin" />
-        <img src="/logo.jpg" alt="Hilal Bot" className="w-16 h-16 rounded-full object-cover absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
-      </div>
-    </div>
-  );
-
-  const Sidebar = ({ mobile = false }: { mobile?: boolean }) => (
-    <aside className={\`\${mobile ? "w-72" : open ? "w-64" : "w-20"} bg-white border-r flex flex-col h-full transition-all duration-300\`}>
-      <div className="p-4 border-b flex items-center gap-3">
-        <img src="/logo.jpg" alt="Hilal Bot" className="w-10 h-10 rounded-full object-cover flex-shrink-0" />
-        {(open || mobile) && (
-          <div>
-            <h2 className="font-bold text-gray-900 text-sm">Hilal Bot</h2>
-            <p className="text-xs text-gray-400">Admin Panel</p>
-          </div>
-        )}
-      </div>
-      <nav className="flex-1 p-3 space-y-1">
-        {menu.map((m) => {
-          const active = pathname === m.href;
-          return (
-            <Link
-              key={m.href}
-              href={m.href}
-              onClick={() => mobile && setMobileOpen(false)}
-              className={\`flex items-center gap-3 px-4 py-3 rounded-xl transition text-sm \${
-                active
-                  ? "bg-indigo-900 text-white font-medium shadow-sm"
-                  : "text-gray-600 hover:bg-gray-50"
-              }\`}
-            >
-              <span className="text-lg">{m.icon}</span>
-              {(open || mobile) && <span>{m.label}</span>}
-            </Link>
-          );
-        })}
-      </nav>
-      <div className="p-3 border-t space-y-1">
-        {(open || mobile) && user && (
-          <div className="flex items-center gap-3 px-4 py-3">
-            <div className="w-9 h-9 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-900 text-sm font-bold flex-shrink-0">
-              {user.firstName?.charAt(0) || "A"}
-            </div>
-            <div className="overflow-hidden">
-              <p className="text-sm font-medium text-gray-900 truncate">{user.firstName}</p>
-              <p className="text-xs text-gray-400 truncate">ID: {user.telegramId}</p>
-            </div>
-          </div>
-        )}
-        {!mobile && (
-          <button
-            onClick={() => setOpen(!open)}
-            className="w-full flex items-center gap-3 px-4 py-2.5 text-gray-400 hover:bg-gray-50 rounded-xl text-sm"
-          >
-            <span>{open ? "◀" : "▶"}</span>
-            {open && <span>Yopish</span>}
-          </button>
-        )}
-        <button
-          onClick={() => { localStorage.clear(); router.push("/"); }}
-          className="w-full flex items-center gap-3 px-4 py-2.5 text-red-500 hover:bg-red-50 rounded-xl text-sm"
-        >
-          <span>🚪</span>
-          {(open || mobile) && <span>Chiqish</span>}
-        </button>
-      </div>
-    </aside>
-  );
-
-  const currentPage = menu.find((m) => m.href === pathname);
-
-  return (
-    <div className="min-h-screen flex bg-gray-50">
-      <div className="hidden md:flex fixed h-full z-30">
-        <Sidebar />
-      </div>
-      {mobileOpen && (
-        <div className="fixed inset-0 z-50 md:hidden">
-          <div className="absolute inset-0 bg-black/30" onClick={() => setMobileOpen(false)} />
-          <div className="relative h-full w-72">
-            <Sidebar mobile />
-          </div>
-        </div>
-      )}
-      <main className={\`flex-1 \${open ? "md:ml-64" : "md:ml-20"} transition-all duration-300\`}>
-        <header className="bg-white border-b px-5 py-4 flex items-center justify-between sticky top-0 z-20">
-          <div className="flex items-center gap-3">
-            <button onClick={() => setMobileOpen(true)} className="md:hidden text-gray-500">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            </button>
-            <h1 className="font-bold text-gray-900">{currentPage?.icon} {currentPage?.label || "Dashboard"}</h1>
-          </div>
-          <div className="text-sm text-gray-400">👋 {user?.firstName}</div>
-        </header>
-        <div className="p-5">{children}</div>
-      </main>
-    </div>
-  );
-}
-`);
-console.log('✅ dashboard/layout.tsx written');
-console.log('✅ All files written successfully!');
+fs.writeFileSync(path.join(__dirname, "admin/src/app/app/page.tsx"), miniapp);
+console.log("✅ app/page.tsx written — " + miniapp.split("\n").length + " lines");
