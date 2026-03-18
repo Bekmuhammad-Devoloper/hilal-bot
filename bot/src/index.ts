@@ -273,7 +273,22 @@ async function main() {
   console.log(`\u{1F4E1} API: ${config.apiUrl}`);
   console.log(`\u{1F310} WebApp: ${config.webAppUrl}`);
   console.log(`\u{1F4E2} Kanal: ${config.channelId}`);
-  await bot.start();
+
+  // Graceful stop
+  const stopBot = () => {
+    console.log("Bot to'xtatilmoqda...");
+    bot.stop();
+    process.exit(0);
+  };
+  process.once("SIGINT", stopBot);
+  process.once("SIGTERM", stopBot);
+
+  await bot.start({
+    onStart: () => console.log("✅ Bot muvaffaqiyatli ishga tushdi!"),
+  });
 }
 
-main().catch(console.error);
+main().catch((err) => {
+  console.error("❌ Bot ishga tushmadi:", err.message);
+  process.exit(1);
+});

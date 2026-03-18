@@ -17,4 +17,7 @@ async function bootstrap() {
   console.log(`🚀 Backend ishga tushdi: http://localhost:${port}`);
   console.log(`📄 API: http://localhost:${port}/api`);
 }
-bootstrap();
+bootstrap().catch((err) => {
+  console.error("❌ Backend ishga tushmadi:", err.message);
+  process.exit(1);
+});
