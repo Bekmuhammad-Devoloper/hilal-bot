@@ -103,6 +103,14 @@ export class UsersService {
     };
   }
 
+  async getRecentUsers(limit = 5) {
+    const users = await this.prisma.user.findMany({
+      take: limit,
+      orderBy: { createdAt: "desc" },
+    });
+    return users.map(this.serializeUser);
+  }
+
   async getAllTelegramIds() {
     const users = await this.prisma.user.findMany({
       where: { isBlocked: false },

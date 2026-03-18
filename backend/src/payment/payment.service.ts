@@ -158,7 +158,11 @@ export class PaymentService {
 
   // Statistikalar
   async getStats() {
-    const [totalPayments, pendingPayments, completedPayments, cancelledPayments, failedPayments, totalRevenue] = await Promise.all([
+    const now = new Date();
+    const todayStart = new Date(now);
+    todayStart.setHours(0, 0, 0, 0);
+
+    const [totalPayments, pendingPayments, completedPayments, cancelledPayments, failedPayments, totalRevenue, todayRevenue, todayPayments] = await Promise.all([
       this.prisma.payment.count(),
       this.prisma.payment.count({ where: { status: "pending" } }),
       this.prisma.payment.count({ where: { status: "completed" } }),
@@ -167,6 +171,13 @@ export class PaymentService {
       this.prisma.payment.aggregate({
         where: { status: "completed" },
         _sum: { amount: true },
+      }),
+      this.prisma.payment.aggregate({
+        where: { status: "completed", createdAt: { gte: todayStart } },
+        _sum: { amount: true },
+      }),
+      this.prisma.payment.count({
+        where: { status: "completed", createdAt: { gte: todayStart } },
       }),
     ]);
 
@@ -178,6 +189,20 @@ export class PaymentService {
       cancelled: cancelledPayments,
       failed: failedPayments,
       totalRevenue: totalRevenue._sum.amount || 0,
+      todayRevenue: todayRevenue._sum.amount || 0,
+      todayPayments,
     };
+  }
+
+  async getRecentPayments(limit = 5) {
+    const payments = await this.prisma.payment.findMany({
+      take: limit,
+      orderBy: { createdAt: "desc" },
+      include: { user: true, plan: true },
+    });
+    return payments.map((p) => ({
+      ...p,
+      user: p.user ? { ...p.user, telegramId: Number(p.user.telegramId) } : null,
+    }));
   }
 }

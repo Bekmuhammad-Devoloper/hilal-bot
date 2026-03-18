@@ -59,6 +59,10 @@ export const getPayments = async (page = 1, limit = 20, status?: string) => {
 };
 export const getPaymentStats = async () => (await api.get("/payments/stats")).data;
 export const getUserPayments = async (telegramId: number) => (await api.get(`/payments/user/${telegramId}`)).data;
+export const getRecentPayments = async (limit = 5) => (await api.get(`/payments/recent?limit=${limit}`)).data;
+
+// ========= USERS (additional) =========
+export const getRecentUsers = async (limit = 5) => (await api.get(`/users/recent?limit=${limit}`)).data;
 
 // ========= SETTINGS =========
 export const getSettings = async () => (await api.get("/settings")).data;

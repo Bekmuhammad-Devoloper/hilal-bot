@@ -51,4 +51,10 @@ export class PaymentController {
   async getStats() {
     return this.paymentService.getStats();
   }
+
+  // Oxirgi to'lovlar
+  @Get("recent")
+  async getRecent(@Query("limit") limit?: string) {
+    return this.paymentService.getRecentPayments(parseInt(limit || "5"));
+  }
 }
