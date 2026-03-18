@@ -6,6 +6,5 @@
     "deleteOutDir": true,
     "assets": ["**/*.prisma"],
     "watchAssets": true
-  },
-  "entryFile": "src/main"
+  }
 }
