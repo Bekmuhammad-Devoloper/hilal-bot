@@ -8,8 +8,9 @@ const API = typeof window !== "undefined" && window.location.hostname === "local
 
 function MiniAppInner() {
   const searchParams = useSearchParams();
-  const userId = searchParams.get("user");
+  const paramUser = searchParams.get("user");
 
+  const [userId, setUserId] = useState<string | null>(paramUser);
   const [screen, setScreen] = useState<"loading" | "subscribe" | "payment" | "success" | "manage">("loading");
   const [plans, setPlans] = useState<any[]>([]);
   const [selectedPlan, setSelectedPlan] = useState<any>(null);
@@ -21,17 +22,42 @@ function MiniAppInner() {
   const [paymentResult, setPaymentResult] = useState<any>(null);
   const [payments, setPayments] = useState<any[]>([]);
 
+  // Telegram WebApp dan userId olish (URL parametri bo'lmasa)
+  useEffect(() => {
+    let uid = paramUser;
+    if (!uid) {
+      try {
+        const tg = (window as any).Telegram?.WebApp;
+        if (tg) {
+          tg.ready();
+          tg.expand();
+          const tgUser = tg.initDataUnsafe?.user;
+          if (tgUser?.id) {
+            uid = String(tgUser.id);
+          }
+        }
+      } catch (e) {}
+    }
+    if (uid) {
+      setUserId(uid);
+    } else {
+      // userId topilmasa ham subscribe ekraniga o'tkazamiz
+      setScreen("subscribe");
+    }
+  }, [paramUser]);
+
   useEffect(() => {
     if (userId) loadData();
   }, [userId]);
 
   const loadData = async () => {
     try {
+      const timeout = (ms: number) => new Promise((_, rej) => setTimeout(() => rej(new Error("timeout")), ms));
       const [plansRes, subRes, paymentsRes] = await Promise.all([
-        fetch(`${API}/plans`).then((r) => r.json()),
-        fetch(`${API}/subscriptions/active/${userId}`).then((r) => r.json()).catch(() => null),
-        fetch(`${API}/payments/user/${userId}`).then((r) => r.json()).catch(() => []),
-      ]);
+        Promise.race([fetch(`${API}/plans`).then((r) => r.json()), timeout(8000)]),
+        Promise.race([fetch(`${API}/subscriptions/active/${userId}`).then((r) => r.json()), timeout(8000)]).catch(() => null),
+        Promise.race([fetch(`${API}/payments/user/${userId}`).then((r) => r.json()), timeout(8000)]).catch(() => []),
+      ]) as [any[], any, any[]];
       setPlans(plansRes || []);
       setPayments(paymentsRes || []);
       if (subRes && subRes.id) {
@@ -41,6 +67,7 @@ function MiniAppInner() {
         setScreen("subscribe");
       }
     } catch (e) {
+      console.error("loadData error:", e);
       setScreen("subscribe");
     }
   };
