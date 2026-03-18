@@ -15,7 +15,7 @@ function MiniAppInner() {
   const [plans, setPlans] = useState<any[]>([]);
   const [selectedPlan, setSelectedPlan] = useState<any>(null);
   const [subscription, setSubscription] = useState<any>(null);
-  const [paymentMethod, setPaymentMethod] = useState<"uzcard" | "visa">("uzcard");
+  const [paymentMethod, setPaymentMethod] = useState<"payme" | "click">("click");
   const [cardNumber, setCardNumber] = useState("");
   const [cardExpiry, setCardExpiry] = useState("");
   const [processing, setProcessing] = useState(false);
@@ -79,7 +79,7 @@ function MiniAppInner() {
 
   const handlePayment = async () => {
     if (!selectedPlan || !userId) return;
-    if (paymentMethod === "uzcard" && (!cardNumber || !cardExpiry)) return;
+    if (paymentMethod === "click" && (!cardNumber || !cardExpiry)) return;
     setProcessing(true);
     try {
       const paymentRes = await fetch(API + "/payments/create", {
@@ -347,32 +347,32 @@ function MiniAppInner() {
                 <p className="text-xs font-medium text-indigo-300/50 tracking-wider uppercase mb-3">To{"'"}lov turi</p>
                 <div className="grid grid-cols-2 gap-3">
                   <button
-                    onClick={() => setPaymentMethod("visa")}
-                    className={"relative p-4 rounded-2xl border transition-all active:scale-[0.97] " + (paymentMethod === "visa" ? "border-indigo-400 bg-indigo-500/15" : "border-white/[0.08] bg-white/[0.05]")}
+                    onClick={() => setPaymentMethod("payme")}
+                    className={"relative p-4 rounded-2xl border transition-all active:scale-[0.97] " + (paymentMethod === "payme" ? "border-indigo-400 bg-indigo-500/15" : "border-white/[0.08] bg-white/[0.05]")}
                   >
-                    <div className="flex items-center gap-1.5 mb-2.5">
-                      <span className="text-[11px] font-extrabold text-red-400 tracking-tight">MC</span>
-                      <span className="text-[11px] font-extrabold text-blue-400 tracking-tight">VISA</span>
+                    <div className="flex items-center gap-1 mb-2.5">
+                      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#33CCCC"/><path d="M6 8h2v8H6V8zm4 0h2v8h-2V8zm4 0h2v8h-2V8zm4 0h2v8h-2V8z" fill="white"/></svg>
+                      <span className="text-[13px] font-bold text-[#33CCCC] tracking-tight">payme</span>
                     </div>
-                    <p className="text-sm font-semibold text-white text-left">Chet-el kartasi</p>
-                    <p className="text-[11px] text-indigo-300/40 text-left mt-0.5">Tribute orqali</p>
-                    <div className={"absolute top-3.5 right-3.5 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors " + (paymentMethod === "visa" ? "border-indigo-400 bg-indigo-500" : "border-white/20")}>
-                      {paymentMethod === "visa" && <div className="w-2 h-2 bg-white rounded-full" />}
+                    <p className="text-sm font-semibold text-white text-left">Payme</p>
+                    <p className="text-[11px] text-indigo-300/40 text-left mt-0.5">Payme orqali</p>
+                    <div className={"absolute top-3.5 right-3.5 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors " + (paymentMethod === "payme" ? "border-indigo-400 bg-indigo-500" : "border-white/20")}>
+                      {paymentMethod === "payme" && <div className="w-2 h-2 bg-white rounded-full" />}
                     </div>
                   </button>
 
                   <button
-                    onClick={() => setPaymentMethod("uzcard")}
-                    className={"relative p-4 rounded-2xl border transition-all active:scale-[0.97] " + (paymentMethod === "uzcard" ? "border-indigo-400 bg-indigo-500/15" : "border-white/[0.08] bg-white/[0.05]")}
+                    onClick={() => setPaymentMethod("click")}
+                    className={"relative p-4 rounded-2xl border transition-all active:scale-[0.97] " + (paymentMethod === "click" ? "border-indigo-400 bg-indigo-500/15" : "border-white/[0.08] bg-white/[0.05]")}
                   >
-                    <div className="flex items-center gap-1.5 mb-2.5">
-                      <span className="text-[11px] font-extrabold text-green-400 tracking-tight">UZ</span>
-                      <span className="text-[11px] font-extrabold text-yellow-400 tracking-tight">HUMO</span>
+                    <div className="flex items-center gap-1 mb-2.5">
+                      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#00B4FF"/><circle cx="12" cy="12" r="6" fill="white"/><circle cx="12" cy="12" r="3" fill="#00B4FF"/></svg>
+                      <span className="text-[13px] font-bold text-[#00B4FF] tracking-tight">click</span>
                     </div>
-                    <p className="text-sm font-semibold text-white text-left">UZCARD / Humo</p>
+                    <p className="text-sm font-semibold text-white text-left">Click</p>
                     <p className="text-[11px] text-indigo-300/40 text-left mt-0.5">Click orqali</p>
-                    <div className={"absolute top-3.5 right-3.5 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors " + (paymentMethod === "uzcard" ? "border-indigo-400 bg-indigo-500" : "border-white/20")}>
-                      {paymentMethod === "uzcard" && <div className="w-2 h-2 bg-white rounded-full" />}
+                    <div className={"absolute top-3.5 right-3.5 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors " + (paymentMethod === "click" ? "border-indigo-400 bg-indigo-500" : "border-white/20")}>
+                      {paymentMethod === "click" && <div className="w-2 h-2 bg-white rounded-full" />}
                     </div>
                   </button>
                 </div>
@@ -448,7 +448,7 @@ function MiniAppInner() {
             <p className="font-semibold text-white text-sm">Karta ulanmayaptimi?</p>
           </div>
           <div className="space-y-1.5 pl-[42px]">
-            <p className="text-xs text-indigo-300/40">1. Click ilovasini o{"'"}rnating</p>
+            <p className="text-xs text-indigo-300/40">1. Payme yoki Click ilovasini o{"'"}rnating</p>
             <p className="text-xs text-indigo-300/40">2. Ilovada kartangizni qo{"'"}shing</p>
             <p className="text-xs text-indigo-300/40">3. Bu sahifada karta raqamini kiriting</p>
           </div>
@@ -458,7 +458,7 @@ function MiniAppInner() {
         <div className="text-center mb-4 fade-in-up stagger-3">
           <div className="flex items-center justify-center gap-1.5 text-xs text-indigo-300/30">
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
-            <span>Xavfsiz to{"'"}lov • Powered by <span className="font-bold text-blue-400">click</span></span>
+            <span>Xavfsiz to{"'"}lov • <span className="font-bold text-[#33CCCC]">payme</span> / <span className="font-bold text-[#00B4FF]">click</span></span>
           </div>
         </div>
 
