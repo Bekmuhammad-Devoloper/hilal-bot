@@ -41,7 +41,8 @@ function MiniAppInner() {
     // 2 sekund splash, keyin data yuklash
     const timer = setTimeout(() => {
       if (uid) {
-        setScreen("loading");
+        // Data ni to'g'ridan-to'g'ri yuklash
+        fetchData(uid);
       } else {
         setScreen("subscribe");
       }
@@ -49,17 +50,14 @@ function MiniAppInner() {
     return () => clearTimeout(timer);
   }, [paramUser]);
 
-  useEffect(() => {
-    if (screen === "loading" && userId) loadData();
-  }, [screen, userId]);
-
-  const loadData = async () => {
+  const fetchData = async (uid: string) => {
+    setScreen("loading");
     try {
       const timeout = (ms: number) => new Promise((_, rej) => setTimeout(() => rej(new Error("timeout")), ms));
       const [plansRes, subRes, paymentsRes] = await Promise.all([
         Promise.race([fetch(API + "/plans").then(r => r.json()), timeout(8000)]),
-        Promise.race([fetch(API + "/subscriptions/active/" + userId).then(r => r.json()), timeout(8000)]).catch(() => null),
-        Promise.race([fetch(API + "/payments/user/" + userId).then(r => r.json()), timeout(8000)]).catch(() => []),
+        Promise.race([fetch(API + "/subscriptions/active/" + uid).then(r => r.json()), timeout(8000)]).catch(() => null),
+        Promise.race([fetch(API + "/payments/user/" + uid).then(r => r.json()), timeout(8000)]).catch(() => []),
       ]) as [any[], any, any[]];
       setPlans(plansRes || []);
       setPayments(paymentsRes || []);
@@ -134,7 +132,7 @@ function MiniAppInner() {
       } catch (e) {}
       setSubscription(null);
       setScreen("subscribe");
-      await loadData();
+      if (userId) await fetchData(userId);
     } catch (e) {
       alert("Xatolik yuz berdi");
     }
