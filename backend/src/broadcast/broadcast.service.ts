@@ -10,54 +10,67 @@ export class BroadcastService {
 
   constructor(private prisma: PrismaService) {}
 
-  async sendToAll(message: string, photo?: string) {
+  // Bitta userga xabar yuborish (text/photo/video)
+  private async sendMsg(chatId: number, message: string, mediaType?: string, mediaUrl?: string) {
+    const base = `https://api.telegram.org/bot${BOT_TOKEN}`;
+    if (mediaType === "photo" && mediaUrl) {
+      await axios.post(`${base}/sendPhoto`, {
+        chat_id: chatId, photo: mediaUrl, caption: message || undefined, parse_mode: "HTML",
+      });
+    } else if (mediaType === "video" && mediaUrl) {
+      await axios.post(`${base}/sendVideo`, {
+        chat_id: chatId, video: mediaUrl, caption: message || undefined, parse_mode: "HTML",
+      });
+    } else {
+      await axios.post(`${base}/sendMessage`, {
+        chat_id: chatId, text: message, parse_mode: "HTML",
+      });
+    }
+  }
+
+  async sendToAll(message: string, mediaType?: string, mediaUrl?: string) {
     const users = await this.prisma.user.findMany({
       where: { isBlocked: false },
       select: { telegramId: true },
     });
-
-    let sent = 0;
-    let failed = 0;
-
-    for (const user of users) {
-      try {
-        if (photo) {
-          await axios.post(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, {
-            chat_id: Number(user.telegramId),
-            photo,
-            caption: message,
-            parse_mode: "Markdown",
-          });
-        } else {
-          await axios.post(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-            chat_id: Number(user.telegramId),
-            text: message,
-            parse_mode: "Markdown",
-          });
-        }
-        sent++;
-      } catch (e) {
-        failed++;
-        this.logger.warn(`Failed to send to ${user.telegramId}`);
-      }
-
-      // Rate limit
-      await new Promise((r) => setTimeout(r, 50));
-    }
-
-    return { total: users.length, sent, failed };
+    return this.broadcastToList(users.map(u => Number(u.telegramId)), message, mediaType, mediaUrl);
   }
 
-  async sendToUser(telegramId: number, message: string) {
+  async sendToSelected(telegramIds: number[], message: string, mediaType?: string, mediaUrl?: string) {
+    return this.broadcastToList(telegramIds, message, mediaType, mediaUrl);
+  }
+
+  async sendToUser(telegramId: number, message: string, mediaType?: string, mediaUrl?: string) {
     try {
-      await axios.post(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-        chat_id: telegramId,
-        text: message,
-        parse_mode: "Markdown",
-      });
+      await this.sendMsg(telegramId, message, mediaType, mediaUrl);
       return { success: true };
     } catch (e) {
       return { success: false, error: "Failed to send message" };
     }
+  }
+
+  private async broadcastToList(chatIds: number[], message: string, mediaType?: string, mediaUrl?: string) {
+    let sent = 0;
+    let failed = 0;
+    for (const chatId of chatIds) {
+      try {
+        await this.sendMsg(chatId, message, mediaType, mediaUrl);
+        sent++;
+      } catch (e) {
+        failed++;
+        this.logger.warn(`Failed to send to ${chatId}`);
+      }
+      await new Promise((r) => setTimeout(r, 50));
+    }
+    return { total: chatIds.length, sent, failed };
+  }
+
+  // Userlar ro'yxatini olish (tanlash uchun)
+  async getUsers() {
+    return this.prisma.user.findMany({
+      where: { isBlocked: false },
+      select: { id: true, telegramId: true, firstName: true, lastName: true, username: true, photoUrl: true },
+      orderBy: { firstName: "asc" },
+    });
   }
 }
