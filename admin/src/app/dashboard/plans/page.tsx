@@ -12,7 +12,7 @@ export default function PlansPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
-  const load = async () => {
+  const load = async (retry = 0) => {
     setLoading(true);
     setError(false);
     try {
@@ -20,6 +20,10 @@ export default function PlansPage() {
       setPlans(Array.isArray(data) ? data : []);
     } catch (e) {
       console.error(e);
+      if (retry < 2) {
+        await new Promise(r => setTimeout(r, 1500));
+        return load(retry + 1);
+      }
       setError(true);
     } finally {
       setLoading(false);
