@@ -66,30 +66,11 @@ export class UsersService {
       this.prisma.user.count({ where }),
     ]);
 
-    // TG rasmlarini yangilash (sahifadagi userlar uchun)
-    await this.refreshPhotosForUsers(users);
-
-    // Yangilangan userlarni qayta o'qish
-    const freshUsers = await this.prisma.user.findMany({
-      where: { id: { in: users.map((u) => u.id) } },
-      orderBy: { createdAt: "desc" },
-      include: {
-        subscriptions: {
-          where: { status: "active" },
-          include: { plan: true },
-          orderBy: { endDate: "desc" },
-          take: 1,
-        },
-        payments: {
-          where: { status: "completed" },
-          orderBy: { createdAt: "desc" },
-          take: 1,
-        },
-      },
-    });
+    // TG rasmlarini background'da yangilash (kutmasdan)
+    this.refreshPhotosForUsers(users.filter((u) => !u.photoUrl));
 
     return {
-      users: freshUsers.map((u) => ({
+      users: users.map((u) => ({
         ...this.serializeUser(u),
         activeSubscription: u.subscriptions[0]
           ? {

@@ -154,15 +154,15 @@ export class AuthService {
     });
     if (!user) throw new UnauthorizedException("User topilmadi");
 
-    // TG profile rasmini yangilash
-    const freshPhotoUrl = await this.fetchTelegramPhoto(Number(user.telegramId));
-    if (freshPhotoUrl && freshPhotoUrl !== user.photoUrl) {
-      await this.prisma.user.update({
-        where: { id: user.id },
-        data: { photoUrl: freshPhotoUrl },
-      });
-      user.photoUrl = freshPhotoUrl;
-    }
+    // TG profile rasmini background'da yangilash (kutmasdan)
+    this.fetchTelegramPhoto(Number(user.telegramId)).then((freshPhotoUrl) => {
+      if (freshPhotoUrl && freshPhotoUrl !== user.photoUrl) {
+        this.prisma.user.update({
+          where: { id: user.id },
+          data: { photoUrl: freshPhotoUrl },
+        }).catch(() => {});
+      }
+    }).catch(() => {});
 
     return { ...user, telegramId: Number(user.telegramId) };
   }
