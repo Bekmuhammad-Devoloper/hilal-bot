@@ -13,7 +13,10 @@ export class PlanService {
   }
 
   async findAllAdmin() {
-    return this.prisma.plan.findMany({ orderBy: { sortOrder: "asc" } });
+    return this.prisma.plan.findMany({
+      orderBy: { sortOrder: "asc" },
+      include: { _count: { select: { subscriptions: true } } },
+    });
   }
 
   async findById(id: number) {

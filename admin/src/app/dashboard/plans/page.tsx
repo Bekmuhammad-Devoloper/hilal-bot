@@ -9,18 +9,38 @@ export default function PlansPage() {
   const [modal, setModal] = useState(false);
   const [form, setForm] = useState<any>({ ...empty });
   const [editId, setEditId] = useState<number | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
-  const load = () => getAdminPlans().then(setPlans).catch(console.error);
+  const load = async () => {
+    setLoading(true);
+    setError(false);
+    try {
+      const data = await getAdminPlans();
+      setPlans(Array.isArray(data) ? data : []);
+    } catch (e) {
+      console.error(e);
+      setError(true);
+    } finally {
+      setLoading(false);
+    }
+  };
   useEffect(() => { load(); }, []);
 
   const openNew = () => { setForm({ ...empty }); setEditId(null); setModal(true); };
   const openEdit = (p: any) => {
-    setForm({ name: p.name, description: p.description || "", price: p.price, duration: p.duration, features: p.features || "", isActive: p.isActive, sortOrder: p.sortOrder });
+    let features = p.features || "";
+    try {
+      const parsed = JSON.parse(features);
+      if (Array.isArray(parsed)) features = parsed.join(", ");
+    } catch {}
+    setForm({ name: p.name, description: p.description || "", price: p.price, duration: p.duration, features, isActive: p.isActive, sortOrder: p.sortOrder });
     setEditId(p.id); setModal(true);
   };
 
   const save = async () => {
-    const data = { ...form, price: Number(form.price), duration: Number(form.duration), sortOrder: Number(form.sortOrder) };
+    const featuresList = form.features ? form.features.split(",").map((s: string) => s.trim()).filter(Boolean) : [];
+    const data = { ...form, price: Number(form.price), duration: Number(form.duration), sortOrder: Number(form.sortOrder), features: JSON.stringify(featuresList) };
     if (editId) await updatePlan(editId, data); else await createPlan(data);
     setModal(false); load();
   };
@@ -31,6 +51,46 @@ export default function PlansPage() {
   };
 
   const fmt = (n: number) => n.toLocaleString("uz-UZ") + " so'm";
+
+  const parseFeatures = (f: string): string[] => {
+    if (!f) return [];
+    try {
+      const parsed = JSON.parse(f);
+      if (Array.isArray(parsed)) return parsed;
+    } catch {}
+    return f.split(",").map((s: string) => s.trim()).filter(Boolean);
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-32">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-8 h-8 border-2 border-violet-500 border-t-transparent rounded-full animate-spin" />
+          <p className="text-sm text-slate-400">Yuklanmoqda...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center py-32">
+        <div className="flex flex-col items-center gap-4 text-center">
+          <div className="w-12 h-12 rounded-2xl bg-red-50 flex items-center justify-center text-red-400">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" /></svg>
+          </div>
+          <div>
+            <p className="text-sm font-medium text-slate-700">Yuklab bo'lmadi</p>
+            <p className="text-xs text-slate-400 mt-1">Server bilan aloqa uzildi</p>
+          </div>
+          <button onClick={load} className="inline-flex items-center gap-2 bg-violet-500 text-white px-5 py-2 rounded-xl text-sm font-medium hover:bg-violet-600 transition-colors">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182" /></svg>
+            Qayta yuklash
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -74,7 +134,7 @@ export default function PlansPage() {
 
               {p.features && (
                 <div className="mb-4 space-y-1.5">
-                  {p.features.split(",").map((f: string, i: number) => (
+                  {parseFeatures(p.features).map((f: string, i: number) => (
                     <div key={i} className="flex items-center gap-2 text-[12px] text-slate-500">
                       <svg className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
                       <span>{f.trim()}</span>
