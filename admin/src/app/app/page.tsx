@@ -11,7 +11,7 @@ function MiniAppInner() {
   const paramUser = searchParams.get("user");
 
   const [userId, setUserId] = useState<string | null>(paramUser);
-  const [screen, setScreen] = useState<"splash" | "loading" | "subscribe" | "payment" | "success" | "manage" | "payments_history" | "edit_profile" | "terms" | "faq" | "contact">("splash");
+  const [screen, setScreen] = useState<"splash" | "subscribe" | "payment" | "success" | "manage" | "payments_history" | "edit_profile" | "terms" | "faq" | "contact">("splash");
   const [plans, setPlans] = useState<any[]>([]);
   const [selectedPlan, setSelectedPlan] = useState<any>(null);
   const [subscription, setSubscription] = useState<any>(null);
@@ -43,20 +43,20 @@ function MiniAppInner() {
     } catch (e) {}
     if (uid) setUserId(uid);
 
-    // 2 sekund splash, keyin data yuklash
-    const timer = setTimeout(() => {
-      if (uid) {
-        // Data ni to'g'ridan-to'g'ri yuklash
-        fetchData(uid);
-      } else {
-        setScreen("subscribe");
-      }
-    }, 2000);
-    return () => clearTimeout(timer);
+    // Splash ko'rsatib, parallel data yuklash
+    if (uid) {
+      const splashMin = new Promise(r => setTimeout(r, 1500));
+      const dataLoad = fetchDataSilent(uid);
+      Promise.all([splashMin, dataLoad]).then(([, result]) => {
+        if (result === "manage") setScreen("manage");
+        else setScreen("subscribe");
+      });
+    } else {
+      setTimeout(() => setScreen("subscribe"), 1500);
+    }
   }, [paramUser]);
 
-  const fetchData = async (uid: string) => {
-    setScreen("loading");
+  const fetchDataSilent = async (uid: string): Promise<string> => {
     try {
       const safeFetch = async (url: string) => {
         const controller = new AbortController();
@@ -81,12 +81,11 @@ function MiniAppInner() {
       setPayments(paymentsRes || []);
       if (subRes && subRes.id) {
         setSubscription(subRes);
-        setScreen("manage");
-      } else {
-        setScreen("subscribe");
+        return "manage";
       }
+      return "subscribe";
     } catch (e) {
-      setScreen("subscribe");
+      return "subscribe";
     }
   };
 
@@ -150,7 +149,10 @@ function MiniAppInner() {
       } catch (e) {}
       setSubscription(null);
       setScreen("subscribe");
-      if (userId) await fetchData(userId);
+      if (userId) {
+        const result = await fetchDataSilent(userId);
+        setScreen(result === "manage" ? "manage" : "subscribe");
+      }
     } catch (e) {
       alert("Xatolik yuz berdi");
     }
@@ -188,18 +190,6 @@ function MiniAppInner() {
           </div>
           <h2 className="text-xl font-bold text-white mt-5 mb-1">Hilal Bot</h2>
           <p className="text-sm text-indigo-300/60">Yuklanmoqda...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // ========== LOADING (data yuklanmoqda) ==========
-  if (screen === "loading") {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-[#0f0a2a] via-[#1a1145] to-[#0f0a2a] flex items-center justify-center">
-        <div className="flex flex-col items-center">
-          <div className="w-10 h-10 border-[3px] border-indigo-800/40 border-t-indigo-400 rounded-full logo-ring-spin" />
-          <p className="text-sm text-indigo-300/60 mt-4">Yuklanmoqda...</p>
         </div>
       </div>
     );

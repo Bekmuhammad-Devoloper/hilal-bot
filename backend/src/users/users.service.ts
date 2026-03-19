@@ -66,9 +66,6 @@ export class UsersService {
       this.prisma.user.count({ where }),
     ]);
 
-    // TG rasmlarini background'da yangilash (kutmasdan)
-    this.refreshPhotosForUsers(users.filter((u) => !u.photoUrl));
-
     return {
       users: users.map((u) => ({
         ...this.serializeUser(u),
