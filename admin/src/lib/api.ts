@@ -4,7 +4,7 @@ const API_URL = typeof window !== "undefined" && window.location.hostname === "l
   ? "http://localhost:7777/api"
   : "/api";
 
-const api = axios.create({ baseURL: API_URL, timeout: 30000 });
+const api = axios.create({ baseURL: API_URL, timeout: 60000 });
 
 // Auth interceptor
 api.interceptors.request.use((config) => {

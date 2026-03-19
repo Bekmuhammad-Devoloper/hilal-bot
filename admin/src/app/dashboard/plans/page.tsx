@@ -23,7 +23,6 @@ export default function PlansPage() {
     } catch (e) {
       console.error(e);
       if (retry < 2) {
-        await new Promise(r => setTimeout(r, 1500));
         return load(retry + 1);
       }
       setError(true);

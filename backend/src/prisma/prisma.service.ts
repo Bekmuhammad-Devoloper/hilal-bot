@@ -20,7 +20,14 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
     // SQLite WAL mode — tezroq concurrent read/write
     await this.$queryRawUnsafe("PRAGMA journal_mode=WAL;");
     await this.$queryRawUnsafe("PRAGMA busy_timeout=5000;");
-    console.log("✅ Prisma DB connected (WAL mode)");
+    // Warmup — Prisma query engine-ni oldindan tayyorlash
+    await Promise.all([
+      this.user.count().catch(() => {}),
+      this.plan.count().catch(() => {}),
+      this.subscription.count().catch(() => {}),
+      this.payment.count().catch(() => {}),
+    ]);
+    console.log("✅ Prisma DB connected (WAL mode, warmed up)");
   }
 
   async onModuleDestroy() {
