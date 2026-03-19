@@ -20,7 +20,13 @@ export default function LoginPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ telegramId: parseInt(telegramId) }),
       });
-      const data = await res.json();
+      const text = await res.text();
+      let data: any;
+      try {
+        data = JSON.parse(text);
+      } catch {
+        throw new Error("Server javob bermadi. Qayta urinib ko'ring.");
+      }
       if (!res.ok) throw new Error(data.message || "Xatolik");
       localStorage.setItem("token", data.token);
       window.location.href = "/dashboard";

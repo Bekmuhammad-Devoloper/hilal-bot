@@ -18,8 +18,10 @@ function AuthCallbackInner() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ code }),
     })
-      .then((r) => r.json())
-      .then((data) => {
+      .then((r) => r.text())
+      .then((text) => {
+        let data: any;
+        try { data = JSON.parse(text); } catch { setStatus("error"); return; }
         if (data.token) {
           localStorage.setItem("token", data.token);
           setStatus("success");

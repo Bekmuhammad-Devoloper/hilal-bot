@@ -92,31 +92,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }, []);
 
   if (loading) return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-white to-indigo-50/30">
-      <div className="flex flex-col items-center gap-6">
-        {/* Logo with animated ring */}
-        <div className="relative">
-          <div className="absolute -inset-3 rounded-3xl bg-gradient-to-br from-violet-500/20 to-indigo-500/20 blur-xl animate-pulse" />
-          <div className="relative w-20 h-20 rounded-2xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center shadow-2xl shadow-indigo-500/30">
-            <img src="/logo.jpg" alt="" className="w-16 h-16 rounded-xl object-cover logo-pulse" />
-          </div>
-          {/* Spinning ring */}
-          <svg className="absolute -inset-2 w-[calc(100%+16px)] h-[calc(100%+16px)] logo-ring-spin" viewBox="0 0 100 100">
-            <rect x="2" y="2" width="96" height="96" rx="24" fill="none" stroke="url(#grad)" strokeWidth="2.5" strokeDasharray="60 200" strokeLinecap="round" />
-            <defs>
-              <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#8b5cf6" />
-                <stop offset="100%" stopColor="#6366f1" />
-              </linearGradient>
-            </defs>
-          </svg>
-        </div>
-        {/* Text */}
+    <div className="min-h-screen flex items-center justify-center bg-slate-50">
+      <div className="flex flex-col items-center gap-5">
+        <img src="/logo.jpg" alt="Hilal Bot" className="w-20 h-20 rounded-2xl object-cover shadow-lg logo-pulse" />
         <div className="text-center">
           <h2 className="text-lg font-bold text-slate-800 tracking-tight">Hilal Bot</h2>
           <p className="text-[12px] text-slate-400 font-medium mt-0.5">Admin Panel yuklanmoqda...</p>
         </div>
-        {/* Dots loader */}
         <div className="flex items-center gap-1.5">
           <div className="w-2 h-2 rounded-full bg-violet-500 animate-bounce" style={{ animationDelay: "0ms" }} />
           <div className="w-2 h-2 rounded-full bg-indigo-500 animate-bounce" style={{ animationDelay: "150ms" }} />
@@ -129,9 +111,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const Sidebar = ({ mobile = false }: { mobile?: boolean }) => (
     <aside className={`${mobile ? "w-[280px]" : open ? "w-[260px]" : "w-[76px]"} bg-white flex flex-col h-full transition-all duration-300 border-r border-slate-100`}>
       <div className="px-5 py-5 flex items-center gap-3">
-        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center flex-shrink-0 shadow-lg shadow-indigo-500/20 p-0.5">
-          <img src="/logo.jpg" alt="" className="w-full h-full rounded-[10px] object-cover" />
-        </div>
+        <img src="/logo.jpg" alt="Hilal Bot" className="w-11 h-11 rounded-xl object-cover flex-shrink-0 shadow-md" />
         {(open || mobile) && (
           <div className="overflow-hidden">
             <h2 className="font-bold text-slate-900 text-[15px] leading-tight">Hilal Bot</h2>
