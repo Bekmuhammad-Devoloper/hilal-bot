@@ -111,6 +111,30 @@ export class UsersService {
     return users.map(this.serializeUser);
   }
 
+  async getWeeklyStats() {
+    const days: { date: string; users: number; payments: number; revenue: number }[] = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const start = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+      const end = new Date(d.getFullYear(), d.getMonth(), d.getDate() + 1);
+
+      const [users, payments, revenue] = await Promise.all([
+        this.prisma.user.count({ where: { createdAt: { gte: start, lt: end } } }),
+        this.prisma.payment.count({ where: { status: "completed", createdAt: { gte: start, lt: end } } }),
+        this.prisma.payment.aggregate({ _sum: { amount: true }, where: { status: "completed", createdAt: { gte: start, lt: end } } }),
+      ]);
+
+      days.push({
+        date: start.toISOString().slice(0, 10),
+        users,
+        payments,
+        revenue: revenue._sum.amount || 0,
+      });
+    }
+    return days;
+  }
+
   async getAllTelegramIds() {
     const users = await this.prisma.user.findMany({
       where: { isBlocked: false },

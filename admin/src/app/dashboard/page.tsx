@@ -1,6 +1,65 @@
 "use client";
 import { useEffect, useState } from "react";
-import { getStats, getSubStats, getPaymentStats, getRecentPayments, getRecentUsers } from "@/lib/api";
+import { getStats, getSubStats, getPaymentStats, getRecentPayments, getRecentUsers, getWeeklyStats } from "@/lib/api";
+
+/* ─── Mini Bar Chart (pure CSS) ─── */
+function BarChart({ data, dataKey, color, label }: { data: any[]; dataKey: string; color: string; label: string }) {
+  const max = Math.max(...data.map((d) => d[dataKey] || 0), 1);
+  const dayNames = ["Yak", "Du", "Se", "Chor", "Pay", "Ju", "Sha"];
+  return (
+    <div>
+      <div className="flex items-end gap-1.5 h-[140px] px-1">
+        {data.map((d, i) => {
+          const val = d[dataKey] || 0;
+          const pct = Math.max((val / max) * 100, 4);
+          const dayIdx = new Date(d.date).getDay();
+          return (
+            <div key={i} className="flex-1 flex flex-col items-center gap-1 group">
+              <div className="text-[10px] font-medium text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity">
+                {dataKey === "revenue" ? `${(val / 1000).toFixed(0)}k` : val}
+              </div>
+              <div className="w-full rounded-t-lg transition-all duration-500 ease-out group-hover:opacity-80" style={{ height: `${pct}%`, background: `linear-gradient(to top, ${color}, ${color}99)` }} />
+              <span className="text-[10px] text-slate-400 font-medium">{dayNames[dayIdx]}</span>
+            </div>
+          );
+        })}
+      </div>
+      <p className="text-center text-[11px] text-slate-400 mt-2 font-medium">{label}</p>
+    </div>
+  );
+}
+
+/* ─── Donut Chart (SVG) ─── */
+function DonutChart({ segments, size = 120 }: { segments: { value: number; color: string; label: string }[]; size?: number }) {
+  const total = segments.reduce((s, seg) => s + seg.value, 0) || 1;
+  const r = 42; const c = 2 * Math.PI * r;
+  let offset = 0;
+  return (
+    <div className="flex items-center gap-5">
+      <svg width={size} height={size} viewBox="0 0 100 100" className="flex-shrink-0 -rotate-90">
+        <circle cx="50" cy="50" r={r} fill="none" stroke="#f1f5f9" strokeWidth="12" />
+        {segments.map((seg, i) => {
+          const pct = seg.value / total;
+          const dash = pct * c;
+          const gap = c - dash;
+          const o = offset;
+          offset += dash;
+          return <circle key={i} cx="50" cy="50" r={r} fill="none" stroke={seg.color} strokeWidth="12" strokeDasharray={`${dash} ${gap}`} strokeDashoffset={-o} strokeLinecap="round" className="transition-all duration-700" />;
+        })}
+        <text x="50" y="50" textAnchor="middle" dominantBaseline="central" className="text-[14px] font-bold fill-slate-700 rotate-90 origin-center">{total}</text>
+      </svg>
+      <div className="space-y-2">
+        {segments.map((seg, i) => (
+          <div key={i} className="flex items-center gap-2">
+            <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: seg.color }} />
+            <span className="text-[12px] text-slate-500">{seg.label}</span>
+            <span className="text-[12px] font-semibold text-slate-700">{seg.value}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 export default function DashboardPage() {
   const [stats, setStats] = useState<any>({});
@@ -8,14 +67,16 @@ export default function DashboardPage() {
   const [payStats, setPayStats] = useState<any>({});
   const [recentPayments, setRecentPayments] = useState<any[]>([]);
   const [recentUsers, setRecentUsers] = useState<any[]>([]);
+  const [weeklyData, setWeeklyData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    Promise.all([getStats(), getSubStats(), getPaymentStats(), getRecentPayments(5), getRecentUsers(5)])
-      .then(([s, ss, ps, rp, ru]) => {
+    Promise.all([getStats(), getSubStats(), getPaymentStats(), getRecentPayments(5), getRecentUsers(5), getWeeklyStats()])
+      .then(([s, ss, ps, rp, ru, wd]) => {
         setStats(s); setSubStats(ss); setPayStats(ps);
         setRecentPayments(Array.isArray(rp) ? rp : []);
         setRecentUsers(Array.isArray(ru) ? ru : []);
+        setWeeklyData(Array.isArray(wd) ? wd : []);
       })
       .catch(console.error)
       .finally(() => setLoading(false));
@@ -159,6 +220,75 @@ export default function DashboardPage() {
           <span>100%</span>
         </div>
       </div>
+
+      {/* ── Weekly Charts ── */}
+      {weeklyData.length > 0 && (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Users Chart */}
+          <div className="bg-white rounded-2xl border border-slate-100 p-6">
+            <div className="flex items-center gap-2.5 mb-5">
+              <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
+                <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-[14px] font-semibold text-slate-800">Yangi foydalanuvchilar</h3>
+                <p className="text-[11px] text-slate-400">Haftalik statistika</p>
+              </div>
+            </div>
+            <BarChart data={weeklyData} dataKey="users" color="#3b82f6" label="So'nggi 7 kun" />
+            <div className="mt-4 pt-3 border-t border-slate-50 flex items-center justify-between">
+              <span className="text-[11px] text-slate-400">Jami hafta</span>
+              <span className="text-sm font-bold text-slate-700">{weeklyData.reduce((s, d) => s + (d.users || 0), 0)} ta</span>
+            </div>
+          </div>
+
+          {/* Revenue Chart */}
+          <div className="bg-white rounded-2xl border border-slate-100 p-6">
+            <div className="flex items-center gap-2.5 mb-5">
+              <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center">
+                <svg className="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-[14px] font-semibold text-slate-800">Daromad</h3>
+                <p className="text-[11px] text-slate-400">Haftalik daromad</p>
+              </div>
+            </div>
+            <BarChart data={weeklyData} dataKey="revenue" color="#10b981" label="So'nggi 7 kun" />
+            <div className="mt-4 pt-3 border-t border-slate-50 flex items-center justify-between">
+              <span className="text-[11px] text-slate-400">Jami hafta</span>
+              <span className="text-sm font-bold text-slate-700">{formatMoney(weeklyData.reduce((s, d) => s + (d.revenue || 0), 0))}</span>
+            </div>
+          </div>
+
+          {/* Subscription Donut */}
+          <div className="bg-white rounded-2xl border border-slate-100 p-6">
+            <div className="flex items-center gap-2.5 mb-5">
+              <div className="w-8 h-8 rounded-lg bg-violet-50 flex items-center justify-center">
+                <svg className="w-4 h-4 text-violet-500" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 6a7.5 7.5 0 107.5 7.5h-7.5V6z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 10.5H21A7.5 7.5 0 0013.5 3v7.5z" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-[14px] font-semibold text-slate-800">Obuna holati</h3>
+                <p className="text-[11px] text-slate-400">Joriy taqsimot</p>
+              </div>
+            </div>
+            <div className="flex items-center justify-center py-2">
+              <DonutChart segments={[
+                { value: subStats.activeSubs || stats.activeSubs || 0, color: "#8b5cf6", label: "Aktiv" },
+                { value: subStats.expiredSubs || 0, color: "#f59e0b", label: "Tugagan" },
+                { value: subStats.cancelledSubs || 0, color: "#ef4444", label: "Bekor" },
+                { value: Math.max(0, totalUsers - (subStats.activeSubs || stats.activeSubs || 0) - (subStats.expiredSubs || 0) - (subStats.cancelledSubs || 0)), color: "#e2e8f0", label: "Obunasiz" },
+              ]} />
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Recent Payments */}

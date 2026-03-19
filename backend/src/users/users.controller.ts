@@ -46,6 +46,11 @@ export class UsersController {
     return this.usersService.getRecentUsers(parseInt(limit || "5"));
   }
 
+  @Get("weekly-stats")
+  async getWeeklyStats() {
+    return this.usersService.getWeeklyStats();
+  }
+
   @Get("telegram-ids")
   async getAllTelegramIds() {
     return this.usersService.getAllTelegramIds();

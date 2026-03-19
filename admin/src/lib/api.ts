@@ -63,6 +63,7 @@ export const getRecentPayments = async (limit = 5) => (await api.get(`/payments/
 
 // ========= USERS (additional) =========
 export const getRecentUsers = async (limit = 5) => (await api.get(`/users/recent?limit=${limit}`)).data;
+export const getWeeklyStats = async () => (await api.get("/users/weekly-stats")).data;
 
 // ========= SETTINGS =========
 export const getSettings = async () => (await api.get("/settings")).data;
