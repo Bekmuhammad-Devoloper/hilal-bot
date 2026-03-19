@@ -369,9 +369,13 @@ export default function DashboardPage() {
               </div>
             ) : recentUsers.map((u: any, i: number) => (
               <div key={i} className="px-6 py-3.5 flex items-center gap-3 hover:bg-slate-50/50 transition-colors">
-                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-100 to-violet-100 flex items-center justify-center text-indigo-600 text-sm font-bold flex-shrink-0">
-                  {u.firstName?.charAt(0)?.toUpperCase() || "?"}
-                </div>
+                {u.photoUrl ? (
+                  <img src={u.photoUrl} alt="" className="w-9 h-9 rounded-xl object-cover flex-shrink-0" />
+                ) : (
+                  <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-100 to-violet-100 flex items-center justify-center text-indigo-600 text-sm font-bold flex-shrink-0">
+                    {u.firstName?.charAt(0)?.toUpperCase() || "?"}
+                  </div>
+                )}
                 <div className="flex-1 min-w-0">
                   <p className="text-[13px] font-medium text-slate-700 truncate">{u.firstName || "Noma'lum"} {u.lastName || ""}</p>
                   <p className="text-[11px] text-slate-400">@{u.username || "username yo'q"}</p>
