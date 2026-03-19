@@ -11,6 +11,8 @@ export default function PlansPage() {
   const [editId, setEditId] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState<number | null>(null);
 
   const load = async (retry = 0) => {
     setLoading(true);
@@ -33,25 +35,51 @@ export default function PlansPage() {
 
   const openNew = () => { setForm({ ...empty }); setEditId(null); setModal(true); };
   const openEdit = (p: any) => {
-    let features = p.features || "";
+    let features = "";
     try {
-      const parsed = JSON.parse(features);
-      if (Array.isArray(parsed)) features = parsed.join(", ");
-    } catch {}
+      const parsed = JSON.parse(p.features || "[]");
+      if (Array.isArray(parsed)) features = parsed.join("\n");
+      else features = String(p.features || "");
+    } catch {
+      features = (p.features || "").split(",").map((s: string) => s.trim()).filter(Boolean).join("\n");
+    }
     setForm({ name: p.name, description: p.description || "", price: p.price, duration: p.duration, features, isActive: p.isActive, sortOrder: p.sortOrder });
     setEditId(p.id); setModal(true);
   };
 
   const save = async () => {
-    const featuresList = form.features ? form.features.split(",").map((s: string) => s.trim()).filter(Boolean) : [];
-    const data = { ...form, price: Number(form.price), duration: Number(form.duration), sortOrder: Number(form.sortOrder), features: JSON.stringify(featuresList) };
-    if (editId) await updatePlan(editId, data); else await createPlan(data);
-    setModal(false); load();
+    setSaving(true);
+    try {
+      const featuresList = form.features ? form.features.split("\n").map((s: string) => s.trim()).filter(Boolean) : [];
+      const data = { ...form, price: Number(form.price), duration: Number(form.duration), sortOrder: Number(form.sortOrder), features: JSON.stringify(featuresList) };
+      if (editId) {
+        const updated = await updatePlan(editId, data);
+        setPlans(prev => prev.map(p => p.id === editId ? { ...p, ...data, features: JSON.stringify(featuresList) } : p));
+      } else {
+        const created = await createPlan(data);
+        setPlans(prev => [...prev, { ...created, _count: { subscriptions: 0 } }]);
+      }
+      setModal(false);
+    } catch (e) {
+      console.error(e);
+      alert("Xatolik yuz berdi");
+    } finally {
+      setSaving(false);
+    }
   };
 
   const remove = async (id: number) => {
     if (!confirm("O'chirishni tasdiqlaysizmi?")) return;
-    await deletePlan(id); load();
+    setDeleting(id);
+    setPlans(prev => prev.filter(p => p.id !== id));
+    try {
+      await deletePlan(id);
+    } catch (e) {
+      console.error(e);
+      load();
+    } finally {
+      setDeleting(null);
+    }
   };
 
   const fmt = (n: number) => n.toLocaleString("uz-UZ") + " so'm";
@@ -202,8 +230,8 @@ export default function PlansPage() {
                 </div>
               </div>
               <div>
-                <label className="text-[12px] font-medium text-slate-500 mb-1.5 block">Xususiyatlar</label>
-                <input value={form.features} onChange={(e) => setForm({ ...form, features: e.target.value })} className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-800 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400 outline-none transition-all" placeholder="Video darslar, Guruh chati, ..." />
+                <label className="text-[12px] font-medium text-slate-500 mb-1.5 block">Xususiyatlar (har bir qator — 1 ta xususiyat)</label>
+                <textarea value={form.features} onChange={(e) => setForm({ ...form, features: e.target.value })} rows={5} className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-800 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400 outline-none transition-all resize-none" placeholder={"Eksklyuziv kontent\nVideo darslar\nGuruh chati\nSertifikat"} />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
@@ -223,10 +251,15 @@ export default function PlansPage() {
               </div>
             </div>
             <div className="flex gap-3 mt-6">
-              <button onClick={save} className="flex-1 bg-gradient-to-r from-violet-500 to-indigo-600 text-white py-2.5 rounded-xl hover:shadow-lg hover:shadow-indigo-500/25 transition-all font-medium text-sm">
-                Saqlash
+              <button onClick={save} disabled={saving} className="flex-1 bg-gradient-to-r from-violet-500 to-indigo-600 text-white py-2.5 rounded-xl hover:shadow-lg hover:shadow-indigo-500/25 transition-all font-medium text-sm disabled:opacity-60">
+                {saving ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Saqlanmoqda...
+                  </span>
+                ) : "Saqlash"}
               </button>
-              <button onClick={() => setModal(false)} className="flex-1 bg-slate-100 text-slate-600 py-2.5 rounded-xl hover:bg-slate-200 transition-colors font-medium text-sm">
+              <button onClick={() => setModal(false)} disabled={saving} className="flex-1 bg-slate-100 text-slate-600 py-2.5 rounded-xl hover:bg-slate-200 transition-colors font-medium text-sm disabled:opacity-60">
                 Bekor
               </button>
             </div>
