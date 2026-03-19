@@ -1,6 +1,9 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import axios from "axios";
+import * as fs from "fs";
+import * as path from "path";
+import FormData from "form-data";
 
 const BOT_TOKEN = process.env.BOT_TOKEN || "";
 
@@ -10,17 +13,57 @@ export class BroadcastService {
 
   constructor(private prisma: PrismaService) {}
 
-  // Bitta userga xabar yuborish (text/photo/video)
+  /**
+   * Checks if media is a local uploaded file (starts with /uploads/)
+   */
+  private isLocalFile(mediaUrl?: string): boolean {
+    return !!mediaUrl && mediaUrl.startsWith("/uploads/");
+  }
+
+  /**
+   * Gets absolute path for a local uploaded file
+   */
+  private getLocalPath(mediaUrl: string): string {
+    const filename = mediaUrl.replace("/uploads/", "");
+    return path.join(process.cwd(), "uploads", filename);
+  }
+
+  /**
+   * Send message to a single user (supports text/photo/video, local files or URLs)
+   */
   private async sendMsg(chatId: number, message: string, mediaType?: string, mediaUrl?: string) {
     const base = `https://api.telegram.org/bot${BOT_TOKEN}`;
+
     if (mediaType === "photo" && mediaUrl) {
-      await axios.post(`${base}/sendPhoto`, {
-        chat_id: chatId, photo: mediaUrl, caption: message || undefined, parse_mode: "HTML",
-      });
+      if (this.isLocalFile(mediaUrl)) {
+        // Send local file via form-data
+        const filePath = this.getLocalPath(mediaUrl);
+        if (!fs.existsSync(filePath)) throw new Error(`File not found: ${filePath}`);
+        const form = new FormData();
+        form.append("chat_id", String(chatId));
+        form.append("photo", fs.createReadStream(filePath));
+        if (message) { form.append("caption", message); form.append("parse_mode", "HTML"); }
+        await axios.post(`${base}/sendPhoto`, form, { headers: form.getHeaders() });
+      } else {
+        // Send URL directly
+        await axios.post(`${base}/sendPhoto`, {
+          chat_id: chatId, photo: mediaUrl, caption: message || undefined, parse_mode: "HTML",
+        });
+      }
     } else if (mediaType === "video" && mediaUrl) {
-      await axios.post(`${base}/sendVideo`, {
-        chat_id: chatId, video: mediaUrl, caption: message || undefined, parse_mode: "HTML",
-      });
+      if (this.isLocalFile(mediaUrl)) {
+        const filePath = this.getLocalPath(mediaUrl);
+        if (!fs.existsSync(filePath)) throw new Error(`File not found: ${filePath}`);
+        const form = new FormData();
+        form.append("chat_id", String(chatId));
+        form.append("video", fs.createReadStream(filePath));
+        if (message) { form.append("caption", message); form.append("parse_mode", "HTML"); }
+        await axios.post(`${base}/sendVideo`, form, { headers: form.getHeaders() });
+      } else {
+        await axios.post(`${base}/sendVideo`, {
+          chat_id: chatId, video: mediaUrl, caption: message || undefined, parse_mode: "HTML",
+        });
+      }
     } else {
       await axios.post(`${base}/sendMessage`, {
         chat_id: chatId, text: message, parse_mode: "HTML",
@@ -67,10 +110,14 @@ export class BroadcastService {
 
   // Userlar ro'yxatini olish (tanlash uchun)
   async getUsers() {
-    return this.prisma.user.findMany({
+    const users = await this.prisma.user.findMany({
       where: { isBlocked: false },
       select: { id: true, telegramId: true, firstName: true, lastName: true, username: true, photoUrl: true },
       orderBy: { firstName: "asc" },
     });
+    return users.map((u) => ({
+      ...u,
+      telegramId: Number(u.telegramId),
+    }));
   }
 }

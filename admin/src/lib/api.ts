@@ -75,5 +75,10 @@ export const getBroadcastUsers = async () => (await api.get("/broadcast/users"))
 export const broadcastAll = async (message: string, mediaType?: string, mediaUrl?: string) => (await api.post("/broadcast/all", { message, mediaType, mediaUrl })).data;
 export const broadcastSelected = async (telegramIds: number[], message: string, mediaType?: string, mediaUrl?: string) => (await api.post("/broadcast/selected", { telegramIds, message, mediaType, mediaUrl })).data;
 export const sendToUser = async (telegramId: number, message: string, mediaType?: string, mediaUrl?: string) => (await api.post("/broadcast/user", { telegramId, message, mediaType, mediaUrl })).data;
+export const uploadFile = async (file: File) => {
+  const form = new FormData();
+  form.append('file', file);
+  return (await api.post('/uploads/upload', form, { headers: { 'Content-Type': 'multipart/form-data' } })).data;
+};
 
 export default api;

@@ -7,6 +7,7 @@ import { BroadcastModule } from "./broadcast/broadcast.module";
 import { SubscriptionModule } from "./subscription/subscription.module";
 import { PaymentModule } from "./payment/payment.module";
 import { PlanModule } from "./plan/plan.module";
+import { UploadsModule } from "./uploads/uploads.module";
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { PlanModule } from "./plan/plan.module";
     SubscriptionModule,
     PaymentModule,
     PlanModule,
+    UploadsModule,
   ],
 })
 export class AppModule {}
