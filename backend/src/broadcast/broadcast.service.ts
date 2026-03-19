@@ -3,7 +3,8 @@ import { PrismaService } from "../prisma/prisma.service";
 import axios from "axios";
 import * as fs from "fs";
 import * as path from "path";
-import FormData from "form-data";
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const FormData = require("form-data");
 
 const BOT_TOKEN = process.env.BOT_TOKEN || "";
 
@@ -99,9 +100,9 @@ export class BroadcastService {
       try {
         await this.sendMsg(chatId, message, mediaType, mediaUrl);
         sent++;
-      } catch (e) {
+      } catch (e: any) {
         failed++;
-        this.logger.warn(`Failed to send to ${chatId}`);
+        this.logger.warn(`Failed to send to ${chatId}: ${e?.response?.data?.description || e.message}`);
       }
       await new Promise((r) => setTimeout(r, 50));
     }
