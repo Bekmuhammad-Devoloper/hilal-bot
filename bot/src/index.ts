@@ -12,7 +12,7 @@ bot.command("start", async (ctx) => {
   try {
     let photoUrl: string | undefined;
     try {
-      const photos = await ctx.api.getUserProfilePhotos(ctx.from!.id, 0, 1);
+      const photos = await ctx.api.getUserProfilePhotos(ctx.from!.id, { offset: 0, limit: 1 });
       if (photos.total_count > 0) {
         const fileId = photos.photos[0][photos.photos[0].length - 1].file_id;
         const file = await ctx.api.getFile(fileId);
