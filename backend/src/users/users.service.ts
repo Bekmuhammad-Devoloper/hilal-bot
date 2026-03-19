@@ -103,24 +103,16 @@ export class UsersService {
 
   async getStats() {
     const now = new Date();
-    const totalUsers = await this.prisma.user.count();
-    const todayUsers = await this.prisma.user.count({
-      where: {
-        createdAt: {
-          gte: new Date(new Date().setHours(0, 0, 0, 0)),
-        },
-      },
-    });
-    const totalAdmins = await this.prisma.user.count({ where: { isAdmin: true } });
+    const todayStart = new Date(new Date().setHours(0, 0, 0, 0));
 
-    const activeSubs = await this.prisma.subscription.count({
-      where: { status: "active", endDate: { gt: now } },
-    });
-    const totalPayments = await this.prisma.payment.count({ where: { status: "completed" } });
-    const totalRevenue = await this.prisma.payment.aggregate({
-      _sum: { amount: true },
-      where: { status: "completed" },
-    });
+    const [totalUsers, todayUsers, totalAdmins, activeSubs, totalPayments, totalRevenue] = await Promise.all([
+      this.prisma.user.count(),
+      this.prisma.user.count({ where: { createdAt: { gte: todayStart } } }),
+      this.prisma.user.count({ where: { isAdmin: true } }),
+      this.prisma.subscription.count({ where: { status: "active", endDate: { gt: now } } }),
+      this.prisma.payment.count({ where: { status: "completed" } }),
+      this.prisma.payment.aggregate({ _sum: { amount: true }, where: { status: "completed" } }),
+    ]);
 
     return {
       totalUsers,
@@ -142,23 +134,39 @@ export class UsersService {
 
   async getWeeklyStats() {
     const days: { date: string; users: number; payments: number; revenue: number }[] = [];
+    const weekStart = new Date();
+    weekStart.setDate(weekStart.getDate() - 6);
+    weekStart.setHours(0, 0, 0, 0);
+    const weekEnd = new Date();
+    weekEnd.setDate(weekEnd.getDate() + 1);
+    weekEnd.setHours(0, 0, 0, 0);
+
+    // 3 ta so'rov bilan 7 kunlik data olish (21 o'rniga 3 ta query)
+    const [users, payments, revenues] = await Promise.all([
+      this.prisma.user.findMany({
+        where: { createdAt: { gte: weekStart, lt: weekEnd } },
+        select: { createdAt: true },
+      }),
+      this.prisma.payment.findMany({
+        where: { status: "completed", createdAt: { gte: weekStart, lt: weekEnd } },
+        select: { createdAt: true, amount: true },
+      }),
+      Promise.resolve(null), // placeholder
+    ]);
+
     for (let i = 6; i >= 0; i--) {
       const d = new Date();
       d.setDate(d.getDate() - i);
-      const start = new Date(d.getFullYear(), d.getMonth(), d.getDate());
-      const end = new Date(d.getFullYear(), d.getMonth(), d.getDate() + 1);
+      const dateStr = new Date(d.getFullYear(), d.getMonth(), d.getDate()).toISOString().slice(0, 10);
 
-      const [users, payments, revenue] = await Promise.all([
-        this.prisma.user.count({ where: { createdAt: { gte: start, lt: end } } }),
-        this.prisma.payment.count({ where: { status: "completed", createdAt: { gte: start, lt: end } } }),
-        this.prisma.payment.aggregate({ _sum: { amount: true }, where: { status: "completed", createdAt: { gte: start, lt: end } } }),
-      ]);
+      const dayUsers = users.filter(u => u.createdAt.toISOString().slice(0, 10) === dateStr).length;
+      const dayPayments = payments.filter(p => p.createdAt.toISOString().slice(0, 10) === dateStr);
 
       days.push({
-        date: start.toISOString().slice(0, 10),
-        users,
-        payments,
-        revenue: revenue._sum.amount || 0,
+        date: dateStr,
+        users: dayUsers,
+        payments: dayPayments.length,
+        revenue: dayPayments.reduce((sum, p) => sum + (p.amount || 0), 0),
       });
     }
     return days;
@@ -238,5 +246,79 @@ export class UsersService {
       ...user,
       telegramId: Number(user.telegramId),
     };
+  }
+
+  // Dashboard uchun barcha ma'lumotlarni bitta so'rov bilan olish
+  private dashboardCache: { data: any; time: number } | null = null;
+
+  async getDashboardData() {
+    // 15 soniya cache
+    if (this.dashboardCache && Date.now() - this.dashboardCache.time < 15000) {
+      return this.dashboardCache.data;
+    }
+
+    const now = new Date();
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const weekStart = new Date();
+    weekStart.setDate(weekStart.getDate() - 6);
+    weekStart.setHours(0, 0, 0, 0);
+
+    // Barcha so'rovlarni PARALLEL yuborish (1 ta katta Promise.all)
+    const [
+      totalUsers, todayUsers, totalAdmins,
+      activeSubs, totalSubs, expiredSubs, cancelledSubs,
+      totalPayments, pendingPayments, completedPayments, cancelledPayments, failedPayments,
+      totalRevenue, todayRevenue, todayPayments,
+      recentUsers, recentPayments,
+      weekUsers, weekPayments,
+    ] = await Promise.all([
+      // User stats
+      this.prisma.user.count(),
+      this.prisma.user.count({ where: { createdAt: { gte: todayStart } } }),
+      this.prisma.user.count({ where: { isAdmin: true } }),
+      // Sub stats
+      this.prisma.subscription.count({ where: { status: "active", endDate: { gt: now } } }),
+      this.prisma.subscription.count(),
+      this.prisma.subscription.count({ where: { status: "expired" } }),
+      this.prisma.subscription.count({ where: { status: "cancelled" } }),
+      // Payment stats
+      this.prisma.payment.count(),
+      this.prisma.payment.count({ where: { status: "pending" } }),
+      this.prisma.payment.count({ where: { status: "completed" } }),
+      this.prisma.payment.count({ where: { status: "cancelled" } }),
+      this.prisma.payment.count({ where: { status: "failed" } }),
+      this.prisma.payment.aggregate({ _sum: { amount: true }, where: { status: "completed" } }),
+      this.prisma.payment.aggregate({ _sum: { amount: true }, where: { status: "completed", createdAt: { gte: todayStart } } }),
+      this.prisma.payment.count({ where: { status: "completed", createdAt: { gte: todayStart } } }),
+      // Recent data
+      this.prisma.user.findMany({ take: 5, orderBy: { createdAt: "desc" } }),
+      this.prisma.payment.findMany({ take: 5, orderBy: { createdAt: "desc" }, include: { user: true, plan: true } }),
+      // Weekly data (2 queries instead of 21)
+      this.prisma.user.findMany({ where: { createdAt: { gte: weekStart } }, select: { createdAt: true } }),
+      this.prisma.payment.findMany({ where: { status: "completed", createdAt: { gte: weekStart } }, select: { createdAt: true, amount: true } }),
+    ]);
+
+    // Weekly stats hisoblash (in-memory)
+    const weekly: any[] = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const dateStr = new Date(d.getFullYear(), d.getMonth(), d.getDate()).toISOString().slice(0, 10);
+      const dUsers = weekUsers.filter((u: any) => u.createdAt.toISOString().slice(0, 10) === dateStr).length;
+      const dPayments = weekPayments.filter((p: any) => p.createdAt.toISOString().slice(0, 10) === dateStr);
+      weekly.push({ date: dateStr, users: dUsers, payments: dPayments.length, revenue: dPayments.reduce((s: number, p: any) => s + (p.amount || 0), 0) });
+    }
+
+    const result = {
+      stats: { totalUsers, todayUsers, totalAdmins, activeSubs, totalPayments, totalRevenue: totalRevenue._sum.amount || 0 },
+      subStats: { totalSubs, activeSubs, expiredSubs, cancelledSubs },
+      paymentStats: { totalPayments, pending: pendingPayments, completedPayments, confirmed: completedPayments, cancelled: cancelledPayments, failed: failedPayments, totalRevenue: totalRevenue._sum.amount || 0, todayRevenue: todayRevenue._sum.amount || 0, todayPayments },
+      recentPayments: recentPayments.map((p: any) => ({ ...p, user: p.user ? { ...p.user, telegramId: Number(p.user.telegramId) } : null })),
+      recentUsers: recentUsers.map((u: any) => ({ ...u, telegramId: Number(u.telegramId) })),
+      weekly,
+    };
+
+    this.dashboardCache = { data: result, time: Date.now() };
+    return result;
   }
 }

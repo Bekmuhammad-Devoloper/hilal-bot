@@ -37,6 +37,11 @@ export class UsersController {
     );
   }
 
+  @Get("dashboard")
+  async getDashboard() {
+    return this.usersService.getDashboardData();
+  }
+
   @Get("stats")
   async getStats() {
     return this.usersService.getStats();

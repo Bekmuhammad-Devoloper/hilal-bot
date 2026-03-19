@@ -27,6 +27,7 @@ export const getUsers = async (page = 1, limit = 20, search?: string) => {
   return (await api.get("/users", { params })).data;
 };
 export const getStats = async () => (await api.get("/users/stats")).data;
+export const getDashboard = async () => (await api.get("/users/dashboard")).data;
 export const setAdmin = async (userId: number, isAdmin: boolean) => (await api.patch(`/users/${userId}/admin`, { isAdmin })).data;
 export const blockUser = async (userId: number, isBlocked: boolean) => (await api.patch(`/users/${userId}/block`, { isBlocked })).data;
 

@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { getStats, getSubStats, getPaymentStats, getRecentPayments, getRecentUsers, getWeeklyStats } from "@/lib/api";
+import { getDashboard } from "@/lib/api";
 
 /* ─── Mini Bar Chart (pure CSS) ─── */
 function BarChart({ data, dataKey, color, label }: { data: any[]; dataKey: string; color: string; label: string }) {
@@ -71,12 +71,14 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    Promise.all([getStats(), getSubStats(), getPaymentStats(), getRecentPayments(5), getRecentUsers(5), getWeeklyStats()])
-      .then(([s, ss, ps, rp, ru, wd]) => {
-        setStats(s); setSubStats(ss); setPayStats(ps);
-        setRecentPayments(Array.isArray(rp) ? rp : []);
-        setRecentUsers(Array.isArray(ru) ? ru : []);
-        setWeeklyData(Array.isArray(wd) ? wd : []);
+    getDashboard()
+      .then((d) => {
+        setStats(d.stats || {});
+        setSubStats(d.subStats || {});
+        setPayStats(d.paymentStats || {});
+        setRecentPayments(Array.isArray(d.recentPayments) ? d.recentPayments : []);
+        setRecentUsers(Array.isArray(d.recentUsers) ? d.recentUsers : []);
+        setWeeklyData(Array.isArray(d.weekly) ? d.weekly : []);
       })
       .catch(console.error)
       .finally(() => setLoading(false));
