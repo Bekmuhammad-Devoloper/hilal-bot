@@ -82,21 +82,38 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) { router.push("/"); return; }
+    
+    // Avval tokenni decode qilib, admin ekanini tekshirish
+    try {
+      const payload = JSON.parse(atob(token.split(".")[1]));
+      if (payload.role !== "admin") { localStorage.clear(); router.push("/"); return; }
+    } catch {
+      localStorage.clear(); router.push("/"); return;
+    }
+
     getMe()
       .then((u) => {
-        console.log("getMe result:", u);
-        if (!u || !u.isAdmin) { localStorage.clear(); router.push("/"); return; }
-        setUser(u);
-      })
-      .catch((err) => { 
-        console.error("getMe error:", err?.response?.status, err?.response?.data, err?.message);
-        // Agar 401 bo'lsa tokenni o'chirish, boshqa xatolikda qayta urinish
-        if (err?.response?.status === 401) {
-          localStorage.clear(); 
-          router.push("/"); 
+        if (u && u.isAdmin) {
+          setUser(u);
+        } else if (u && !u.isAdmin) {
+          localStorage.clear(); router.push("/");
         } else {
-          // Network xatosi bo'lishi mumkin, qayta urinib ko'rish
-          setTimeout(() => window.location.reload(), 2000);
+          // null qaytdi — tokendan user data olish
+          try {
+            const payload = JSON.parse(atob(token.split(".")[1]));
+            setUser({ firstName: payload.firstName, telegramId: payload.telegramId, isAdmin: true });
+          } catch {
+            localStorage.clear(); router.push("/");
+          }
+        }
+      })
+      .catch(() => {
+        // Network xato — tokendan user data olish
+        try {
+          const payload = JSON.parse(atob(token.split(".")[1]));
+          setUser({ firstName: payload.firstName, telegramId: payload.telegramId, isAdmin: true });
+        } catch {
+          localStorage.clear(); router.push("/");
         }
       })
       .finally(() => setLoading(false));
