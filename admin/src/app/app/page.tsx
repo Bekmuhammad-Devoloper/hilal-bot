@@ -47,10 +47,12 @@ function MiniAppInner() {
     if (uid) {
       const splashMin = new Promise(r => setTimeout(r, 1500));
       const dataLoad = fetchDataSilent(uid);
-      Promise.all([splashMin, dataLoad]).then(([, result]) => {
+      // Maksimum 10 soniya kutish, keyin subscribe sahifaga o'tish
+      const maxWait = new Promise<string>(r => setTimeout(() => r("subscribe"), 10000));
+      Promise.all([splashMin, Promise.race([dataLoad, maxWait])]).then(([, result]) => {
         if (result === "manage") setScreen("manage");
         else setScreen("subscribe");
-      });
+      }).catch(() => setScreen("subscribe"));
     } else {
       setTimeout(() => setScreen("subscribe"), 1500);
     }
@@ -60,7 +62,7 @@ function MiniAppInner() {
     try {
       const safeFetch = async (url: string) => {
         const controller = new AbortController();
-        const timer = setTimeout(() => controller.abort(), 8000);
+        const timer = setTimeout(() => controller.abort(), 5000);
         try {
           const r = await fetch(url, { signal: controller.signal });
           const text = await r.text();
