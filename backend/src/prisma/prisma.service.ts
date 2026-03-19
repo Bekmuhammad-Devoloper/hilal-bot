@@ -18,8 +18,8 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
   async onModuleInit() {
     await this.$connect();
     // SQLite WAL mode — tezroq concurrent read/write
-    await this.$executeRawUnsafe("PRAGMA journal_mode=WAL;");
-    await this.$executeRawUnsafe("PRAGMA busy_timeout=5000;");
+    await this.$queryRawUnsafe("PRAGMA journal_mode=WAL;");
+    await this.$queryRawUnsafe("PRAGMA busy_timeout=5000;");
     console.log("✅ Prisma DB connected (WAL mode)");
   }
 
