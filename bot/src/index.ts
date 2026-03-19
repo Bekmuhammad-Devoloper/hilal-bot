@@ -8,13 +8,23 @@ const bot = new Bot(config.botToken);
 // /start - Parallel Muhit uslubidagi welcome
 // =============================================
 bot.command("start", async (ctx) => {
-  // Royxatdan otkazish
+  // Royxatdan otkazish (profil rasm bilan)
   try {
+    let photoUrl: string | undefined;
+    try {
+      const photos = await ctx.api.getUserProfilePhotos(ctx.from!.id, 0, 1);
+      if (photos.total_count > 0) {
+        const fileId = photos.photos[0][photos.photos[0].length - 1].file_id;
+        const file = await ctx.api.getFile(fileId);
+        photoUrl = `https://api.telegram.org/file/bot${config.botToken}/${file.file_path}`;
+      }
+    } catch (e) {}
     await api.registerUser(
       ctx.from!.id,
       ctx.from!.username || "",
       ctx.from!.first_name || "",
       ctx.from!.last_name || "",
+      photoUrl,
     );
   } catch (e) {}
 

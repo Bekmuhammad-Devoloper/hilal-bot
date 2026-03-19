@@ -92,12 +92,36 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }, []);
 
   if (loading) return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50">
-      <div className="flex flex-col items-center gap-4">
-        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
-          <img src="/logo.jpg" alt="" className="w-10 h-10 rounded-xl object-cover" />
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-white to-indigo-50/30">
+      <div className="flex flex-col items-center gap-6">
+        {/* Logo with animated ring */}
+        <div className="relative">
+          <div className="absolute -inset-3 rounded-3xl bg-gradient-to-br from-violet-500/20 to-indigo-500/20 blur-xl animate-pulse" />
+          <div className="relative w-20 h-20 rounded-2xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center shadow-2xl shadow-indigo-500/30">
+            <img src="/logo.jpg" alt="" className="w-16 h-16 rounded-xl object-cover logo-pulse" />
+          </div>
+          {/* Spinning ring */}
+          <svg className="absolute -inset-2 w-[calc(100%+16px)] h-[calc(100%+16px)] logo-ring-spin" viewBox="0 0 100 100">
+            <rect x="2" y="2" width="96" height="96" rx="24" fill="none" stroke="url(#grad)" strokeWidth="2.5" strokeDasharray="60 200" strokeLinecap="round" />
+            <defs>
+              <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#8b5cf6" />
+                <stop offset="100%" stopColor="#6366f1" />
+              </linearGradient>
+            </defs>
+          </svg>
         </div>
-        <div className="w-6 h-6 border-[2.5px] border-slate-200 border-t-indigo-500 rounded-full animate-spin" />
+        {/* Text */}
+        <div className="text-center">
+          <h2 className="text-lg font-bold text-slate-800 tracking-tight">Hilal Bot</h2>
+          <p className="text-[12px] text-slate-400 font-medium mt-0.5">Admin Panel yuklanmoqda...</p>
+        </div>
+        {/* Dots loader */}
+        <div className="flex items-center gap-1.5">
+          <div className="w-2 h-2 rounded-full bg-violet-500 animate-bounce" style={{ animationDelay: "0ms" }} />
+          <div className="w-2 h-2 rounded-full bg-indigo-500 animate-bounce" style={{ animationDelay: "150ms" }} />
+          <div className="w-2 h-2 rounded-full bg-violet-500 animate-bounce" style={{ animationDelay: "300ms" }} />
+        </div>
       </div>
     </div>
   );
@@ -105,8 +129,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const Sidebar = ({ mobile = false }: { mobile?: boolean }) => (
     <aside className={`${mobile ? "w-[280px]" : open ? "w-[260px]" : "w-[76px]"} bg-white flex flex-col h-full transition-all duration-300 border-r border-slate-100`}>
       <div className="px-5 py-5 flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center flex-shrink-0 shadow-lg shadow-indigo-500/20">
-          <img src="/logo.jpg" alt="" className="w-8 h-8 rounded-lg object-cover" />
+        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center flex-shrink-0 shadow-lg shadow-indigo-500/20 p-0.5">
+          <img src="/logo.jpg" alt="" className="w-full h-full rounded-[10px] object-cover" />
         </div>
         {(open || mobile) && (
           <div className="overflow-hidden">
@@ -139,9 +163,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <div className="p-3 border-t border-slate-100">
         {(open || mobile) && user && (
           <div className="flex items-center gap-3 px-3 py-2.5 mb-1">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-100 to-indigo-100 flex items-center justify-center text-indigo-600 text-sm font-bold flex-shrink-0">
-              {user.firstName?.charAt(0)?.toUpperCase() || "A"}
-            </div>
+            {user.photoUrl ? (
+              <img src={user.photoUrl} alt="" className="w-9 h-9 rounded-xl object-cover flex-shrink-0" />
+            ) : (
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-100 to-indigo-100 flex items-center justify-center text-indigo-600 text-sm font-bold flex-shrink-0">
+                {user.firstName?.charAt(0)?.toUpperCase() || "A"}
+              </div>
+            )}
             <div className="overflow-hidden">
               <p className="text-[13px] font-semibold text-slate-700 truncate">{user.firstName}</p>
               <p className="text-[11px] text-slate-400 truncate">ID: {user.telegramId}</p>
@@ -198,9 +226,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <span className="text-[11px] text-emerald-600 font-medium">Online</span>
             </div>
             <div className="flex items-center gap-2.5 bg-gradient-to-r from-violet-50 to-indigo-50 rounded-xl px-3 py-1.5">
-              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center text-white text-xs font-bold">
-                {user?.firstName?.charAt(0)?.toUpperCase() || "A"}
-              </div>
+              {user?.photoUrl ? (
+                <img src={user.photoUrl} alt="" className="w-7 h-7 rounded-lg object-cover" />
+              ) : (
+                <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center text-white text-xs font-bold">
+                  {user?.firstName?.charAt(0)?.toUpperCase() || "A"}
+                </div>
+              )}
               <span className="text-[12px] font-semibold text-slate-700 hidden sm:block">{user?.firstName}</span>
             </div>
           </div>

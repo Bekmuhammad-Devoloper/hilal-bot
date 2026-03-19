@@ -12,12 +12,14 @@ export async function registerUser(
   username: string,
   firstName: string,
   lastName: string,
+  photoUrl?: string,
 ) {
   const { data } = await api.post("/users/register", {
     telegramId,
     username,
     firstName,
     lastName,
+    photoUrl,
   });
   return data;
 }

@@ -5,15 +5,18 @@ import { PrismaService } from "../prisma/prisma.service";
 export class UsersService {
   constructor(private prisma: PrismaService) {}
 
-  async register(telegramId: number, username: string, firstName: string, lastName: string) {
+  async register(telegramId: number, username: string, firstName: string, lastName: string, photoUrl?: string) {
+    const data: any = { username, firstName, lastName };
+    if (photoUrl) data.photoUrl = photoUrl;
     return this.prisma.user.upsert({
       where: { telegramId: BigInt(telegramId) },
-      update: { username, firstName, lastName },
+      update: data,
       create: {
         telegramId: BigInt(telegramId),
         username,
         firstName,
         lastName,
+        ...(photoUrl ? { photoUrl } : {}),
       },
     });
   }

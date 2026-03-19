@@ -24,9 +24,16 @@ export default function UsersPage() {
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap justify-between items-center gap-3">
-        <div>
-          <h1 className="text-xl font-bold text-slate-800">Foydalanuvchilar</h1>
-          <p className="text-sm text-slate-400 mt-0.5">Jami: {data.total || 0}</p>
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
+            </svg>
+          </div>
+          <div>
+            <h1 className="text-xl font-bold text-slate-800">Foydalanuvchilar</h1>
+            <p className="text-sm text-slate-400 mt-0.5">Jami foydalanuvchilar: <span className="font-semibold text-indigo-600">{data.total || 0}</span></p>
+          </div>
         </div>
         <div className="relative">
           <svg className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" /></svg>
@@ -52,9 +59,13 @@ export default function UsersPage() {
                 <tr key={u.id} className="hover:bg-slate-50/50 transition-colors">
                   <td className="px-5 py-3.5">
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-100 to-violet-100 flex items-center justify-center text-indigo-600 text-sm font-bold flex-shrink-0">
-                        {u.firstName?.charAt(0)?.toUpperCase() || "?"}
-                      </div>
+                      {u.photoUrl ? (
+                        <img src={u.photoUrl} alt="" className="w-9 h-9 rounded-xl object-cover flex-shrink-0" />
+                      ) : (
+                        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-100 to-violet-100 flex items-center justify-center text-indigo-600 text-sm font-bold flex-shrink-0">
+                          {u.firstName?.charAt(0)?.toUpperCase() || "?"}
+                        </div>
+                      )}
                       <div>
                         <p className="font-medium text-slate-800 text-[13px]">{u.firstName} {u.lastName || ""}</p>
                         <p className="text-[11px] text-slate-400">@{u.username || "—"}</p>

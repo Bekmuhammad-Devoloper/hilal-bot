@@ -7,13 +7,14 @@ export class UsersController {
 
   @Post("register")
   async register(
-    @Body() body: { telegramId: number; username: string; firstName: string; lastName: string }
+    @Body() body: { telegramId: number; username: string; firstName: string; lastName: string; photoUrl?: string }
   ) {
     const user = await this.usersService.register(
       body.telegramId,
       body.username,
       body.firstName,
-      body.lastName
+      body.lastName,
+      body.photoUrl
     );
     return { ...user, telegramId: Number(user.telegramId) };
   }

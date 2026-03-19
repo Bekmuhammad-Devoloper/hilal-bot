@@ -179,17 +179,28 @@ export default function DashboardPage() {
       {/* Quick Stats Bar */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {[
-          { label: "Bugungi yangi", value: todayUsers, icon: "�" },
-          { label: "Adminlar", value: totalAdmins, icon: "🔐" },
-          { label: "Bugungi to'lovlar", value: todayPayments, icon: "💳" },
-          { label: "Bugungi daromad", value: formatMoney(todayRevenue), icon: "💰" },
+          { label: "Bugungi yangi", value: todayUsers, gradient: "from-sky-400 to-blue-500", icon: (
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
+          )},
+          { label: "Adminlar", value: totalAdmins, gradient: "from-amber-400 to-orange-500", icon: (
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" /></svg>
+          )},
+          { label: "Bugungi to'lovlar", value: todayPayments, gradient: "from-rose-400 to-pink-500", icon: (
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z" /></svg>
+          )},
+          { label: "Bugungi daromad", value: formatMoney(todayRevenue), gradient: "from-emerald-400 to-green-500", icon: (
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+          )},
         ].map((q, i) => (
-          <div key={i} className="bg-white rounded-xl p-4 border border-slate-100 hover:border-slate-200 transition-colors">
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-base">{q.icon}</span>
-              <span className="text-[11px] text-slate-400 font-medium uppercase tracking-wide">{q.label}</span>
+          <div key={i} className={`bg-gradient-to-br ${q.gradient} rounded-2xl p-4 text-white relative overflow-hidden group hover:shadow-lg transition-shadow duration-300`}>
+            <div className="absolute -right-3 -top-3 w-16 h-16 rounded-full bg-white/10" />
+            <div className="relative">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center">{q.icon}</div>
+                <span className="text-[11px] text-white/80 font-medium uppercase tracking-wide">{q.label}</span>
+              </div>
+              <p className="text-xl font-bold tracking-tight">{q.value}</p>
             </div>
-            <p className="text-lg font-bold text-slate-800">{q.value}</p>
           </div>
         ))}
       </div>
