@@ -101,7 +101,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           // null qaytdi — tokendan user data olish
           try {
             const payload = JSON.parse(atob(token.split(".")[1]));
-            setUser({ firstName: payload.firstName, telegramId: payload.telegramId, isAdmin: true });
+            setUser({ firstName: payload.firstName, telegramId: payload.telegramId, isAdmin: true, photoUrl: payload.photoUrl || null });
           } catch {
             localStorage.clear(); router.push("/");
           }
@@ -111,7 +111,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         // Network xato — tokendan user data olish
         try {
           const payload = JSON.parse(atob(token.split(".")[1]));
-          setUser({ firstName: payload.firstName, telegramId: payload.telegramId, isAdmin: true });
+          setUser({ firstName: payload.firstName, telegramId: payload.telegramId, isAdmin: true, photoUrl: payload.photoUrl || null });
         } catch {
           localStorage.clear(); router.push("/");
         }

@@ -61,6 +61,7 @@ export class AuthService {
         telegramId: Number(user.telegramId),
         role: "admin",
         firstName: user.firstName,
+        photoUrl: user.photoUrl || null,
       },
       JWT_SECRET,
       { expiresIn: "7d" }
@@ -89,6 +90,7 @@ export class AuthService {
         telegramId: Number(user.telegramId),
         role: "admin",
         firstName: user.firstName,
+        photoUrl: user.photoUrl || null,
       },
       JWT_SECRET,
       { expiresIn: "7d" }

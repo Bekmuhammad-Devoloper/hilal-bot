@@ -47,12 +47,36 @@ export class UsersService {
         skip,
         take: limit,
         orderBy: { createdAt: "desc" },
+        include: {
+          subscriptions: {
+            where: { status: "active" },
+            include: { plan: true },
+            orderBy: { endDate: "desc" },
+            take: 1,
+          },
+          payments: {
+            where: { status: "completed" },
+            orderBy: { createdAt: "desc" },
+            take: 1,
+          },
+        },
       }),
       this.prisma.user.count({ where }),
     ]);
 
     return {
-      users: users.map(this.serializeUser),
+      users: users.map((u) => ({
+        ...this.serializeUser(u),
+        activeSubscription: u.subscriptions[0]
+          ? {
+              status: u.subscriptions[0].status,
+              startDate: u.subscriptions[0].startDate,
+              endDate: u.subscriptions[0].endDate,
+              planName: u.subscriptions[0].plan?.name || null,
+            }
+          : null,
+        lastPaymentMethod: u.payments[0]?.method || null,
+      })),
       total,
       page,
       totalPages: Math.ceil(total / limit),
