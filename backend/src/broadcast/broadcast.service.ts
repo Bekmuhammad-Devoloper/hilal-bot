@@ -81,6 +81,7 @@ export class BroadcastService {
   }
 
   async sendToSelected(telegramIds: number[], message: string, mediaType?: string, mediaUrl?: string) {
+    this.logger.log(`sendToSelected: ids=${JSON.stringify(telegramIds)}, msg=${message}, mediaType=${mediaType}, mediaUrl=${mediaUrl}`);
     return this.broadcastToList(telegramIds, message, mediaType, mediaUrl);
   }
 
@@ -94,18 +95,22 @@ export class BroadcastService {
   }
 
   private async broadcastToList(chatIds: number[], message: string, mediaType?: string, mediaUrl?: string) {
+    this.logger.log(`broadcastToList: ${chatIds.length} users, mediaType=${mediaType}`);
     let sent = 0;
     let failed = 0;
     for (const chatId of chatIds) {
       try {
+        this.logger.log(`Sending to ${chatId}...`);
         await this.sendMsg(chatId, message, mediaType, mediaUrl);
         sent++;
+        this.logger.log(`Sent to ${chatId} OK`);
       } catch (e: any) {
         failed++;
         this.logger.warn(`Failed to send to ${chatId}: ${e?.response?.data?.description || e.message}`);
       }
       await new Promise((r) => setTimeout(r, 50));
     }
+    this.logger.log(`broadcastToList done: sent=${sent}, failed=${failed}`);
     return { total: chatIds.length, sent, failed };
   }
 
