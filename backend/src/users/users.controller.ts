@@ -57,6 +57,11 @@ export class UsersController {
     return this.usersService.getAllTelegramIds();
   }
 
+  @Post("refresh-photos")
+  async refreshPhotos() {
+    return this.usersService.refreshAllPhotos();
+  }
+
   @Patch(":id/admin")
   async setAdmin(@Param("id") id: string, @Body() body: { isAdmin: boolean }) {
     return this.usersService.setAdmin(parseInt(id), body.isAdmin);

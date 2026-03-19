@@ -4,6 +4,7 @@ import * as jwt from "jsonwebtoken";
 import * as crypto from "crypto";
 
 const JWT_SECRET = process.env.JWT_SECRET || "hilal-bot-secret-key-2024";
+const BOT_TOKEN = process.env.BOT_TOKEN || "";
 
 // Vaqtinchalik auth kodlari: { telegramId: { code, expiresAt } }
 const authCodes = new Map<number, { code: string; expiresAt: number }>();
@@ -152,6 +153,41 @@ export class AuthService {
       where: { id: decoded.userId },
     });
     if (!user) throw new UnauthorizedException("User topilmadi");
+
+    // TG profile rasmini yangilash
+    const freshPhotoUrl = await this.fetchTelegramPhoto(Number(user.telegramId));
+    if (freshPhotoUrl && freshPhotoUrl !== user.photoUrl) {
+      await this.prisma.user.update({
+        where: { id: user.id },
+        data: { photoUrl: freshPhotoUrl },
+      });
+      user.photoUrl = freshPhotoUrl;
+    }
+
     return { ...user, telegramId: Number(user.telegramId) };
+  }
+
+  // Telegram Bot API orqali user profile rasmini olish
+  async fetchTelegramPhoto(telegramId: number): Promise<string | null> {
+    if (!BOT_TOKEN) return null;
+    try {
+      const res = await fetch(
+        `https://api.telegram.org/bot${BOT_TOKEN}/getUserProfilePhotos?user_id=${telegramId}&offset=0&limit=1`
+      );
+      const data = await res.json();
+      if (!data.ok || !data.result?.photos?.length) return null;
+
+      const photos = data.result.photos[0];
+      const largest = photos[photos.length - 1];
+      const fileRes = await fetch(
+        `https://api.telegram.org/bot${BOT_TOKEN}/getFile?file_id=${largest.file_id}`
+      );
+      const fileData = await fileRes.json();
+      if (!fileData.ok) return null;
+
+      return `https://api.telegram.org/file/bot${BOT_TOKEN}/${fileData.result.file_path}`;
+    } catch {
+      return null;
+    }
   }
 }

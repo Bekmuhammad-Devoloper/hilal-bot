@@ -1,6 +1,8 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 
+const BOT_TOKEN = process.env.BOT_TOKEN || "";
+
 @Injectable()
 export class UsersService {
   constructor(private prisma: PrismaService) {}
@@ -64,8 +66,30 @@ export class UsersService {
       this.prisma.user.count({ where }),
     ]);
 
+    // TG rasmlarini yangilash (sahifadagi userlar uchun)
+    await this.refreshPhotosForUsers(users);
+
+    // Yangilangan userlarni qayta o'qish
+    const freshUsers = await this.prisma.user.findMany({
+      where: { id: { in: users.map((u) => u.id) } },
+      orderBy: { createdAt: "desc" },
+      include: {
+        subscriptions: {
+          where: { status: "active" },
+          include: { plan: true },
+          orderBy: { endDate: "desc" },
+          take: 1,
+        },
+        payments: {
+          where: { status: "completed" },
+          orderBy: { createdAt: "desc" },
+          take: 1,
+        },
+      },
+    });
+
     return {
-      users: users.map((u) => ({
+      users: freshUsers.map((u) => ({
         ...this.serializeUser(u),
         activeSubscription: u.subscriptions[0]
           ? {
@@ -168,6 +192,67 @@ export class UsersService {
       select: { telegramId: true },
     });
     return users.map((u) => Number(u.telegramId));
+  }
+
+  // Telegram Bot API orqali user profile rasmini olish
+  async fetchTelegramPhoto(telegramId: number): Promise<string | null> {
+    if (!BOT_TOKEN) return null;
+    try {
+      const res = await fetch(
+        `https://api.telegram.org/bot${BOT_TOKEN}/getUserProfilePhotos?user_id=${telegramId}&offset=0&limit=1`
+      );
+      const data = await res.json();
+      if (!data.ok || !data.result?.photos?.length) return null;
+
+      const photos = data.result.photos[0];
+      const largest = photos[photos.length - 1];
+      const fileRes = await fetch(
+        `https://api.telegram.org/bot${BOT_TOKEN}/getFile?file_id=${largest.file_id}`
+      );
+      const fileData = await fileRes.json();
+      if (!fileData.ok) return null;
+
+      return `https://api.telegram.org/file/bot${BOT_TOKEN}/${fileData.result.file_path}`;
+    } catch {
+      return null;
+    }
+  }
+
+  // Rasmlarini yangilash (sahifadagi userlar uchun)
+  private async refreshPhotosForUsers(users: any[]) {
+    const promises = users.map(async (u) => {
+      try {
+        const photoUrl = await this.fetchTelegramPhoto(Number(u.telegramId));
+        if (photoUrl) {
+          await this.prisma.user.update({
+            where: { id: u.id },
+            data: { photoUrl },
+          });
+        }
+      } catch {}
+    });
+    await Promise.all(promises);
+  }
+
+  // Barcha userlarning rasmlarini yangilash
+  async refreshAllPhotos() {
+    const users = await this.prisma.user.findMany({
+      select: { id: true, telegramId: true },
+    });
+    let updated = 0;
+    for (const u of users) {
+      try {
+        const photoUrl = await this.fetchTelegramPhoto(Number(u.telegramId));
+        if (photoUrl) {
+          await this.prisma.user.update({
+            where: { id: u.id },
+            data: { photoUrl },
+          });
+          updated++;
+        }
+      } catch {}
+    }
+    return { total: users.length, updated };
   }
 
   private serializeUser(user: any) {
