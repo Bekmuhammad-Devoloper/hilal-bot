@@ -84,10 +84,21 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     if (!token) { router.push("/"); return; }
     getMe()
       .then((u) => {
-        if (!u?.isAdmin) { localStorage.clear(); router.push("/"); return; }
+        console.log("getMe result:", u);
+        if (!u || !u.isAdmin) { localStorage.clear(); router.push("/"); return; }
         setUser(u);
       })
-      .catch(() => { localStorage.clear(); router.push("/"); })
+      .catch((err) => { 
+        console.error("getMe error:", err?.response?.status, err?.response?.data, err?.message);
+        // Agar 401 bo'lsa tokenni o'chirish, boshqa xatolikda qayta urinish
+        if (err?.response?.status === 401) {
+          localStorage.clear(); 
+          router.push("/"); 
+        } else {
+          // Network xatosi bo'lishi mumkin, qayta urinib ko'rish
+          setTimeout(() => window.location.reload(), 2000);
+        }
+      })
       .finally(() => setLoading(false));
   }, []);
 
