@@ -58,12 +58,25 @@ function MiniAppInner() {
   const fetchData = async (uid: string) => {
     setScreen("loading");
     try {
-      const timeout = (ms: number) => new Promise((_, rej) => setTimeout(() => rej(new Error("timeout")), ms));
+      const safeFetch = async (url: string) => {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 8000);
+        try {
+          const r = await fetch(url, { signal: controller.signal });
+          const text = await r.text();
+          clearTimeout(timer);
+          if (!text) return null;
+          try { return JSON.parse(text); } catch { return null; }
+        } catch {
+          clearTimeout(timer);
+          return null;
+        }
+      };
       const [plansRes, subRes, paymentsRes] = await Promise.all([
-        Promise.race([fetch(API + "/plans").then(r => r.json()), timeout(8000)]),
-        Promise.race([fetch(API + "/subscriptions/active/" + uid).then(r => r.json()), timeout(8000)]).catch(() => null),
-        Promise.race([fetch(API + "/payments/user/" + uid).then(r => r.json()), timeout(8000)]).catch(() => []),
-      ]) as [any[], any, any[]];
+        safeFetch(API + "/plans"),
+        safeFetch(API + "/subscriptions/active/" + uid),
+        safeFetch(API + "/payments/user/" + uid),
+      ]);
       setPlans(plansRes || []);
       setPayments(paymentsRes || []);
       if (subRes && subRes.id) {

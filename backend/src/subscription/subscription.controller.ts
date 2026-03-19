@@ -8,7 +8,8 @@ export class SubscriptionController {
   // Foydalanuvchining aktiv obunasi
   @Get("active/:telegramId")
   async getActive(@Param("telegramId") telegramId: string) {
-    return this.subService.getActiveSubscription(parseInt(telegramId));
+    const sub = await this.subService.getActiveSubscription(parseInt(telegramId));
+    return sub || { active: false };
   }
 
   // Foydalanuvchining barcha obunalari
