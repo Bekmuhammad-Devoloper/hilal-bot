@@ -4,7 +4,7 @@ const API_URL = typeof window !== "undefined" && window.location.hostname === "l
   ? "http://localhost:7777/api"
   : "/api";
 
-const api = axios.create({ baseURL: API_URL, timeout: 60000 });
+const api = axios.create({ baseURL: API_URL, timeout: 120000 });
 
 // Auth interceptor
 api.interceptors.request.use((config) => {
@@ -72,13 +72,16 @@ export const updateSettings = async (key: string, value: any) => (await api.put(
 
 // ========= BROADCAST =========
 export const getBroadcastUsers = async () => (await api.get("/broadcast/users")).data;
-export const broadcastAll = async (message: string, mediaType?: string, mediaUrl?: string) => (await api.post("/broadcast/all", { message, mediaType, mediaUrl })).data;
-export const broadcastSelected = async (telegramIds: number[], message: string, mediaType?: string, mediaUrl?: string) => (await api.post("/broadcast/selected", { telegramIds, message, mediaType, mediaUrl })).data;
-export const sendToUser = async (telegramId: number, message: string, mediaType?: string, mediaUrl?: string) => (await api.post("/broadcast/user", { telegramId, message, mediaType, mediaUrl })).data;
+export const broadcastAll = async (message: string, mediaType?: string, mediaUrl?: string) => (await api.post("/broadcast/all", { message, mediaType, mediaUrl }, { timeout: 300000 })).data;
+export const broadcastSelected = async (telegramIds: number[], message: string, mediaType?: string, mediaUrl?: string) => (await api.post("/broadcast/selected", { telegramIds, message, mediaType, mediaUrl }, { timeout: 300000 })).data;
+export const sendToUser = async (telegramId: number, message: string, mediaType?: string, mediaUrl?: string) => (await api.post("/broadcast/user", { telegramId, message, mediaType, mediaUrl }, { timeout: 300000 })).data;
 export const uploadFile = async (file: File) => {
   const form = new FormData();
   form.append('file', file);
-  return (await api.post('/uploads/upload', form, { headers: { 'Content-Type': 'multipart/form-data' } })).data;
+  return (await api.post('/uploads/upload', form, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+    timeout: 300000, // 5 min for large video uploads
+  })).data;
 };
 
 export default api;

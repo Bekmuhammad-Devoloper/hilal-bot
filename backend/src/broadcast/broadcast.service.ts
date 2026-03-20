@@ -44,12 +44,12 @@ export class BroadcastService {
         form.append("chat_id", String(chatId));
         form.append("photo", fs.createReadStream(filePath));
         if (message) { form.append("caption", message); form.append("parse_mode", "HTML"); }
-        await axios.post(`${base}/sendPhoto`, form, { headers: form.getHeaders() });
+        await axios.post(`${base}/sendPhoto`, form, { headers: form.getHeaders(), timeout: 120000 });
       } else {
         // Send URL directly
         await axios.post(`${base}/sendPhoto`, {
           chat_id: chatId, photo: mediaUrl, caption: message || undefined, parse_mode: "HTML",
-        });
+        }, { timeout: 120000 });
       }
     } else if (mediaType === "video" && mediaUrl) {
       if (this.isLocalFile(mediaUrl)) {
@@ -59,11 +59,11 @@ export class BroadcastService {
         form.append("chat_id", String(chatId));
         form.append("video", fs.createReadStream(filePath));
         if (message) { form.append("caption", message); form.append("parse_mode", "HTML"); }
-        await axios.post(`${base}/sendVideo`, form, { headers: form.getHeaders() });
+        await axios.post(`${base}/sendVideo`, form, { headers: form.getHeaders(), timeout: 300000 });
       } else {
         await axios.post(`${base}/sendVideo`, {
           chat_id: chatId, video: mediaUrl, caption: message || undefined, parse_mode: "HTML",
-        });
+        }, { timeout: 300000 });
       }
     } else {
       await axios.post(`${base}/sendMessage`, {
