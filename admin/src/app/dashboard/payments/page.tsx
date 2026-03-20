@@ -117,9 +117,13 @@ export default function PaymentsPage() {
                     </td>
                     <td className="px-5 py-3.5">
                       <div className="flex items-center gap-2.5">
-                        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-100 to-violet-100 flex items-center justify-center text-indigo-600 text-xs font-bold flex-shrink-0">
-                          {p.user?.firstName?.charAt(0)?.toUpperCase() || "?"}
-                        </div>
+                        {p.user?.photoUrl ? (
+                          <img src={p.user.photoUrl} alt="" className="w-8 h-8 rounded-lg object-cover flex-shrink-0" />
+                        ) : (
+                          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-100 to-violet-100 flex items-center justify-center text-indigo-600 text-xs font-bold flex-shrink-0">
+                            {p.user?.firstName?.charAt(0)?.toUpperCase() || "?"}
+                          </div>
+                        )}
                         <div>
                           <p className="font-medium text-slate-800 text-[13px]">{p.user?.firstName || "?"}</p>
                           <p className="text-[10px] text-slate-400">{p.user?.telegramId}</p>

@@ -118,9 +118,13 @@ export default function SubscriptionsPage() {
                   <tr key={s.id} className="hover:bg-slate-50/50 transition-colors">
                     <td className="px-5 py-3.5">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-100 to-violet-100 flex items-center justify-center text-indigo-600 text-xs font-bold flex-shrink-0">
-                          {s.user?.firstName?.charAt(0)?.toUpperCase() || "?"}
-                        </div>
+                        {s.user?.photoUrl ? (
+                          <img src={s.user.photoUrl} alt="" className="w-8 h-8 rounded-lg object-cover flex-shrink-0" />
+                        ) : (
+                          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-100 to-violet-100 flex items-center justify-center text-indigo-600 text-xs font-bold flex-shrink-0">
+                            {s.user?.firstName?.charAt(0)?.toUpperCase() || "?"}
+                          </div>
+                        )}
                         <div>
                           <p className="font-medium text-slate-800 text-[13px]">{s.user?.firstName || "?"}</p>
                           <p className="text-[11px] text-slate-400">{s.user?.telegramId}</p>
