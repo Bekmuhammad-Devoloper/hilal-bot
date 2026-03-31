@@ -109,17 +109,15 @@ function MiniAppInner() {
         setEditName(((profileRes.firstName || "") + " " + (profileRes.lastName || "")).trim());
         setEditPhone(profileRes.phone || "");
       }
-      // Admin yoki aktiv obuna — manage ekraniga
-      if (profileRes?.isAdmin) {
-        if (subRes && subRes.id && subRes.endDate && !isNaN(new Date(subRes.endDate).getTime())) {
-          setSubscription(subRes);
-        }
-        return "manage";
-      }
+      // Aktiv obuna bo'lsa set qilish
       if (subRes && subRes.id && subRes.endDate && !isNaN(new Date(subRes.endDate).getTime())) {
         setSubscription(subRes);
+      }
+      // Profili bor foydalanuvchi — manage ekraniga (obuna bor/yo'q farqi yo'q)
+      if (profileRes?.id) {
         return "manage";
       }
+      // Yangi foydalanuvchi — welcome sahifasiga
       return "welcome";
     } catch (e) {
       return "welcome";
@@ -331,8 +329,8 @@ function MiniAppInner() {
               <div className="flex items-center gap-3 mb-4">
                 <img src="/logo.jpg" alt="" className="w-10 h-10 rounded-full border-2 border-white/20" />
                 <div>
-                  <p className="font-bold text-base text-white">{subscription?.plan?.name || "Oson Turk Tili"}</p>
-                  <p className="text-indigo-300/70 text-xs">{isAdmin && !hasSub ? "👑 Admin" : "Faol obuna"}</p>
+                  <p className="font-bold text-base text-white">{hasSub ? (subscription?.plan?.name || "Oson Turk Tili") : "Hilal Edu"}</p>
+                  <p className="text-indigo-300/70 text-xs">{isAdmin && !hasSub ? "👑 Admin" : hasSub ? "Faol obuna" : "Obuna faol emas"}</p>
                 </div>
               </div>
 
@@ -360,8 +358,9 @@ function MiniAppInner() {
                 </div>
               ) : (
                 <div className="mt-2">
-                  <p className="text-indigo-300/70 text-xs mb-1">Obuna tugashiga</p>
-                  <p className="text-5xl font-black count-pulse text-white">0 <span className="text-lg font-medium text-indigo-300/70">kun</span></p>
+                  <p className="text-indigo-300/70 text-xs mb-1">Hozircha obunangiz yo{"'"}q</p>
+                  <p className="text-2xl font-black text-white">Obuna sotib oling</p>
+                  <p className="text-xs text-indigo-300/50 mt-1">Eksklyuziv darslarga kirish uchun</p>
                 </div>
               )}
             </div>
@@ -371,7 +370,7 @@ function MiniAppInner() {
         <div className="px-5 space-y-3 pb-8">
           {/* Obunani yangilash */}
           <div className="bg-white/[0.07] backdrop-blur-sm rounded-2xl p-5 border border-white/[0.08] fade-in-up stagger-1">
-            <p className="font-semibold text-white text-center mb-4">{isAdmin && !hasSub ? "Obuna sotib olasizmi?" : "Obunani yangilaysizmi?"}</p>
+            <p className="font-semibold text-white text-center mb-4">{hasSub ? "Obunani yangilaysizmi?" : "Obuna sotib olasizmi?"}</p>
             <div className="grid grid-cols-2 gap-3">
               <button
                 onClick={() => { setScreen("subscribe"); setSubscription(null); }}
