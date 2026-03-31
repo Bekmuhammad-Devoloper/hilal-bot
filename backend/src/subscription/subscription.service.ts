@@ -14,7 +14,7 @@ export class SubscriptionService {
     if (!user) return null;
 
     const now = new Date();
-    return this.prisma.subscription.findFirst({
+    const sub = await this.prisma.subscription.findFirst({
       where: {
         userId: user.id,
         status: "active",
@@ -23,6 +23,17 @@ export class SubscriptionService {
       include: { plan: true },
       orderBy: { endDate: "desc" },
     });
+
+    if (!sub) return null;
+
+    // endDate validligini tekshirish
+    const endDate = new Date(sub.endDate);
+    if (isNaN(endDate.getTime())) {
+      console.error(`Invalid endDate found for subscription ${sub.id}:`, sub.endDate);
+      return null;
+    }
+
+    return sub;
   }
 
   // Obuna yaratish (to'lovdan keyin)
@@ -35,11 +46,20 @@ export class SubscriptionService {
     const plan = await this.prisma.plan.findUnique({ where: { id: planId } });
     if (!plan) throw new Error("Plan topilmadi");
 
+    // duration ni tekshirish — default 30 kun
+    const duration = plan.duration && plan.duration > 0 ? plan.duration : 30;
+
     // Mavjud aktiv obunani tekshirish
     const existingSub = await this.getActiveSubscription(telegramId);
-    const startDate = existingSub ? new Date(existingSub.endDate) : new Date();
+    let startDate: Date;
+    if (existingSub && existingSub.endDate) {
+      const existingEnd = new Date(existingSub.endDate);
+      startDate = !isNaN(existingEnd.getTime()) ? existingEnd : new Date();
+    } else {
+      startDate = new Date();
+    }
     const endDate = new Date(startDate);
-    endDate.setDate(endDate.getDate() + plan.duration);
+    endDate.setDate(endDate.getDate() + duration);
 
     const subscription = await this.prisma.subscription.create({
       data: {

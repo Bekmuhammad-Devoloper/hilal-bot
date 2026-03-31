@@ -32,26 +32,34 @@ bot.command("start", async (ctx) => {
   let sub: any = null;
   try {
     sub = await api.getActiveSubscription(ctx.from!.id);
-  } catch (e) {}
+  } catch (e) {
+    console.error("getActiveSubscription error:", e);
+  }
 
-  if (sub) {
+  if (sub && sub.endDate) {
     const endDate = new Date(sub.endDate);
     const now = new Date();
-    const daysLeft = Math.max(0, Math.ceil((endDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)));
 
-    const keyboard = new InlineKeyboard()
-      .webApp("\u{1F4F1} Ishga tushirish", `${config.webAppUrl}/app?user=${ctx.from!.id}`)
-      .row()
-      .url("\u{1F4E2} Kanalga o'tish", `https://t.me/${config.channelId.replace("@", "")}`);
+    // endDate validligini tekshirish
+    if (!isNaN(endDate.getTime())) {
+      const daysLeft = Math.max(0, Math.ceil((endDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)));
 
-    await ctx.reply(
-      `\u2705 Sizning obunangiz faol!\n\n` +
-      `\u{1F4C5} Obuna tugash sanasi: ${formatDate(endDate)}\n` +
-      `\u23F3 Qolgan kunlar: ${daysLeft} kun\n\n` +
-      `Maxsus kontentlarimiz siz uchun ochiq \u26A1`,
-      { reply_markup: keyboard },
-    );
-    return;
+      const keyboard = new InlineKeyboard()
+        .webApp("\u{1F4F1} Ishga tushirish", `${config.webAppUrl}/app?user=${ctx.from!.id}`)
+        .row()
+        .url("\u{1F4E2} Kanalga o'tish", `https://t.me/${config.channelId.replace("@", "")}`);
+
+      await ctx.reply(
+        `\u2705 Sizning obunangiz faol!\n\n` +
+        `\u{1F4C5} Obuna tugash sanasi: ${formatDate(endDate)}\n` +
+        `\u23F3 Qolgan kunlar: ${daysLeft} kun\n\n` +
+        `Maxsus kontentlarimiz siz uchun ochiq \u26A1`,
+        { reply_markup: keyboard },
+      );
+      return;
+    }
+    // Agar endDate noto'g'ri bo'lsa, pastga tushadi va yangi foydalanuvchi sifatida ko'rsatadi
+    console.error("Invalid endDate in subscription:", sub.endDate);
   }
 
   // Obuna yoq - WebApp orqali boshlash
@@ -104,9 +112,11 @@ bot.command("status", async (ctx) => {
   let sub: any = null;
   try {
     sub = await api.getActiveSubscription(ctx.from!.id);
-  } catch (e) {}
+  } catch (e) {
+    console.error("getActiveSubscription error:", e);
+  }
 
-  if (!sub) {
+  if (!sub || !sub.endDate) {
     const keyboard = new InlineKeyboard()
       .webApp("\u{1F680} Obuna bo'lish", `${config.webAppUrl}/app?user=${ctx.from!.id}`);
 
@@ -120,6 +130,20 @@ bot.command("status", async (ctx) => {
 
   const endDate = new Date(sub.endDate);
   const now = new Date();
+
+  // endDate validligini tekshirish
+  if (isNaN(endDate.getTime())) {
+    const keyboard = new InlineKeyboard()
+      .webApp("\u{1F680} Obuna bo'lish", `${config.webAppUrl}/app?user=${ctx.from!.id}`);
+
+    await ctx.reply(
+      `\u274C Obuna ma'lumotlarida xatolik.\n\n` +
+      `Iltimos, qaytadan obuna bo'ling:`,
+      { reply_markup: keyboard },
+    );
+    return;
+  }
+
   const daysLeft = Math.max(0, Math.ceil((endDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)));
 
   const keyboard = new InlineKeyboard()

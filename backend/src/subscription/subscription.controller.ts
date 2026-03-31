@@ -9,7 +9,16 @@ export class SubscriptionController {
   @Get("active/:telegramId")
   async getActive(@Param("telegramId") telegramId: string) {
     const sub = await this.subService.getActiveSubscription(parseInt(telegramId));
-    return sub || { active: false };
+    if (!sub) return { active: false };
+    
+    // Sanalarni ISO string formatida qaytarish (NaN oldini olish)
+    return {
+      ...sub,
+      startDate: sub.startDate instanceof Date ? sub.startDate.toISOString() : sub.startDate,
+      endDate: sub.endDate instanceof Date ? sub.endDate.toISOString() : sub.endDate,
+      createdAt: sub.createdAt instanceof Date ? sub.createdAt.toISOString() : sub.createdAt,
+      updatedAt: sub.updatedAt instanceof Date ? sub.updatedAt.toISOString() : sub.updatedAt,
+    };
   }
 
   // Foydalanuvchining barcha obunalari

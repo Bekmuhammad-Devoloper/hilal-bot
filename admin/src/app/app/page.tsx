@@ -111,10 +111,12 @@ function MiniAppInner() {
       }
       // Admin yoki aktiv obuna — manage ekraniga
       if (profileRes?.isAdmin) {
-        if (subRes && subRes.id) setSubscription(subRes);
+        if (subRes && subRes.id && subRes.endDate && !isNaN(new Date(subRes.endDate).getTime())) {
+          setSubscription(subRes);
+        }
         return "manage";
       }
-      if (subRes && subRes.id) {
+      if (subRes && subRes.id && subRes.endDate && !isNaN(new Date(subRes.endDate).getTime())) {
         setSubscription(subRes);
         return "manage";
       }
@@ -195,15 +197,20 @@ function MiniAppInner() {
 
   const formatPrice = (n: number) => new Intl.NumberFormat("uz-UZ").format(n);
   const formatDate = (d: string) => {
+    if (!d) return "—";
     const date = new Date(d);
+    if (isNaN(date.getTime())) return "—";
     const dd = String(date.getDate()).padStart(2, "0");
     const mm = String(date.getMonth() + 1).padStart(2, "0");
     const yyyy = date.getFullYear();
     return dd + "." + mm + "." + yyyy;
   };
 
-  const daysLeft = subscription && subscription.status === "active"
-    ? Math.max(0, Math.ceil((new Date(subscription.endDate).getTime() - Date.now()) / 86400000))
+  const daysLeft = subscription && subscription.status === "active" && subscription.endDate
+    ? (() => {
+        const endTime = new Date(subscription.endDate).getTime();
+        return isNaN(endTime) ? 0 : Math.max(0, Math.ceil((endTime - Date.now()) / 86400000));
+      })()
     : 0;
 
   // ========== SPLASH ==========

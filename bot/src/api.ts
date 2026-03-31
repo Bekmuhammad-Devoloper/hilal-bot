@@ -43,6 +43,19 @@ export async function getPlan(id: number) {
 // ============ SUBSCRIPTIONS ============
 export async function getActiveSubscription(telegramId: number) {
   const { data } = await api.get(`/subscriptions/active/${telegramId}`);
+  // API returns {active: false} when no subscription
+  if (!data || !data.id) return null;
+  // endDate validligini tekshirish
+  if (data.endDate) {
+    const endDate = new Date(data.endDate);
+    if (isNaN(endDate.getTime())) {
+      console.error(`Invalid endDate for user ${telegramId}:`, data.endDate);
+      return null;
+    }
+  } else {
+    console.error(`No endDate in subscription for user ${telegramId}`);
+    return null;
+  }
   return data;
 }
 
