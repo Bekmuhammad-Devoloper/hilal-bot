@@ -81,13 +81,24 @@ function MiniAppInner() {
           return null;
         }
       };
-      const [plansRes, subRes, paymentsRes] = await Promise.all([
+      const [plansRes, subRes, paymentsRes, profileRes] = await Promise.all([
         safeFetch(API + "/plans"),
         safeFetch(API + "/subscriptions/active/" + uid),
         safeFetch(API + "/payments/user/" + uid),
+        safeFetch(API + "/users/telegram/" + uid),
       ]);
       setPlans(plansRes || []);
       setPayments(paymentsRes || []);
+      if (profileRes) {
+        setUserProfile(profileRes);
+        setEditName(((profileRes.firstName || "") + " " + (profileRes.lastName || "")).trim());
+        setEditPhone(profileRes.phone || "");
+      }
+      // Admin yoki aktiv obuna — manage ekraniga
+      if (profileRes?.isAdmin) {
+        if (subRes && subRes.id) setSubscription(subRes);
+        return "manage";
+      }
       if (subRes && subRes.id) {
         setSubscription(subRes);
         return "manage";
@@ -206,8 +217,10 @@ function MiniAppInner() {
 
   // ========== MANAGE — Animatsiyali minimalistik ==========
   if (screen === "manage") {
+    const isAdmin = userProfile?.isAdmin;
+    const hasSub = subscription && subscription.id;
     const totalDays = subscription?.plan?.duration || 30;
-    const progressPercent = Math.max(0, Math.min(100, (daysLeft / totalDays) * 100));
+    const progressPercent = hasSub ? Math.max(0, Math.min(100, (daysLeft / totalDays) * 100)) : 0;
 
     return (
       <div className="min-h-screen bg-gradient-to-b from-[#0f0a2a] via-[#1a1145] to-[#0f0a2a]">
@@ -223,24 +236,38 @@ function MiniAppInner() {
                 <img src="/logo.jpg" alt="" className="w-10 h-10 rounded-full border-2 border-white/20" />
                 <div>
                   <p className="font-bold text-base text-white">{subscription?.plan?.name || "Oson Turk Tili"}</p>
-                  <p className="text-indigo-300/70 text-xs">Faol obuna</p>
+                  <p className="text-indigo-300/70 text-xs">{isAdmin && !hasSub ? "👑 Admin" : "Faol obuna"}</p>
                 </div>
               </div>
 
-              <div className="mt-2">
-                <p className="text-indigo-300/70 text-xs mb-1">Obuna tugashiga</p>
-                <p className="text-5xl font-black count-pulse text-white">{daysLeft} <span className="text-lg font-medium text-indigo-300/70">kun</span></p>
-              </div>
+              {hasSub ? (
+                <>
+                  <div className="mt-2">
+                    <p className="text-indigo-300/70 text-xs mb-1">Obuna tugashiga</p>
+                    <p className="text-5xl font-black count-pulse text-white">{daysLeft} <span className="text-lg font-medium text-indigo-300/70">kun</span></p>
+                  </div>
 
-              <div className="mt-4">
-                <div className="w-full bg-white/10 rounded-full h-1.5 overflow-hidden">
-                  <div className="bg-gradient-to-r from-emerald-400 to-cyan-300 h-1.5 rounded-full progress-fill" style={{ width: progressPercent + "%" }} />
+                  <div className="mt-4">
+                    <div className="w-full bg-white/10 rounded-full h-1.5 overflow-hidden">
+                      <div className="bg-gradient-to-r from-emerald-400 to-cyan-300 h-1.5 rounded-full progress-fill" style={{ width: progressPercent + "%" }} />
+                    </div>
+                    <div className="flex justify-between mt-1.5">
+                      <p className="text-[10px] text-indigo-300/50">Boshlangan</p>
+                      <p className="text-[10px] text-indigo-300/50">{daysLeft}/{totalDays} kun</p>
+                    </div>
+                  </div>
+                </>
+              ) : isAdmin ? (
+                <div className="mt-2">
+                  <p className="text-indigo-300/70 text-xs mb-1">Cheksiz kirish</p>
+                  <p className="text-3xl font-black text-white">♾️ <span className="text-lg font-medium text-indigo-300/70">Admin rejim</span></p>
                 </div>
-                <div className="flex justify-between mt-1.5">
-                  <p className="text-[10px] text-indigo-300/50">Boshlangan</p>
-                  <p className="text-[10px] text-indigo-300/50">{daysLeft}/{totalDays} kun</p>
+              ) : (
+                <div className="mt-2">
+                  <p className="text-indigo-300/70 text-xs mb-1">Obuna tugashiga</p>
+                  <p className="text-5xl font-black count-pulse text-white">0 <span className="text-lg font-medium text-indigo-300/70">kun</span></p>
                 </div>
-              </div>
+              )}
             </div>
           </div>
         </div>
@@ -248,7 +275,7 @@ function MiniAppInner() {
         <div className="px-5 space-y-3 pb-8">
           {/* Obunani yangilash */}
           <div className="bg-white/[0.07] backdrop-blur-sm rounded-2xl p-5 border border-white/[0.08] fade-in-up stagger-1">
-            <p className="font-semibold text-white text-center mb-4">Obunani yangilaysizmi?</p>
+            <p className="font-semibold text-white text-center mb-4">{isAdmin && !hasSub ? "Obuna sotib olasizmi?" : "Obunani yangilaysizmi?"}</p>
             <div className="grid grid-cols-2 gap-3">
               <button
                 onClick={() => { setScreen("subscribe"); setSubscription(null); }}
