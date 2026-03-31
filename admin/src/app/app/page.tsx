@@ -11,7 +11,7 @@ function MiniAppInner() {
   const paramUser = searchParams.get("user");
 
   const [userId, setUserId] = useState<string | null>(paramUser);
-  const [screen, setScreen] = useState<"splash" | "subscribe" | "payment" | "success" | "manage" | "payments_history" | "edit_profile" | "terms" | "faq" | "contact">("splash");
+  const [screen, setScreen] = useState<"splash" | "welcome" | "subscribe" | "payment" | "success" | "manage" | "payments_history" | "edit_profile" | "terms" | "faq" | "contact">("splash");
   const [plans, setPlans] = useState<any[]>([]);
   const [selectedPlan, setSelectedPlan] = useState<any>(null);
   const [subscription, setSubscription] = useState<any>(null);
@@ -69,14 +69,14 @@ function MiniAppInner() {
     if (uid) {
       const splashMin = new Promise(r => setTimeout(r, 1500));
       const dataLoad = fetchDataSilent(uid);
-      // Maksimum 10 soniya kutish, keyin subscribe sahifaga o'tish
-      const maxWait = new Promise<string>(r => setTimeout(() => r("subscribe"), 10000));
+      // Maksimum 10 soniya kutish, keyin welcome sahifaga o'tish
+      const maxWait = new Promise<string>(r => setTimeout(() => r("welcome"), 10000));
       Promise.all([splashMin, Promise.race([dataLoad, maxWait])]).then(([, result]) => {
         if (result === "manage") setScreen("manage");
-        else setScreen("subscribe");
-      }).catch(() => setScreen("subscribe"));
+        else setScreen("welcome");
+      }).catch(() => setScreen("welcome"));
     } else {
-      setTimeout(() => setScreen("subscribe"), 1500);
+      setTimeout(() => setScreen("welcome"), 1500);
     }
   }, [paramUser]);
 
@@ -120,9 +120,9 @@ function MiniAppInner() {
         setSubscription(subRes);
         return "manage";
       }
-      return "subscribe";
+      return "welcome";
     } catch (e) {
-      return "subscribe";
+      return "welcome";
     }
   };
 
@@ -232,6 +232,80 @@ function MiniAppInner() {
           </div>
           <h2 className="text-xl font-bold text-white mt-5 mb-1">Hilal Bot</h2>
           <p className="text-sm text-indigo-300/60">Yuklanmoqda...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // ========== WELCOME — Kanal taqdimoti ==========
+  if (screen === "welcome") {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-[#0f0a2a] via-[#1a1145] to-[#0f0a2a] flex flex-col">
+        {/* Hero section */}
+        <div className="flex-1 flex flex-col items-center justify-center px-6 pt-10 pb-6">
+          {/* Logo */}
+          <div className="relative mb-6 scale-in">
+            <div className="absolute -inset-3 bg-indigo-500/20 rounded-full blur-xl" />
+            <img
+              src="/logo.jpg"
+              alt="Hilal Bot"
+              className="relative w-28 h-28 rounded-full object-cover border-4 border-white/10 shadow-2xl shadow-indigo-900/50"
+            />
+          </div>
+
+          {/* Title */}
+          <h1 className="text-2xl font-black text-white text-center mb-2 fade-in-up">
+            Hilal Edu ga xush kelibsiz!
+          </h1>
+          <p className="text-sm text-indigo-300/60 text-center mb-8 fade-in-up" style={{ animationDelay: "0.1s" }}>
+            Turk tilini oson va samarali o{"'"}rganing
+          </p>
+
+          {/* Features */}
+          <div className="w-full max-w-sm space-y-3 mb-8">
+            <div className="flex items-center gap-3 bg-white/[0.06] backdrop-blur-sm rounded-2xl px-5 py-4 border border-white/[0.06] fade-in-up" style={{ animationDelay: "0.15s" }}>
+              <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-xl flex items-center justify-center">
+                <span className="text-lg">📚</span>
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-white">Eksklyuziv darslar</p>
+                <p className="text-xs text-indigo-300/50">Haftada 2 ta yangi dars</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 bg-white/[0.06] backdrop-blur-sm rounded-2xl px-5 py-4 border border-white/[0.06] fade-in-up" style={{ animationDelay: "0.25s" }}>
+              <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-emerald-500 to-cyan-500 rounded-xl flex items-center justify-center">
+                <span className="text-lg">🎥</span>
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-white">Video va matnlar</p>
+                <p className="text-xs text-indigo-300/50">Savol-javoblar bilan</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 bg-white/[0.06] backdrop-blur-sm rounded-2xl px-5 py-4 border border-white/[0.06] fade-in-up" style={{ animationDelay: "0.35s" }}>
+              <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-amber-500 to-orange-500 rounded-xl flex items-center justify-center">
+                <span className="text-lg">🤝</span>
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-white">Turk tili muhiti</p>
+                <p className="text-xs text-indigo-300/50">Fikrlash va muloqot imkoniyati</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom CTA */}
+        <div className="px-6 pb-10 fade-in-up" style={{ animationDelay: "0.45s" }}>
+          <button
+            onClick={() => setScreen("subscribe")}
+            className="w-full py-4 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-2xl font-bold text-base shadow-lg shadow-indigo-900/30 active:scale-[0.98] transition-transform"
+          >
+            BOSHLASH
+          </button>
+          <p className="text-center text-xs text-indigo-300/30 mt-3">
+            G{"'"}ulomjon Sobirov pullik boti
+          </p>
         </div>
       </div>
     );
