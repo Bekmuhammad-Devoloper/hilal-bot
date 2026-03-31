@@ -1,7 +1,7 @@
 const { Client } = require("ssh2");
 const conn = new Client();
 
-function run(conn, cmd, timeout = 120000) {
+function run(conn, cmd, timeout = 15000) {
   return new Promise((resolve, reject) => {
     const timer = setTimeout(() => resolve("TIMEOUT"), timeout);
     conn.exec(cmd, (err, stream) => {
@@ -22,29 +22,20 @@ conn.on("ready", async () => {
   console.log("Connected!\n");
 
   try {
-    console.log("=== GIT PULL ===");
-    let r = await run(conn, "cd /root/hilal-bot && git pull origin main");
+    // 1. Check current nginx config for hilal-bot
+    console.log("=== CURRENT NGINX CONFIG ===");
+    let r = await run(conn, "cat /etc/nginx/sites-enabled/hilal-bot.bekmuhammad.uz 2>/dev/null || cat /etc/nginx/sites-available/hilal-bot.bekmuhammad.uz 2>/dev/null || ls /etc/nginx/sites-enabled/");
     console.log(r);
 
-    console.log("\n=== BUILD ADMIN ===");
-    r = await run(conn, "cd /root/hilal-bot/admin && npm run build 2>&1", 120000);
+    // 2. Check nginx.conf for client_max_body_size
+    console.log("\n=== NGINX.CONF client_max_body_size ===");
+    r = await run(conn, "grep -n client_max_body_size /etc/nginx/nginx.conf /etc/nginx/sites-enabled/* /etc/nginx/conf.d/* 2>/dev/null || echo 'NOT FOUND'");
     console.log(r);
-
-    console.log("\n=== RESTART ADMIN ===");
-    r = await run(conn, "pm2 restart hilal-admin 2>&1");
-    console.log(r);
-
-    await new Promise(r => setTimeout(r, 3000));
-
-    console.log("\n=== TEST ===");
-    r = await run(conn, "curl -s -w ' HTTP:%{http_code}' -m 5 -o /dev/null http://localhost:8888");
-    console.log("Admin:", r);
-
-    console.log("\n✅ DONE!");
 
   } catch (e) {
     console.error("Error:", e.message);
   }
+
   conn.end();
 });
 

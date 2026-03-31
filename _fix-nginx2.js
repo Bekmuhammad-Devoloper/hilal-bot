@@ -1,7 +1,7 @@
 const { Client } = require("ssh2");
 const conn = new Client();
 
-function run(conn, cmd, timeout = 120000) {
+function run(conn, cmd, timeout = 15000) {
   return new Promise((resolve, reject) => {
     const timer = setTimeout(() => resolve("TIMEOUT"), timeout);
     conn.exec(cmd, (err, stream) => {
@@ -22,29 +22,30 @@ conn.on("ready", async () => {
   console.log("Connected!\n");
 
   try {
-    console.log("=== GIT PULL ===");
-    let r = await run(conn, "cd /root/hilal-bot && git pull origin main");
+    // 1. Full nginx config
+    console.log("=== FULL NGINX CONFIG ===");
+    let r = await run(conn, "cat /etc/nginx/sites-enabled/hilal-bot");
     console.log(r);
 
-    console.log("\n=== BUILD ADMIN ===");
-    r = await run(conn, "cd /root/hilal-bot/admin && npm run build 2>&1", 120000);
+    // 2. Check nginx.conf main
+    console.log("\n=== NGINX.CONF ===");
+    r = await run(conn, "grep -n 'client_max_body_size\\|http {' /etc/nginx/nginx.conf");
     console.log(r);
 
-    console.log("\n=== RESTART ADMIN ===");
-    r = await run(conn, "pm2 restart hilal-admin 2>&1");
+    // 3. Check NestJS uploads controller file limit
+    console.log("\n=== UPLOADS CONTROLLER ===");
+    r = await run(conn, "cat /root/hilal-bot/backend/src/uploads/uploads.controller.ts");
     console.log(r);
 
-    await new Promise(r => setTimeout(r, 3000));
-
-    console.log("\n=== TEST ===");
-    r = await run(conn, "curl -s -w ' HTTP:%{http_code}' -m 5 -o /dev/null http://localhost:8888");
-    console.log("Admin:", r);
-
-    console.log("\n✅ DONE!");
+    // 4. Check NestJS main.ts for body limit
+    console.log("\n=== MAIN.TS ===");
+    r = await run(conn, "cat /root/hilal-bot/backend/src/main.ts");
+    console.log(r);
 
   } catch (e) {
     console.error("Error:", e.message);
   }
+
   conn.end();
 });
 

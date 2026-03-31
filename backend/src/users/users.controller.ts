@@ -1,10 +1,14 @@
 import { Controller, Get, Post, Patch, Param, Body, Query, Res, HttpStatus } from "@nestjs/common";
 import { UsersService } from "./users.service";
+import { PrismaService } from "../prisma/prisma.service";
 import { Response } from "express";
 
 @Controller("users")
 export class UsersController {
-  constructor(private usersService: UsersService) {}
+  constructor(
+    private usersService: UsersService,
+    private prisma: PrismaService,
+  ) {}
 
   @Post("register")
   async register(
@@ -28,13 +32,17 @@ export class UsersController {
   @Get("photo/:telegramId")
   async getPhoto(@Param("telegramId") telegramId: string, @Res() res: Response) {
     try {
-      const user = await this.usersService.findByTelegramId(parseInt(telegramId));
+      const tid = BigInt(telegramId);
+      const user = await this.prisma.user.findUnique({
+        where: { telegramId: tid },
+        select: { photoUrl: true },
+      });
       if (user?.photoUrl) {
         return res.redirect(user.photoUrl);
       }
       return res.status(HttpStatus.NOT_FOUND).json({ error: "Photo not found" });
-    } catch {
-      return res.status(HttpStatus.NOT_FOUND).json({ error: "Photo not found" });
+    } catch (e) {
+      return res.status(HttpStatus.NOT_FOUND).json({ error: "Photo not found", detail: String(e) });
     }
   }
 
