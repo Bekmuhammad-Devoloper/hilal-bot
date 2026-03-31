@@ -436,11 +436,15 @@ function MiniAppInner() {
         <div className="space-y-4 fade-in-up stagger-1">
           {/* Avatar — TG profil rasmi */}
           <div className="flex justify-center mb-2">
-            {(userProfile?.photoUrl || tgPhotoUrl) ? (
+            {(tgPhotoUrl || userProfile?.photoUrl) ? (
               <img
-                src={userProfile?.photoUrl || tgPhotoUrl || ""}
+                src={tgPhotoUrl || userProfile?.photoUrl || ""}
                 alt="Profile"
                 className="w-20 h-20 rounded-full object-cover border-[3px] border-indigo-500/40 shadow-lg shadow-indigo-900/30"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).style.display = "none";
+                  (e.target as HTMLImageElement).parentElement!.innerHTML = `<div class="w-20 h-20 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-full flex items-center justify-center text-white text-2xl font-bold border-[3px] border-indigo-500/40">${(editName || "?")[0]?.toUpperCase() || "?"}</div>`;
+                }}
               />
             ) : (
               <div className="w-20 h-20 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-full flex items-center justify-center text-white text-2xl font-bold border-[3px] border-indigo-500/40">
@@ -450,9 +454,9 @@ function MiniAppInner() {
           </div>
 
           {/* TG username */}
-          {(userProfile?.username || tgUsername) && (
+          {(tgUsername || userProfile?.username) && (
             <div className="text-center -mt-1 mb-2">
-              <span className="text-indigo-300/60 text-sm">@{userProfile?.username || tgUsername}</span>
+              <span className="text-indigo-300/60 text-sm">@{tgUsername || userProfile?.username}</span>
             </div>
           )}
 
@@ -478,12 +482,20 @@ function MiniAppInner() {
             />
           </div>
 
-          {userProfile && (
+          {(userProfile || tgUsername) && (
             <div className="bg-white/[0.05] rounded-2xl p-4 border border-white/[0.06]">
-              <div className="flex items-center gap-2 text-indigo-300/40 text-xs">
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                <span>Telegram ID: {userProfile.telegramId}</span>
-              </div>
+              {userProfile?.telegramId && (
+                <div className="flex items-center gap-2 text-indigo-300/40 text-xs">
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                  <span>Telegram ID: {userProfile.telegramId}</span>
+                </div>
+              )}
+              {(tgUsername || userProfile?.username) && (
+                <div className="flex items-center gap-2 text-indigo-300/40 text-xs mt-1.5">
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                  <span>@{tgUsername || userProfile?.username}</span>
+                </div>
+              )}
             </div>
           )}
         </div>
