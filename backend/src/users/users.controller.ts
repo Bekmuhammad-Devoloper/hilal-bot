@@ -30,14 +30,7 @@ export class UsersController {
     try {
       const user = await this.usersService.findByTelegramId(parseInt(telegramId));
       if (user?.photoUrl) {
-        const response = await fetch(user.photoUrl);
-        if (response.ok) {
-          const contentType = response.headers.get("content-type") || "image/jpeg";
-          const buffer = Buffer.from(await response.arrayBuffer());
-          res.set("Content-Type", contentType);
-          res.set("Cache-Control", "public, max-age=3600");
-          return res.send(buffer);
-        }
+        return res.redirect(user.photoUrl);
       }
       return res.status(HttpStatus.NOT_FOUND).json({ error: "Photo not found" });
     } catch {

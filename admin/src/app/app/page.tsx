@@ -436,27 +436,21 @@ function MiniAppInner() {
         <div className="space-y-4 fade-in-up stagger-1">
           {/* Avatar — TG profil rasmi */}
           <div className="flex justify-center mb-2">
-            {userId ? (
-              <img
-                src={tgPhotoUrl || (API + "/users/photo/" + userId)}
-                alt="Profile"
-                className="w-20 h-20 rounded-full object-cover border-[3px] border-indigo-500/40 shadow-lg shadow-indigo-900/30"
-                onError={(e) => {
-                  const el = e.target as HTMLImageElement;
-                  el.style.display = "none";
-                  if (el.parentElement) {
-                    const fallback = document.createElement("div");
-                    fallback.className = "w-20 h-20 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-full flex items-center justify-center text-white text-2xl font-bold border-[3px] border-indigo-500/40";
-                    fallback.textContent = (editName || "?")[0]?.toUpperCase() || "?";
-                    el.parentElement.appendChild(fallback);
-                  }
-                }}
-              />
-            ) : (
+            <div className="relative w-20 h-20">
+              {userId && (
+                <img
+                  src={tgPhotoUrl || userProfile?.photoUrl || (API + "/users/photo/" + userId)}
+                  alt=""
+                  className="w-20 h-20 rounded-full object-cover border-[3px] border-indigo-500/40 shadow-lg shadow-indigo-900/30 absolute inset-0"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).style.display = "none";
+                  }}
+                />
+              )}
               <div className="w-20 h-20 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-full flex items-center justify-center text-white text-2xl font-bold border-[3px] border-indigo-500/40">
                 {(editName || "?")[0]?.toUpperCase()}
               </div>
-            )}
+            </div>
           </div>
 
           {/* TG username */}
