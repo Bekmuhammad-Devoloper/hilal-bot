@@ -41,8 +41,8 @@ export class UsersController {
         return res.redirect(user.photoUrl);
       }
       return res.status(HttpStatus.NOT_FOUND).json({ error: "Photo not found" });
-    } catch (e) {
-      return res.status(HttpStatus.NOT_FOUND).json({ error: "Photo not found", detail: String(e) });
+    } catch {
+      return res.status(HttpStatus.NOT_FOUND).json({ error: "Photo not found" });
     }
   }
 
