@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { getPayments, confirmPayment, cancelPayment, getPaymentStats } from "@/lib/api";
 
 export default function PaymentsPage() {
@@ -8,11 +8,12 @@ export default function PaymentsPage() {
   const [page, setPage] = useState(1);
   const [status, setStatus] = useState("");
 
-  const load = () => {
+  const load = useCallback(() => {
     getPayments(page, 20, status || undefined).then(setData).catch(console.error);
     getPaymentStats().then(setStats).catch(console.error);
-  };
-  useEffect(() => { load(); }, [page, status]);
+  }, [page, status]);
+
+  useEffect(() => { load(); }, [load]);
 
   const handleConfirm = async (id: number) => {
     if (!confirm("To'lovni tasdiqlaysizmi? Obuna yaratiladi.")) return;

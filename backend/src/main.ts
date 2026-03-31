@@ -4,12 +4,18 @@ import { ValidationPipe } from "@nestjs/common";
 import * as express from "express";
 import { join } from "path";
 
+// BigInt JSON serialization qo'llab-quvvatlash
+// Prisma BigInt fieldlarni JSON.stringify() qila olmasligi muammosini hal qiladi
+(BigInt.prototype as any).toJSON = function () {
+  return Number(this);
+};
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.setGlobalPrefix("api");
   app.enableCors({
-    origin: "*",
+    origin: true, // Barcha origin'larni dinamik qabul qiladi (credentials bilan ishlaydi)
     credentials: true,
   });
   app.useGlobalPipes(new ValidationPipe({ transform: true }));

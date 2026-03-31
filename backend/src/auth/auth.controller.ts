@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Body, Headers } from "@nestjs/common";
+import { Controller, Post, Get, Body, Headers, UnauthorizedException } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 
 @Controller("auth")
@@ -33,7 +33,7 @@ export class AuthController {
   @Get("me")
   async getMe(@Headers("authorization") auth: string) {
     const token = auth?.replace("Bearer ", "");
-    if (!token) return null;
+    if (!token) throw new UnauthorizedException("Token topilmadi");
     return this.authService.getMe(token);
   }
 }

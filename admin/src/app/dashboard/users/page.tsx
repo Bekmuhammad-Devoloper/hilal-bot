@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { getUsers, setAdmin, blockUser, sendToUser } from "@/lib/api";
 
 export default function UsersPage() {
@@ -9,8 +9,11 @@ export default function UsersPage() {
   const [msgModal, setMsgModal] = useState<any>(null);
   const [msg, setMsg] = useState("");
 
-  const load = () => getUsers(page, 20, search || undefined).then(setData).catch(console.error);
-  useEffect(() => { load(); }, [page, search]);
+  const load = useCallback(() => {
+    getUsers(page, 20, search || undefined).then(setData).catch(console.error);
+  }, [page, search]);
+
+  useEffect(() => { load(); }, [load]);
 
   const toggleAdmin = async (id: number, val: boolean) => { await setAdmin(id, val); load(); };
   const toggleBlock = async (id: number, val: boolean) => { await blockUser(id, val); load(); };

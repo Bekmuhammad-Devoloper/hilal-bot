@@ -325,12 +325,12 @@ export default function DashboardPage() {
             ) : recentPayments.map((p: any, i: number) => (
               <div key={i} className="px-6 py-3.5 flex items-center gap-3 hover:bg-slate-50/50 transition-colors">
                 <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${
-                  p.status === "COMPLETED" ? "bg-emerald-50 text-emerald-500" :
-                  p.status === "PENDING" ? "bg-amber-50 text-amber-500" : "bg-red-50 text-red-500"
+                  p.status === "completed" ? "bg-emerald-50 text-emerald-500" :
+                  p.status === "pending" ? "bg-amber-50 text-amber-500" : "bg-red-50 text-red-500"
                 }`}>
-                  {p.status === "COMPLETED" ? (
+                  {p.status === "completed" ? (
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
-                  ) : p.status === "PENDING" ? (
+                  ) : p.status === "pending" ? (
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                   ) : (
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>

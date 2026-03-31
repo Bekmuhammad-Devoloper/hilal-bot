@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { getSubscriptions, cancelSubscription, checkExpired, getSubStats } from "@/lib/api";
 
 export default function SubscriptionsPage() {
@@ -8,11 +8,12 @@ export default function SubscriptionsPage() {
   const [page, setPage] = useState(1);
   const [status, setStatus] = useState("");
 
-  const load = () => {
+  const load = useCallback(() => {
     getSubscriptions(page, 20, status || undefined).then(setData).catch(console.error);
     getSubStats().then(setStats).catch(console.error);
-  };
-  useEffect(() => { load(); }, [page, status]);
+  }, [page, status]);
+
+  useEffect(() => { load(); }, [load]);
 
   const handleCancel = async (telegramId: number) => {
     if (!confirm("Obunani bekor qilishni tasdiqlaysizmi?")) return;

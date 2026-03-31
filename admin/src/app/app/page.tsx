@@ -26,6 +26,9 @@ function MiniAppInner() {
   const [editPhone, setEditPhone] = useState("");
   const [saving, setSaving] = useState(false);
   const [faqOpen, setFaqOpen] = useState<number | null>(null);
+  const [tgPhotoUrl, setTgPhotoUrl] = useState<string | null>(null);
+  const [tgUsername, setTgUsername] = useState<string | null>(null);
+  const [prevScreen, setPrevScreen] = useState<string>("manage");
 
   // Telegram WebApp init + userId olish
   useEffect(() => {
@@ -39,6 +42,10 @@ function MiniAppInner() {
           const tgUser = tg.initDataUnsafe?.user;
           if (tgUser?.id) uid = String(tgUser.id);
         }
+        // Telegram profil rasmi va username olish
+        const tgUser = tg.initDataUnsafe?.user;
+        if (tgUser?.photo_url) setTgPhotoUrl(tgUser.photo_url);
+        if (tgUser?.username) setTgUsername(tgUser.username);
       }
     } catch (e) {}
     if (uid) setUserId(uid);
@@ -301,7 +308,7 @@ function MiniAppInner() {
                 <div className="w-9 h-9 bg-amber-500/15 rounded-xl flex items-center justify-center float-icon" style={{ animationDelay: "1s" }}>
                   <svg className="w-[18px] h-[18px] text-amber-400" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
                 </div>
-                <span className="font-medium text-indigo-100 text-sm">Shartnoma</span>
+                <span className="font-medium text-indigo-100 text-sm">Ommaviy oferta</span>
               </div>
               <svg className="w-4 h-4 text-indigo-400/30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" /></svg>
             </button>
@@ -427,12 +434,27 @@ function MiniAppInner() {
         </div>
 
         <div className="space-y-4 fade-in-up stagger-1">
-          {/* Avatar */}
+          {/* Avatar — TG profil rasmi */}
           <div className="flex justify-center mb-2">
-            <div className="w-20 h-20 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-full flex items-center justify-center text-white text-2xl font-bold">
-              {(editName || "?")[0]?.toUpperCase()}
-            </div>
+            {(userProfile?.photoUrl || tgPhotoUrl) ? (
+              <img
+                src={userProfile?.photoUrl || tgPhotoUrl || ""}
+                alt="Profile"
+                className="w-20 h-20 rounded-full object-cover border-[3px] border-indigo-500/40 shadow-lg shadow-indigo-900/30"
+              />
+            ) : (
+              <div className="w-20 h-20 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-full flex items-center justify-center text-white text-2xl font-bold border-[3px] border-indigo-500/40">
+                {(editName || "?")[0]?.toUpperCase()}
+              </div>
+            )}
           </div>
+
+          {/* TG username */}
+          {(userProfile?.username || tgUsername) && (
+            <div className="text-center -mt-1 mb-2">
+              <span className="text-indigo-300/60 text-sm">@{userProfile?.username || tgUsername}</span>
+            </div>
+          )}
 
           <div>
             <label className="text-xs font-medium text-indigo-300/50 uppercase tracking-wider mb-1.5 block">Ism Familiya</label>
@@ -462,12 +484,6 @@ function MiniAppInner() {
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                 <span>Telegram ID: {userProfile.telegramId}</span>
               </div>
-              {userProfile.username && (
-                <div className="flex items-center gap-2 text-indigo-300/40 text-xs mt-1.5">
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
-                  <span>@{userProfile.username}</span>
-                </div>
-              )}
             </div>
           )}
         </div>
@@ -490,32 +506,75 @@ function MiniAppInner() {
     );
   }
 
-  // ========== TERMS (Shartnoma) ==========
+  // ========== TERMS (Ommaviy oferta) ==========
   if (screen === "terms") {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#0f0a2a] via-[#1a1145] to-[#0f0a2a] p-5">
+      <div className="min-h-screen bg-gradient-to-b from-[#0f0a2a] via-[#1a1145] to-[#0f0a2a] p-5 pb-10">
         <div className="mb-6 scale-in">
-          <button onClick={() => setScreen("manage")} className="flex items-center gap-1.5 text-indigo-300/50 text-sm mb-4 active:text-indigo-200 transition-colors">
+          <button onClick={() => { setScreen(prevScreen as any); setPrevScreen("manage"); }} className="flex items-center gap-1.5 text-indigo-300/50 text-sm mb-4 active:text-indigo-200 transition-colors">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
             Orqaga
           </button>
-          <h1 className="text-2xl font-bold text-white">Shartnoma</h1>
-          <p className="text-sm text-indigo-300/50 mt-1">Foydalanish shartlari</p>
+          <h1 className="text-2xl font-bold text-white">Ommaviy oferta</h1>
+          <p className="text-sm text-indigo-300/50 mt-1">Xizmat ko{"'"}rsatish shartlari</p>
         </div>
 
         <div className="space-y-4 fade-in-up">
           {[
-            { title: "1. Umumiy qoidalar", text: "Ushbu xizmatdan foydalanish orqali siz quyidagi shartlarga rozilik bildirasiz. Xizmat Telegram bot va veb-ilova orqali ta'lim kontentiga kirish imkoniyatini beradi." },
-            { title: "2. Obuna shartlari", text: "Obuna tanlangan reja bo'yicha belgilangan muddatga amal qiladi. Obuna muddati tugagach, kanalga kirish cheklanadi. Obunani bekor qilish istalgan vaqtda mumkin." },
-            { title: "3. To'lov shartlari", text: "To'lovlar Payme yoki Click tizimi orqali amalga oshiriladi. To'lov muvaffaqiyatli amalga oshgandan so'ng obuna faollashtiriladi. Qaytarib berish siyosati individual ko'rib chiqiladi." },
-            { title: "4. Mas'uliyat", text: "Xizmat ta'lim maqsadida taqdim etiladi. Kontentni boshqa shaxslarga tarqatish taqiqlanadi. Shartlarni buzgan foydalanuvchilar bloklashi mumkin." },
-            { title: "5. Maxfiylik", text: "Shaxsiy ma'lumotlaringiz xavfsiz saqlanadi va uchinchi tomonlarga berilmaydi. Faqat xizmat ko'rsatish maqsadida foydalaniladi." },
+            { icon: "💳", title: "1. Obuna narxi va to'lov", text: "Kanalga kirish oylik obuna asosida ishlaydi. To'lov har 30 kunda avtomatik ravishda yechib olinadi. To'lov Payme yoki Click orqali amalga oshiriladi." },
+            { icon: "🔄", title: "2. Avtomatik yechib olish", text: "Har oy belgilangan summa avtomatik ravishda kartangizdan yechib olinadi. Obuna faol bo'lgan davr mobaynida to'lov avtomatik davom etadi." },
+            { icon: "❌", title: "3. Bekor qilish tartibi", text: "Obunani istalgan vaqtda bekor qilish mumkin. Bekor qilish keyingi to'lov davridan kuchga kiradi. Joriy davr oxirigacha kanaldan foydalanish mumkin." },
+            { icon: "💰", title: "4. Pulni qaytarish", text: "Foydalanilgan davr uchun to'lov qaytarilmaydi. Obuna bekor qilinsa, joriy oylik davr tugaguncha xizmatdan foydalanishingiz mumkin." },
+            { icon: "🔐", title: "5. Kanal kontenti", text: "Kanaldagi barcha materiallar mualliflik huquqi bilan himoyalangan. Kontentni uchinchi shaxslarga tarqatish, nusxalash yoki qayta nashr qilish qat'iyan taqiqlanadi." },
+            { icon: "⚠️", title: "6. Qoidabuzarlik", text: "Shartlarni buzgan foydalanuvchilarning obunasi ogohlantirishsiz bekor qilinishi mumkin. Bunday hollarda to'lov qaytarilmaydi." },
+            { icon: "📢", title: "7. O'zgarishlar", text: "Ma'muriyat istalgan vaqtda ushbu shartlarni yangilash huquqiga ega. O'zgarishlar haqida foydalanuvchilarga oldindan xabar beriladi." },
+            { icon: "📞", title: "8. Aloqa", text: "Savollar yoki muammolar bo'lsa, biz bilan bog'laning. Biz sizga yordam berishdan mamnunmiz." },
           ].map((item, i) => (
             <div key={i} className="bg-white/[0.07] backdrop-blur-sm rounded-2xl p-4 border border-white/[0.08]">
-              <h3 className="text-white font-semibold text-sm mb-2">{item.title}</h3>
+              <h3 className="text-white font-semibold text-sm mb-2">{item.icon} {item.title}</h3>
               <p className="text-indigo-300/50 text-xs leading-relaxed">{item.text}</p>
             </div>
           ))}
+        </div>
+
+        {/* Aloqa bo'limi */}
+        <div className="mt-6 bg-gradient-to-br from-indigo-500/10 to-purple-500/10 backdrop-blur-sm rounded-2xl p-5 border border-indigo-400/15 fade-in-up">
+          <h3 className="text-white font-bold text-sm mb-4 text-center">Bog{"'"}lanish uchun</h3>
+          <div className="space-y-3">
+            <a
+              href="https://t.me/hilaledu"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-3 bg-white/[0.07] rounded-xl p-3 border border-white/[0.08] active:bg-white/[0.12] transition-colors"
+            >
+              <div className="w-10 h-10 bg-blue-500/15 rounded-xl flex items-center justify-center">
+                <span className="text-lg">✈️</span>
+              </div>
+              <div>
+                <p className="text-white text-sm font-medium">Telegram</p>
+                <p className="text-indigo-300/50 text-xs">@hilaledu</p>
+              </div>
+              <svg className="w-4 h-4 text-indigo-400/30 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" /></svg>
+            </a>
+            <a
+              href="tel:+99855519787878"
+              className="flex items-center gap-3 bg-white/[0.07] rounded-xl p-3 border border-white/[0.08] active:bg-white/[0.12] transition-colors"
+            >
+              <div className="w-10 h-10 bg-emerald-500/15 rounded-xl flex items-center justify-center">
+                <span className="text-lg">📱</span>
+              </div>
+              <div>
+                <p className="text-white text-sm font-medium">Telefon raqam</p>
+                <p className="text-indigo-300/50 text-xs">55-519-78-78</p>
+              </div>
+              <svg className="w-4 h-4 text-indigo-400/30 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" /></svg>
+            </a>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="mt-6 text-center">
+          <p className="text-indigo-300/30 text-[10px]">Obunani rasmiylashtirish orqali siz ushbu shartlarga rozilik bildirasiz</p>
         </div>
       </div>
     );
@@ -801,6 +860,12 @@ function MiniAppInner() {
 
         {/* Footer */}
         <div className="text-center mb-4 fade-in-up stagger-3">
+          <button
+            onClick={() => { setPrevScreen("payment"); setScreen("terms"); }}
+            className="text-indigo-400/60 text-xs underline underline-offset-2 mb-3 active:text-indigo-300 transition-colors"
+          >
+            📄 Ommaviy oferta shartlari
+          </button>
           <div className="flex items-center justify-center gap-3 text-xs text-indigo-300/30">
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
             <span>Xavfsiz to{"'"}lov</span>
