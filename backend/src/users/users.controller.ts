@@ -1,5 +1,6 @@
-import { Controller, Get, Post, Patch, Param, Body, Query } from "@nestjs/common";
+import { Controller, Get, Post, Patch, Param, Body, Query, Res, HttpStatus } from "@nestjs/common";
 import { UsersService } from "./users.service";
+import { Response } from "express";
 
 @Controller("users")
 export class UsersController {
@@ -22,6 +23,26 @@ export class UsersController {
   @Get("telegram/:telegramId")
   async findByTelegramId(@Param("telegramId") telegramId: string) {
     return this.usersService.findByTelegramId(parseInt(telegramId));
+  }
+
+  @Get("photo/:telegramId")
+  async getPhoto(@Param("telegramId") telegramId: string, @Res() res: Response) {
+    try {
+      const user = await this.usersService.findByTelegramId(parseInt(telegramId));
+      if (user?.photoUrl) {
+        const response = await fetch(user.photoUrl);
+        if (response.ok) {
+          const contentType = response.headers.get("content-type") || "image/jpeg";
+          const buffer = Buffer.from(await response.arrayBuffer());
+          res.set("Content-Type", contentType);
+          res.set("Cache-Control", "public, max-age=3600");
+          return res.send(buffer);
+        }
+      }
+      return res.status(HttpStatus.NOT_FOUND).json({ error: "Photo not found" });
+    } catch {
+      return res.status(HttpStatus.NOT_FOUND).json({ error: "Photo not found" });
+    }
   }
 
   @Get()
