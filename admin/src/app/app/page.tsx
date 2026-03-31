@@ -38,10 +38,25 @@ function MiniAppInner() {
       if (tg) {
         tg.ready();
         tg.expand();
+
+        // 1. URL paramdan olish
+        // 2. initDataUnsafe dan olish
+        // 3. initData string parse qilish
         if (!uid) {
           const tgUser = tg.initDataUnsafe?.user;
           if (tgUser?.id) uid = String(tgUser.id);
         }
+        if (!uid && tg.initData) {
+          try {
+            const params = new URLSearchParams(tg.initData);
+            const userStr = params.get("user");
+            if (userStr) {
+              const parsed = JSON.parse(userStr);
+              if (parsed?.id) uid = String(parsed.id);
+            }
+          } catch (e) {}
+        }
+
         // Telegram profil rasmi va username olish
         const tgUser = tg.initDataUnsafe?.user;
         if (tgUser?.photo_url) setTgPhotoUrl(tgUser.photo_url);

@@ -293,6 +293,17 @@ async function main() {
   process.once("SIGINT", stopBot);
   process.once("SIGTERM", stopBot);
 
+  // Menu button sozlash
+  try {
+    await bot.api.setChatMenuButton({
+      menu_button: {
+        type: "web_app",
+        text: "Hilal Edu",
+        web_app: { url: `${config.webAppUrl}/app` },
+      },
+    });
+  } catch (e) {}
+
   await bot.start({
     onStart: () => console.log("✅ Bot muvaffaqiyatli ishga tushdi!"),
   });
