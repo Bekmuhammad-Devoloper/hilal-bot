@@ -3,7 +3,7 @@ import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
 // Build version: 2026-04-01-v8
-const APP_VERSION = "2.0.9";
+const APP_VERSION = "2.1.0";
 
 const API = typeof window !== "undefined" && window.location.hostname === "localhost"
   ? "http://localhost:7777/api"
@@ -287,42 +287,77 @@ function MiniAppInner() {
       <div className="min-h-screen bg-gradient-to-b from-[#0f0a2a] via-[#1a1145] to-[#0f0a2a]">
         <div className="px-5 pt-8 pb-4 scale-in">
           <div className="bg-white/[0.07] backdrop-blur-sm rounded-3xl p-6 text-white border border-white/[0.08] relative overflow-hidden">
-            <div className="absolute -top-8 -right-8 w-32 h-32 bg-indigo-500/10 rounded-full" />
-            <div className="absolute -bottom-4 -left-4 w-24 h-24 bg-purple-500/10 rounded-full" />
+            <div className="absolute -top-12 -right-12 w-40 h-40 bg-indigo-500/10 rounded-full blur-2xl" />
+            <div className="absolute -bottom-8 -left-8 w-32 h-32 bg-purple-500/10 rounded-full blur-2xl" />
+            {isAdmin && !hasSub && <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-amber-400/60 to-transparent" />}
             <div className="relative z-10">
-              <div className="flex items-center gap-3 mb-4">
-                <img src="/logo.jpg" alt="" className="w-10 h-10 rounded-full border-2 border-white/20" />
-                <div>
-                  <p className="font-bold text-base text-white">{hasSub ? (subscription?.plan?.name || "Oson Turk Tili") : "Hilal Edu"}</p>
-                  <p className="text-indigo-300/70 text-xs">{isAdmin && !hasSub ? "👑 Admin" : hasSub ? "Faol obuna" : "Obuna faol emas"}</p>
+              <div className="flex items-center gap-4 mb-4">
+                <div className="relative">
+                  <div className={`w-14 h-14 rounded-2xl overflow-hidden border-2 ${isAdmin && !hasSub ? 'border-amber-400/40 shadow-lg shadow-amber-500/20' : hasSub ? 'border-emerald-400/30 shadow-lg shadow-emerald-500/20' : 'border-white/20'}`}>
+                    <img src={tgPhotoUrl || "/logo.jpg"} alt="" className="w-full h-full object-cover" />
+                  </div>
+                  {isAdmin && !hasSub && (
+                    <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-gradient-to-br from-amber-400 to-orange-500 rounded-lg flex items-center justify-center shadow-lg shadow-amber-500/30">
+                      <svg className="w-3.5 h-3.5 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm14 3c0 .6-.4 1-1 1H6c-.6 0-1-.4-1-1v-1h14v1z"/></svg>
+                    </div>
+                  )}
+                  {hasSub && (
+                    <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-gradient-to-br from-emerald-400 to-cyan-500 rounded-lg flex items-center justify-center shadow-lg shadow-emerald-500/30">
+                      <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
+                    </div>
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-bold text-base text-white truncate">{userProfile?.firstName || (hasSub ? (subscription?.plan?.name || "Oson Turk Tili") : "Hilal Edu")}</p>
+                  {isAdmin && !hasSub ? (
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-gradient-to-r from-amber-500/20 to-orange-500/20 rounded-md border border-amber-400/20 mt-0.5">
+                      <span className="text-[10px] font-semibold text-amber-300 tracking-wide uppercase">Admin</span>
+                    </span>
+                  ) : hasSub ? (
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-500/15 rounded-md border border-emerald-400/20 mt-0.5">
+                      <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
+                      <span className="text-[10px] font-medium text-emerald-300">Faol obuna</span>
+                    </span>
+                  ) : (
+                    <p className="text-indigo-300/50 text-xs mt-0.5">Obuna faol emas</p>
+                  )}
                 </div>
               </div>
               {hasSub ? (
                 <>
-                  <div className="mt-2">
-                    <p className="text-indigo-300/70 text-xs mb-1">Obuna tugashiga</p>
-                    <p className="text-5xl font-black count-pulse text-white">{daysLeft} <span className="text-lg font-medium text-indigo-300/70">kun</span></p>
+                  <div className="mt-3 bg-white/[0.04] rounded-2xl p-4 border border-white/[0.05]">
+                    <p className="text-indigo-300/60 text-xs mb-1">Obuna tugashiga</p>
+                    <p className="text-5xl font-black count-pulse text-white">{daysLeft} <span className="text-lg font-medium text-indigo-300/60">kun</span></p>
                   </div>
                   <div className="mt-4">
                     <div className="w-full bg-white/10 rounded-full h-1.5 overflow-hidden">
                       <div className="bg-gradient-to-r from-emerald-400 to-cyan-300 h-1.5 rounded-full progress-fill" style={{ width: progressPercent + "%" }} />
                     </div>
                     <div className="flex justify-between mt-1.5">
-                      <p className="text-[10px] text-indigo-300/50">Boshlangan</p>
-                      <p className="text-[10px] text-indigo-300/50">{daysLeft}/{totalDays} kun</p>
+                      <p className="text-[10px] text-indigo-300/40">Boshlangan</p>
+                      <p className="text-[10px] text-indigo-300/40">{daysLeft}/{totalDays} kun</p>
                     </div>
                   </div>
                 </>
               ) : isAdmin ? (
-                <div className="mt-2">
-                  <p className="text-indigo-300/70 text-xs mb-1">Cheksiz kirish</p>
-                  <p className="text-3xl font-black text-white">♾️ <span className="text-lg font-medium text-indigo-300/70">Admin rejim</span></p>
+                <div className="mt-3 bg-gradient-to-br from-amber-500/[0.06] to-orange-500/[0.04] rounded-2xl p-5 border border-amber-400/10">
+                  <p className="text-amber-300/60 text-xs mb-2 font-medium">Kirish holati</p>
+                  <div className="flex items-center gap-3">
+                    <div className="relative">
+                      <svg className="w-10 h-10 text-amber-400" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" /></svg>
+                      <div className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-emerald-400 rounded-full border-2 border-[#1a1145]" />
+                    </div>
+                    <div>
+                      <p className="text-2xl font-black bg-gradient-to-r from-amber-300 to-orange-400 bg-clip-text text-transparent">Cheksiz</p>
+                      <p className="text-xs text-amber-300/40 mt-0.5">Barcha kontentga kirish ochiq</p>
+                    </div>
+                  </div>
                 </div>
               ) : (
-                <div className="mt-2">
-                  <p className="text-indigo-300/70 text-xs mb-1">Obuna tugashiga</p>
-                  <p className="text-5xl font-black count-pulse text-white">0 <span className="text-lg font-medium text-indigo-300/70">kun</span></p>
-                  <p className="text-xs text-amber-400/80 mt-2 flex items-center gap-1.5"><svg className="w-3.5 h-3.5 inline" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" /></svg> Obunangiz yo{"'"}q yoki tugagan</p>
+                <div className="mt-3 bg-white/[0.04] rounded-2xl p-4 border border-white/[0.05]">
+                  <p className="text-indigo-300/60 text-xs mb-1">Obuna tugashiga</p>
+                  <p className="text-5xl font-black count-pulse text-white">0 <span className="text-lg font-medium text-indigo-300/60">kun</span></p>
+                  <p className="text-xs text-amber-400/80 mt-3 flex items-center gap-1.5"><svg className="w-3.5 h-3.5 inline flex-shrink-0" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" /></svg> Obunangiz yo{"'"}q yoki tugagan</p>
                 </div>
               )}
             </div>
