@@ -11,11 +11,11 @@ const nextConfig = {
   async headers() {
     return [
       {
-        source: "/app/:path*",
+        source: "/app",
         headers: [
           { key: "Cache-Control", value: "no-cache, no-store, must-revalidate" },
           { key: "Pragma", value: "no-cache" },
-          { key: "Bypass-Tunnel-Reminder", value: "true" },
+          { key: "Expires", value: "0" },
           { key: "X-Frame-Options", value: "ALLOWALL" },
           { key: "Content-Security-Policy", value: "frame-ancestors *;" },
         ],
