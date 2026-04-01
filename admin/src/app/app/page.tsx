@@ -2,8 +2,8 @@
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
-// Build version: 2026-04-01-v3
-const APP_VERSION = "2.0.3";
+// Build version: 2026-04-01-v4
+const APP_VERSION = "2.0.4";
 
 const API = typeof window !== "undefined" && window.location.hostname === "localhost"
   ? "http://localhost:7777/api"
@@ -68,17 +68,37 @@ function MiniAppInner() {
     } catch (e) {}
     if (uid) setUserId(uid);
 
-    // Splash ko'rsatib, parallel data yuklash — har doim manage sahifaga o'tish
+    console.log("[HilalBot v" + APP_VERSION + "] Init, uid:", uid);
+
+    // Har doim manage sahifaga o'tish — splash ko'rsatib, parallel data yuklash
+    const goToManage = () => {
+      console.log("[HilalBot] -> manage screen");
+      setScreen("manage");
+    };
+
     if (uid) {
       const splashMin = new Promise(r => setTimeout(r, 1500));
       const dataLoad = fetchDataSilent(uid);
       const maxWait = new Promise<string>(r => setTimeout(() => r("manage"), 10000));
-      Promise.all([splashMin, Promise.race([dataLoad, maxWait])]).then(() => {
-        setScreen("manage");
-      }).catch(() => setScreen("manage"));
+      Promise.all([splashMin, Promise.race([dataLoad, maxWait])])
+        .then(() => goToManage())
+        .catch(() => goToManage());
     } else {
-      setTimeout(() => setScreen("manage"), 1500);
+      setTimeout(() => goToManage(), 1500);
     }
+
+    // Xavfsizlik — agar 12 sekunddan keyin hali ham splash bo'lsa, majburan manage ga o'tkazish
+    const safetyTimer = setTimeout(() => {
+      setScreen((prev) => {
+        if (prev === "splash") {
+          console.log("[HilalBot] Safety timer -> manage");
+          return "manage";
+        }
+        return prev;
+      });
+    }, 12000);
+
+    return () => clearTimeout(safetyTimer);
   }, [paramUser]);
 
   const fetchDataSilent = async (uid: string): Promise<string> => {
