@@ -1,20 +1,37 @@
-"use client";
-import { Suspense, useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { headers } from "next/headers";"use client";
 
-// Build version: 2026-04-01-v5
-const APP_VERSION = "2.0.5";
+import { unstable_noStore } from "next/cache";import { Suspense, useEffect, useState } from "react";
 
-const API = typeof window !== "undefined" && window.location.hostname === "localhost"
+import MiniAppClient from "./MiniApp";import { useSearchParams } from "next/navigation";
+
+
+
+// Bu SERVER COMPONENT — Next.js bu sahifani HECH QACHON cache qilmasligi kerak// Build version: 2026-04-01-v5
+
+export const dynamic = "force-dynamic";const APP_VERSION = "2.0.5";
+
+export const revalidate = 0;
+
+export const fetchCache = "force-no-store";const API = typeof window !== "undefined" && window.location.hostname === "localhost"
+
   ? "http://localhost:7777/api"
-  : "/api";
 
-function MiniAppInner() {
-  const searchParams = useSearchParams();
-  const paramUser = searchParams.get("user");
+export default function AppPage() {  : "/api";
 
-  const [userId, setUserId] = useState<string | null>(paramUser);
-  const [screen, setScreen] = useState<"splash" | "welcome" | "subscribe" | "payment" | "success" | "manage" | "payments_history" | "edit_profile" | "terms" | "faq" | "contact">("splash");
+  // 1) unstable_noStore — Next.js Data Cache va Full Route Cache ni o'chiradi
+
+  unstable_noStore();function MiniAppInner() {
+
+  // 2) headers() — dynamic rendering ga majburlaydi  const searchParams = useSearchParams();
+
+  headers();  const paramUser = searchParams.get("user");
+
+
+
+  return <MiniAppClient />;  const [userId, setUserId] = useState<string | null>(paramUser);
+
+}  const [screen, setScreen] = useState<"splash" | "welcome" | "subscribe" | "payment" | "success" | "manage" | "payments_history" | "edit_profile" | "terms" | "faq" | "contact">("splash");
+
   const [plans, setPlans] = useState<any[]>([]);
   const [selectedPlan, setSelectedPlan] = useState<any>(null);
   const [subscription, setSubscription] = useState<any>(null);
