@@ -2,8 +2,8 @@
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
-// Build version: 2026-04-01-v4
-const APP_VERSION = "2.0.4";
+// Build version: 2026-04-01-v5
+const APP_VERSION = "2.0.5";
 
 const API = typeof window !== "undefined" && window.location.hostname === "localhost"
   ? "http://localhost:7777/api"

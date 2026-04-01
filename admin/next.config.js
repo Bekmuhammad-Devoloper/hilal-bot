@@ -13,7 +13,19 @@ const nextConfig = {
       {
         source: "/app",
         headers: [
-          { key: "Cache-Control", value: "no-cache, no-store, must-revalidate" },
+          { key: "Cache-Control", value: "no-cache, no-store, must-revalidate, max-age=0, s-maxage=0" },
+          { key: "Pragma", value: "no-cache" },
+          { key: "Expires", value: "0" },
+          { key: "X-Frame-Options", value: "ALLOWALL" },
+          { key: "Content-Security-Policy", value: "frame-ancestors *;" },
+          { key: "CDN-Cache-Control", value: "no-store" },
+          { key: "Vercel-CDN-Cache-Control", value: "no-store" },
+        ],
+      },
+      {
+        source: "/app/:path*",
+        headers: [
+          { key: "Cache-Control", value: "no-cache, no-store, must-revalidate, max-age=0, s-maxage=0" },
           { key: "Pragma", value: "no-cache" },
           { key: "Expires", value: "0" },
           { key: "X-Frame-Options", value: "ALLOWALL" },
