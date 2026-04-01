@@ -36,18 +36,18 @@ bot.command("start", async (ctx) => {
     console.error("getActiveSubscription error:", e);
   }
 
+  // Har doim asosiy sahifaga yo'naltirish (obuna bor/yo'q farqi yo'q)
+  const keyboard = new InlineKeyboard()
+    .webApp("\u{1F4F1} Ishga tushirish", `${config.webAppUrl}/app?user=${ctx.from!.id}`)
+    .row()
+    .url("\u{1F4E2} Kanalga o'tish", `https://t.me/${config.channelId.replace("@", "")}`);
+
   if (sub && sub.endDate) {
     const endDate = new Date(sub.endDate);
     const now = new Date();
 
-    // endDate validligini tekshirish
     if (!isNaN(endDate.getTime())) {
       const daysLeft = Math.max(0, Math.ceil((endDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)));
-
-      const keyboard = new InlineKeyboard()
-        .webApp("\u{1F4F1} Ishga tushirish", `${config.webAppUrl}/app?user=${ctx.from!.id}`)
-        .row()
-        .url("\u{1F4E2} Kanalga o'tish", `https://t.me/${config.channelId.replace("@", "")}`);
 
       await ctx.reply(
         `\u2705 Sizning obunangiz faol!\n\n` +
@@ -58,21 +58,16 @@ bot.command("start", async (ctx) => {
       );
       return;
     }
-    // Agar endDate noto'g'ri bo'lsa, pastga tushadi va yangi foydalanuvchi sifatida ko'rsatadi
-    console.error("Invalid endDate in subscription:", sub.endDate);
   }
 
-  // Obuna yoq - WebApp orqali boshlash
-  const keyboard = new InlineKeyboard()
-    .webApp("\u{1F680} BOSHLASH", `${config.webAppUrl}/app?user=${ctx.from!.id}`);
-
+  // Obuna yoq yoki noto'g'ri — lekin har doim asosiy sahifaga
   await ctx.reply(
-    `Bu bot nimalar qila oladi?\n\n` +
+    `Hilal Edu ga xush kelibsiz! \u{1F44B}\n\n` +
     `Bu yerda sizni:\n` +
-    `\u26A1Rivojlantiradigan muhit\n` +
-    `\u270DTakrorlanmas kontent\n` +
-    `\u{1F5E3}Ilm suhbatlari kutmoqda!\n\n` +
-    `Qo'shilish uchun "BOSHLASH" tugmasini bosing`,
+    `\u26A1 Rivojlantiradigan muhit\n` +
+    `\u270D Takrorlanmas kontent\n` +
+    `\u{1F5E3} Ilm suhbatlari kutmoqda!\n\n` +
+    `Boshlash uchun quyidagi tugmani bosing \u{1F447}`,
     { reply_markup: keyboard },
   );
 });

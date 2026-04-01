@@ -2,6 +2,9 @@
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
+// Build version: 2026-04-01-v2
+const APP_VERSION = "2.0.1";
+
 const API = typeof window !== "undefined" && window.location.hostname === "localhost"
   ? "http://localhost:7777/api"
   : "/api";
@@ -65,18 +68,16 @@ function MiniAppInner() {
     } catch (e) {}
     if (uid) setUserId(uid);
 
-    // Splash ko'rsatib, parallel data yuklash
+    // Splash ko'rsatib, parallel data yuklash — har doim manage sahifaga o'tish
     if (uid) {
       const splashMin = new Promise(r => setTimeout(r, 1500));
       const dataLoad = fetchDataSilent(uid);
-      // Maksimum 10 soniya kutish, keyin welcome sahifaga o'tish
-      const maxWait = new Promise<string>(r => setTimeout(() => r("welcome"), 10000));
-      Promise.all([splashMin, Promise.race([dataLoad, maxWait])]).then(([, result]) => {
-        if (result === "manage") setScreen("manage");
-        else setScreen("welcome");
-      }).catch(() => setScreen("welcome"));
+      const maxWait = new Promise<string>(r => setTimeout(() => r("manage"), 10000));
+      Promise.all([splashMin, Promise.race([dataLoad, maxWait])]).then(() => {
+        setScreen("manage");
+      }).catch(() => setScreen("manage"));
     } else {
-      setTimeout(() => setScreen("welcome"), 1500);
+      setTimeout(() => setScreen("manage"), 1500);
     }
   }, [paramUser]);
 
@@ -358,9 +359,9 @@ function MiniAppInner() {
                 </div>
               ) : (
                 <div className="mt-2">
-                  <p className="text-indigo-300/70 text-xs mb-1">Hozircha obunangiz yo{"'"}q</p>
-                  <p className="text-2xl font-black text-white">Obuna sotib oling</p>
-                  <p className="text-xs text-indigo-300/50 mt-1">Eksklyuziv darslarga kirish uchun</p>
+                  <p className="text-indigo-300/70 text-xs mb-1">Obuna tugashiga</p>
+                  <p className="text-5xl font-black count-pulse text-white">0 <span className="text-lg font-medium text-indigo-300/70">kun</span></p>
+                  <p className="text-xs text-amber-400/80 mt-2">⚠️ Obunangiz yo{"'"}q yoki tugagan</p>
                 </div>
               )}
             </div>
@@ -378,12 +379,21 @@ function MiniAppInner() {
               >
                 Ha
               </button>
-              <button
-                onClick={handleCancel}
-                className="py-3.5 bg-white/[0.08] text-indigo-200 rounded-xl font-semibold text-sm border border-white/[0.1] active:scale-95 transition-transform"
-              >
-                Yo{"'"}q
-              </button>
+              {hasSub ? (
+                <button
+                  onClick={handleCancel}
+                  className="py-3.5 bg-white/[0.08] text-indigo-200 rounded-xl font-semibold text-sm border border-white/[0.1] active:scale-95 transition-transform"
+                >
+                  Yo{"'"}q
+                </button>
+              ) : (
+                <button
+                  onClick={() => setScreen("welcome")}
+                  className="py-3.5 bg-white/[0.08] text-indigo-200 rounded-xl font-semibold text-sm border border-white/[0.1] active:scale-95 transition-transform"
+                >
+                  Batafsil
+                </button>
+              )}
             </div>
           </div>
 
