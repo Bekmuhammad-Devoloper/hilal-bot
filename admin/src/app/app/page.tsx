@@ -1,20 +1,38 @@
-import { headers } from "next/headers";"use client";
+import { headers } from "next/headers";import { headers } from "next/headers";"use client";
 
-import { unstable_noStore } from "next/cache";import { Suspense, useEffect, useState } from "react";
+import { unstable_noStore } from "next/cache";
 
-import MiniAppClient from "./MiniApp";import { useSearchParams } from "next/navigation";
+import MiniAppClient from "./MiniApp";import { unstable_noStore } from "next/cache";import { Suspense, useEffect, useState } from "react";
 
 
 
-// Bu SERVER COMPONENT — Next.js bu sahifani HECH QACHON cache qilmasligi kerak// Build version: 2026-04-01-v5
+// Bu SERVER COMPONENT — Next.js bu sahifani HECH QACHON cache qilmasligi kerakimport MiniAppClient from "./MiniApp";import { useSearchParams } from "next/navigation";
 
-export const dynamic = "force-dynamic";const APP_VERSION = "2.0.5";
+export const dynamic = "force-dynamic";
 
 export const revalidate = 0;
 
-export const fetchCache = "force-no-store";const API = typeof window !== "undefined" && window.location.hostname === "localhost"
+export const fetchCache = "force-no-store";
 
-  ? "http://localhost:7777/api"
+// Bu SERVER COMPONENT — Next.js bu sahifani HECH QACHON cache qilmasligi kerak// Build version: 2026-04-01-v5
+
+export default function AppPage() {
+
+  // 1) unstable_noStore — Next.js Data Cache va Full Route Cache ni o'chiradiexport const dynamic = "force-dynamic";const APP_VERSION = "2.0.5";
+
+  unstable_noStore();
+
+export const revalidate = 0;
+
+  // 2) headers() — dynamic rendering ga majburlaydi
+
+  headers();export const fetchCache = "force-no-store";const API = typeof window !== "undefined" && window.location.hostname === "localhost"
+
+
+
+  return <MiniAppClient />;  ? "http://localhost:7777/api"
+
+}
 
 export default function AppPage() {  : "/api";
 
