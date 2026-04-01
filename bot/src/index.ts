@@ -37,17 +37,18 @@ bot.command("start", async (ctx) => {
   }
 
   // Har doim asosiy sahifaga yo'naltirish (obuna bor/yo'q farqi yo'q)
-  const keyboard = new InlineKeyboard()
-    .webApp("\u{1F4F1} Ishga tushirish", `${config.webAppUrl}/app?user=${ctx.from!.id}`)
-    .row()
-    .url("\u{1F4E2} Kanalga o'tish", `https://t.me/${config.channelId.replace("@", "")}`);
-
   if (sub && sub.endDate) {
     const endDate = new Date(sub.endDate);
     const now = new Date();
 
     if (!isNaN(endDate.getTime())) {
       const daysLeft = Math.max(0, Math.ceil((endDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)));
+
+      // Obuna bor — kanal linkini ham ko'rsat
+      const keyboard = new InlineKeyboard()
+        .webApp("\u{1F4F1} Ishga tushirish", `${config.webAppUrl}/app?user=${ctx.from!.id}`)
+        .row()
+        .url("\u{1F4E2} Kanalga o'tish", `https://t.me/${config.channelId.replace("@", "")}`);
 
       await ctx.reply(
         `\u2705 Sizning obunangiz faol!\n\n` +
@@ -60,7 +61,10 @@ bot.command("start", async (ctx) => {
     }
   }
 
-  // Obuna yoq yoki noto'g'ri — lekin har doim asosiy sahifaga
+  // Obuna yo'q — faqat WebApp tugmasini ko'rsat, kanal linkisiz
+  const keyboard = new InlineKeyboard()
+    .webApp("\u{1F4F1} Ishga tushirish", `${config.webAppUrl}/app?user=${ctx.from!.id}`);
+
   await ctx.reply(
     `Hilal Edu ga xush kelibsiz! \u{1F44B}\n\n` +
     `Bu yerda sizni:\n` +

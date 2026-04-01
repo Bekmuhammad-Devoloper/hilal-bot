@@ -2,8 +2,8 @@
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
-// Build version: 2026-04-01-v2
-const APP_VERSION = "2.0.1";
+// Build version: 2026-04-01-v3
+const APP_VERSION = "2.0.3";
 
 const API = typeof window !== "undefined" && window.location.hostname === "localhost"
   ? "http://localhost:7777/api"
@@ -114,14 +114,10 @@ function MiniAppInner() {
       if (subRes && subRes.id && subRes.endDate && !isNaN(new Date(subRes.endDate).getTime())) {
         setSubscription(subRes);
       }
-      // Profili bor foydalanuvchi — manage ekraniga (obuna bor/yo'q farqi yo'q)
-      if (profileRes?.id) {
-        return "manage";
-      }
-      // Yangi foydalanuvchi — welcome sahifasiga
-      return "welcome";
+      // Har doim manage sahifaga o'tish (obuna bor/yo'q, profil bor/yo'q farqi yo'q)
+      return "manage";
     } catch (e) {
-      return "welcome";
+      return "manage";
     }
   };
 
