@@ -241,6 +241,51 @@ export class UsersService {
     return { total: users.length, updated };
   }
 
+  // User detail (admin uchun)
+  async getUserDetail(userId: number) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      include: {
+        subscriptions: {
+          include: { plan: true },
+          orderBy: { createdAt: "desc" },
+        },
+        payments: {
+          include: { plan: true },
+          orderBy: { createdAt: "desc" },
+        },
+      },
+    });
+    if (!user) throw new NotFoundException("Foydalanuvchi topilmadi");
+
+    const now = new Date();
+    const activeSub = user.subscriptions.find(
+      (s) => s.status === "active" && new Date(s.endDate) > now,
+    );
+
+    return {
+      ...this.serializeUser(user),
+      activeSubscription: activeSub
+        ? {
+            ...activeSub,
+            planName: activeSub.plan?.name || null,
+          }
+        : null,
+      subscriptions: user.subscriptions.map((s) => ({
+        ...s,
+        planName: s.plan?.name || null,
+      })),
+      payments: user.payments.map((p) => ({
+        ...p,
+        planName: p.plan?.name || null,
+      })),
+      totalPayments: user.payments.filter((p) => p.status === "completed").length,
+      totalSpent: user.payments
+        .filter((p) => p.status === "completed")
+        .reduce((sum, p) => sum + p.amount, 0),
+    };
+  }
+
   private serializeUser(user: any) {
     return {
       ...user,

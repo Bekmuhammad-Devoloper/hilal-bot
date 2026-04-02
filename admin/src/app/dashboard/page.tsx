@@ -337,7 +337,7 @@ export default function DashboardPage() {
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-[13px] font-medium text-slate-700 truncate">{p.user?.firstName || `ID: ${p.telegramId}`}</p>
+                  <a href={`/dashboard/users/${p.user?.id || p.userId}`} className="text-[13px] font-medium text-slate-700 truncate hover:text-indigo-600 transition-colors block">{p.user?.firstName || `ID: ${p.telegramId}`}</a>
                   <p className="text-[11px] text-slate-400">{p.plan?.name || "Tarif"} • {p.method || "Noma'lum"}</p>
                 </div>
                 <div className="text-right flex-shrink-0">
@@ -368,7 +368,7 @@ export default function DashboardPage() {
                 <p className="text-sm text-slate-400">Foydalanuvchilar topilmadi</p>
               </div>
             ) : recentUsers.map((u: any, i: number) => (
-              <div key={i} className="px-6 py-3.5 flex items-center gap-3 hover:bg-slate-50/50 transition-colors">
+              <a key={i} href={`/dashboard/users/${u.id}`} className="px-6 py-3.5 flex items-center gap-3 hover:bg-slate-50/50 transition-colors group block">
                 {u.photoUrl ? (
                   <img src={u.photoUrl} alt="" className="w-9 h-9 rounded-xl object-cover flex-shrink-0" />
                 ) : (
@@ -377,7 +377,7 @@ export default function DashboardPage() {
                   </div>
                 )}
                 <div className="flex-1 min-w-0">
-                  <p className="text-[13px] font-medium text-slate-700 truncate">{u.firstName || "Noma'lum"} {u.lastName || ""}</p>
+                  <p className="text-[13px] font-medium text-slate-700 truncate group-hover:text-indigo-600 transition-colors">{u.firstName || "Noma'lum"} {u.lastName || ""}</p>
                   <p className="text-[11px] text-slate-400">@{u.username || "username yo'q"}</p>
                 </div>
                 <div className="text-right flex-shrink-0">
@@ -393,7 +393,7 @@ export default function DashboardPage() {
                   </div>
                   <p className="text-[10px] text-slate-400 mt-0.5">{u.createdAt ? formatDate(u.createdAt) : ""}</p>
                 </div>
-              </div>
+              </a>
             ))}
           </div>
         </div>

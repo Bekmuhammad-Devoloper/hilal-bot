@@ -33,6 +33,15 @@ export class SubscriptionController {
     return this.subService.createSubscription(body.telegramId, body.planId);
   }
 
+  // Admin: sovg'a obuna berish (to'lovsiz)
+  @Post("gift")
+  async giftSubscription(@Body() body: { telegramId: number; planId: number }) {
+    const subscription = await this.subService.createSubscription(body.telegramId, body.planId);
+    // Kanal invite link ham yaratish
+    const inviteLink = await this.subService.createChannelInviteLink(body.telegramId);
+    return { subscription, inviteLink };
+  }
+
   // Obunani bekor qilish
   @Post("cancel/:telegramId")
   async cancel(@Param("telegramId") telegramId: string) {

@@ -117,7 +117,7 @@ export default function PaymentsPage() {
                       <span className="font-mono text-xs text-slate-400 bg-slate-50 px-2 py-1 rounded-lg">#{p.id}</span>
                     </td>
                     <td className="px-5 py-3.5">
-                      <div className="flex items-center gap-2.5">
+                      <a href={`/dashboard/users/${p.user?.id}`} className="flex items-center gap-2.5 group">
                         {p.user?.photoUrl ? (
                           <img src={p.user.photoUrl} alt="" className="w-8 h-8 rounded-lg object-cover flex-shrink-0" />
                         ) : (
@@ -126,10 +126,10 @@ export default function PaymentsPage() {
                           </div>
                         )}
                         <div>
-                          <p className="font-medium text-slate-800 text-[13px]">{p.user?.firstName || "?"}</p>
+                          <p className="font-medium text-slate-800 text-[13px] group-hover:text-indigo-600 transition-colors">{p.user?.firstName || "?"}</p>
                           <p className="text-[10px] text-slate-400">{p.user?.telegramId}</p>
                         </div>
-                      </div>
+                      </a>
                     </td>
                     <td className="px-5 py-3.5 text-[13px] font-medium text-slate-700">{p.plan?.name || "?"}</td>
                     <td className="px-5 py-3.5 text-[13px] font-semibold text-slate-800">{fmt(p.amount)}</td>

@@ -64,6 +64,11 @@ export class UsersController {
     return this.usersService.getDashboardData();
   }
 
+  @Get("detail/:id")
+  async getUserDetail(@Param("id") id: string) {
+    return this.usersService.getUserDetail(parseInt(id));
+  }
+
   @Get("stats")
   async getStats() {
     return this.usersService.getStats();

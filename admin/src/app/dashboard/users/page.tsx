@@ -60,7 +60,7 @@ export default function UsersPage() {
               {data.users?.map((u: any) => (
                 <tr key={u.id} className="hover:bg-slate-50/50 transition-colors">
                   <td className="px-5 py-3.5">
-                    <div className="flex items-center gap-3">
+                    <a href={`/dashboard/users/${u.id}`} className="flex items-center gap-3 group">
                       {u.photoUrl ? (
                         <img src={u.photoUrl} alt="" className="w-9 h-9 rounded-xl object-cover flex-shrink-0" />
                       ) : (
@@ -69,10 +69,10 @@ export default function UsersPage() {
                         </div>
                       )}
                       <div>
-                        <p className="font-medium text-slate-800 text-[13px]">{u.firstName} {u.lastName || ""}</p>
+                        <p className="font-medium text-slate-800 text-[13px] group-hover:text-indigo-600 transition-colors">{u.firstName} {u.lastName || ""}</p>
                         <p className="text-[11px] text-slate-400">@{u.username || "\u2014"}</p>
                       </div>
-                    </div>
+                    </a>
                   </td>
                   <td className="px-5 py-3.5">
                     <span className="font-mono text-xs text-slate-500 bg-slate-50 px-2 py-1 rounded-lg">{u.telegramId}</span>

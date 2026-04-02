@@ -118,7 +118,7 @@ export default function SubscriptionsPage() {
                 return (
                   <tr key={s.id} className="hover:bg-slate-50/50 transition-colors">
                     <td className="px-5 py-3.5">
-                      <div className="flex items-center gap-3">
+                      <a href={`/dashboard/users/${s.user?.id}`} className="flex items-center gap-3 group">
                         {s.user?.photoUrl ? (
                           <img src={s.user.photoUrl} alt="" className="w-8 h-8 rounded-lg object-cover flex-shrink-0" />
                         ) : (
@@ -127,10 +127,10 @@ export default function SubscriptionsPage() {
                           </div>
                         )}
                         <div>
-                          <p className="font-medium text-slate-800 text-[13px]">{s.user?.firstName || "?"}</p>
+                          <p className="font-medium text-slate-800 text-[13px] group-hover:text-indigo-600 transition-colors">{s.user?.firstName || "?"}</p>
                           <p className="text-[11px] text-slate-400">{s.user?.telegramId}</p>
                         </div>
-                      </div>
+                      </a>
                     </td>
                     <td className="px-5 py-3.5">
                       <span className="text-[13px] font-medium text-slate-700">{s.plan?.name || "?"}</span>
