@@ -352,7 +352,7 @@ function MiniAppInner() {
                 <img src="/logo.png" alt="" className="w-10 h-10 rounded-full border-2 border-white/20" />
                 <div>
                   <p className="font-bold text-base text-white">{hasSub ? (subscription?.plan?.name || "Oson Turk Tili") : "Hilal Edu"}</p>
-                  <p className="text-indigo-300/70 text-xs">{isAdmin && !hasSub ? "👑 Admin" : hasSub ? "Faol obuna" : "Obuna faol emas"}</p>
+                  <p className="text-indigo-300/70 text-xs flex items-center gap-1">{isAdmin && !hasSub ? <><svg className="w-3.5 h-3.5 text-amber-400" fill="currentColor" viewBox="0 0 24 24"><path d="M2.5 19h19l-2.5-8.5L16 13l-4-7-4 7-3.5-2.5L2.5 19zm2.14-1.5l1.26-4.28L9 15.3l3-5.25 3 5.25 3.1-2.08 1.26 4.28H4.64z" /><path d="M5 21h14v1.5H5z" /></svg><span>Admin</span></> : hasSub ? "Faol obuna" : "Obuna faol emas"}</p>
                 </div>
               </div>
               {hasSub ? (
@@ -373,8 +373,14 @@ function MiniAppInner() {
                 </>
               ) : isAdmin ? (
                 <div className="mt-2">
-                  <p className="text-indigo-300/70 text-xs mb-1">Cheksiz kirish</p>
-                  <p className="text-3xl font-black text-white">♾️ <span className="text-lg font-medium text-indigo-300/70">Admin rejim</span></p>
+                  <p className="text-indigo-300/70 text-xs mb-1 flex items-center gap-1.5">
+                    <svg className="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" /></svg>
+                    Cheksiz kirish
+                  </p>
+                  <div className="flex items-center gap-2.5">
+                    <svg className="w-8 h-8 text-indigo-400" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182M21.015 4.356v4.992" /></svg>
+                    <span className="text-2xl font-black text-white">Admin rejim</span>
+                  </div>
                 </div>
               ) : (
                 <div className="mt-2">
