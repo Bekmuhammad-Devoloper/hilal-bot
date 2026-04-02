@@ -5,6 +5,52 @@ import { PaymentService } from "./payment.service";
 export class PaymentController {
   constructor(private paymentService: PaymentService) {}
 
+  // ========== CLICK TOKENIZATSIYA API ==========
+
+  // 1-qadam: Karta token so'rash (SMS yuboradi)
+  @Post("click/token")
+  async createCardToken(
+    @Body() body: { cardNumber: string; expireDate: string },
+  ) {
+    try {
+      const result = await this.paymentService.createCardToken(body.cardNumber, body.expireDate);
+      return { success: true, ...result };
+    } catch (e: any) {
+      return { success: false, error: e.message };
+    }
+  }
+
+  // 2-qadam: SMS kodni tasdiqlash
+  @Post("click/verify")
+  async verifyCardToken(
+    @Body() body: { cardToken: string; smsCode: string },
+  ) {
+    try {
+      const result = await this.paymentService.verifyCardToken(body.cardToken, body.smsCode);
+      return { success: true, ...result };
+    } catch (e: any) {
+      return { success: false, error: e.message };
+    }
+  }
+
+  // 3-qadam: Token orqali to'lov qilish (payment yaratish + Click to'lov + obuna)
+  @Post("click/pay")
+  async payWithClick(
+    @Body() body: { telegramId: number; planId: number; cardToken: string; cardLast4: string },
+  ) {
+    try {
+      // Avval DB da payment yaratish
+      const payment = await this.paymentService.createPayment(body.telegramId, body.planId, "click");
+      // Click orqali haqiqiy to'lov + obuna aktivatsiya
+      const result = await this.paymentService.completeClickPayment(payment.id, body.cardToken, body.cardLast4);
+      return { success: true, ...result };
+    } catch (e: any) {
+      return { success: false, error: e.message };
+    }
+  }
+
+  // ========== ESKI ENDPOINT LAR ==========
+
   // To'lov yaratish
   @Post("create")
   async create(@Body() body: { telegramId: number; planId: number; method?: string }) {

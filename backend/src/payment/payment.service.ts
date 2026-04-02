@@ -2,6 +2,9 @@ import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { SubscriptionService } from "../subscription/subscription.service";
 import axios from "axios";
+import * as crypto from "crypto";
+
+const CLICK_API = "https://api.click.uz/v2/merchant";
 
 @Injectable()
 export class PaymentService {
@@ -10,7 +13,127 @@ export class PaymentService {
     private subService: SubscriptionService,
   ) {}
 
-  // To'lov yaratish
+  // Click API uchun Auth header yaratish
+  private getClickAuthHeader(): string {
+    const merchantUserId = process.env.CLICK_MERCHANT_USER_ID || "81357";
+    const secretKey = process.env.CLICK_SECRET_KEY || "SblP2wgqqjQ6ek";
+    const timestamp = Math.floor(Date.now() / 1000).toString();
+    const digest = crypto.createHash("sha1").update(timestamp + secretKey).digest("hex");
+    return `${merchantUserId}:${digest}:${timestamp}`;
+  }
+
+  private get serviceId(): number {
+    return parseInt(process.env.CLICK_SERVICE_ID || "99386");
+  }
+
+  // 1-qadam: Karta token so'rash (SMS yuboriladi)
+  async createCardToken(cardNumber: string, expireDate: string) {
+    try {
+      const res = await axios.post(
+        `${CLICK_API}/card_token/request`,
+        {
+          service_id: this.serviceId,
+          card_number: cardNumber.replace(/\s/g, ""),
+          expire_date: expireDate, // MMYY format
+          temporary: 1,
+        },
+        {
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Auth: this.getClickAuthHeader(),
+          },
+        },
+      );
+
+      console.log("[Click] card_token/request response:", JSON.stringify(res.data));
+
+      if (res.data.error_code !== 0) {
+        throw new Error(res.data.error_note || "Karta tokenizatsiya xatolik");
+      }
+
+      return {
+        card_token: res.data.card_token,
+        phone_number: res.data.phone_number,
+      };
+    } catch (e: any) {
+      console.error("[Click] card_token/request error:", e?.response?.data || e.message);
+      throw new Error(e?.response?.data?.error_note || e.message || "Click bilan bog'lanishda xatolik");
+    }
+  }
+
+  // 2-qadam: SMS kodni tasdiqlash
+  async verifyCardToken(cardToken: string, smsCode: string) {
+    try {
+      const res = await axios.post(
+        `${CLICK_API}/card_token/verify`,
+        {
+          service_id: this.serviceId,
+          card_token: cardToken,
+          sms_code: smsCode,
+        },
+        {
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Auth: this.getClickAuthHeader(),
+          },
+        },
+      );
+
+      console.log("[Click] card_token/verify response:", JSON.stringify(res.data));
+
+      if (res.data.error_code !== 0) {
+        throw new Error(res.data.error_note || "SMS tasdiqlash xatolik");
+      }
+
+      return {
+        confirmed: true,
+        card_number: res.data.card_number, // masked: "8600 55** **** 3244"
+      };
+    } catch (e: any) {
+      console.error("[Click] card_token/verify error:", e?.response?.data || e.message);
+      throw new Error(e?.response?.data?.error_note || e.message || "SMS tasdiqlashda xatolik");
+    }
+  }
+
+  // 3-qadam: Token orqali to'lov
+  async payWithToken(cardToken: string, amount: number, merchantTransId: string) {
+    try {
+      const res = await axios.post(
+        `${CLICK_API}/card_token/payment`,
+        {
+          service_id: this.serviceId,
+          card_token: cardToken,
+          amount: amount,
+          transaction_parameter: merchantTransId,
+        },
+        {
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Auth: this.getClickAuthHeader(),
+          },
+        },
+      );
+
+      console.log("[Click] card_token/payment response:", JSON.stringify(res.data));
+
+      if (res.data.error_code !== 0) {
+        throw new Error(res.data.error_note || "To'lov amalga oshmadi");
+      }
+
+      return {
+        payment_id: res.data.payment_id,
+        payment_status: res.data.payment_status,
+      };
+    } catch (e: any) {
+      console.error("[Click] card_token/payment error:", e?.response?.data || e.message);
+      throw new Error(e?.response?.data?.error_note || e.message || "To'lovda xatolik");
+    }
+  }
+
+  // To'lov yaratish (DB ga yozish)
   async createPayment(telegramId: number, planId: number, method: string = "click") {
     const user = await this.prisma.user.findUnique({
       where: { telegramId: BigInt(telegramId) },
@@ -34,7 +157,47 @@ export class PaymentService {
     return payment;
   }
 
-  // To'lovni tasdiqlash (simulyatsiya — haqiqiy Click integratsiya keyinroq)
+  // Click to'lovni yakunlash (token orqali real to'lov + obuna)
+  async completeClickPayment(paymentId: number, cardToken: string, cardLast4: string) {
+    const payment = await this.prisma.payment.findUnique({
+      where: { id: paymentId },
+      include: { user: true, plan: true },
+    });
+    if (!payment) throw new Error("Payment topilmadi");
+
+    // Click orqali haqiqiy to'lov
+    const merchantTransId = `hilal-${paymentId}-${Date.now()}`;
+    const clickResult = await this.payWithToken(cardToken, payment.amount, merchantTransId);
+
+    // DB ni yangilash
+    const updatedPayment = await this.prisma.payment.update({
+      where: { id: paymentId },
+      data: {
+        status: "completed",
+        cardLast4: cardLast4 || "****",
+        transactionId: String(clickResult.payment_id),
+      },
+      include: { user: true, plan: true },
+    });
+
+    // Obuna yaratish
+    const subscription = await this.subService.createSubscription(
+      Number(updatedPayment.user.telegramId),
+      updatedPayment.planId,
+    );
+
+    // Kanal invite link
+    const inviteLink = await this.subService.createChannelInviteLink(
+      Number(updatedPayment.user.telegramId),
+    );
+
+    // Foydalanuvchiga xabar yuborish
+    this.notifyUser(updatedPayment, subscription, inviteLink, cardLast4);
+
+    return { payment: updatedPayment, subscription, inviteLink };
+  }
+
+  // Eski confirmPayment (fallback)
   async confirmPayment(paymentId: number, cardLast4?: string, transactionId?: string) {
     const payment = await this.prisma.payment.update({
       where: { id: paymentId },
@@ -58,6 +221,13 @@ export class PaymentService {
     );
 
     // Foydalanuvchiga xabar yuborish
+    this.notifyUser(payment, subscription, inviteLink, cardLast4);
+
+    return { payment, subscription, inviteLink };
+  }
+
+  // Foydalanuvchiga TG xabar yuborish
+  private async notifyUser(payment: any, subscription: any, inviteLink: string | null, cardLast4?: string) {
     try {
       const botToken = process.env.BOT_TOKEN;
       const endDate = new Date(subscription.endDate);
@@ -102,8 +272,6 @@ export class PaymentService {
     } catch (e: any) {
       console.error("Notify error:", e?.response?.data || e.message);
     }
-
-    return { payment, subscription, inviteLink };
   }
 
   // To'lovni bekor qilish

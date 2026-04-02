@@ -3,7 +3,7 @@ import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
 // Build version: 2026-04-01-v8
-const APP_VERSION = "2.1.1";
+const APP_VERSION = "2.2.0";
 
 const API = typeof window !== "undefined" && window.location.hostname === "localhost"
   ? "http://localhost:7777/api"
@@ -32,6 +32,11 @@ function MiniAppInner() {
   const [tgPhotoUrl, setTgPhotoUrl] = useState<string | null>(null);
   const [tgUsername, setTgUsername] = useState<string | null>(null);
   const [prevScreen, setPrevScreen] = useState<string>("manage");
+  // Click tokenizatsiya uchun
+  const [paymentStep, setPaymentStep] = useState<"card" | "sms" | "paying">("card");
+  const [smsCode, setSmsCode] = useState("");
+  const [cardToken, setCardToken] = useState("");
+  const [maskedPhone, setMaskedPhone] = useState("");
 
   // Telegram WebApp init + userId olish
   useEffect(() => {
@@ -135,44 +140,97 @@ function MiniAppInner() {
 
   const handleSelectPlan = (plan: any) => {
     setSelectedPlan(plan);
+    setPaymentStep("card");
+    setSmsCode("");
+    setCardToken("");
+    setMaskedPhone("");
+    setCardNumber("");
+    setCardExpiry("");
     setScreen("payment");
   };
 
-  const handlePayment = async () => {
+  // 1-qadam: Karta kiritish → Click ga token so'rash (SMS yuboriladi)
+  const handleRequestToken = async () => {
     if (!selectedPlan || !userId) return;
-    if (paymentMethod === "click" && (!cardNumber || !cardExpiry)) return;
+    if (!cardNumber || !cardExpiry) return;
     setProcessing(true);
     try {
-      const paymentRes = await fetch(API + "/payments/create", {
+      const rawCard = cardNumber.replace(/\s/g, "");
+      const rawExpiry = cardExpiry.replace("/", ""); // MM/YY → MMYY
+      const res = await fetch(API + "/payments/click/token", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ telegramId: parseInt(userId), planId: selectedPlan.id, method: paymentMethod }),
+        body: JSON.stringify({ cardNumber: rawCard, expireDate: rawExpiry }),
       }).then(r => r.json());
 
-      await new Promise(r => setTimeout(r, 2000));
+      if (!res.success) {
+        alert(res.error || "Karta qabul qilinmadi. Tekshirib qaytadan urinib ko'ring.");
+        return;
+      }
 
-      const last4 = cardNumber.replace(/\s/g, "").slice(-4) || "0001";
-      const result = await fetch(API + "/payments/confirm/" + paymentRes.id, {
+      setCardToken(res.card_token);
+      setMaskedPhone(res.phone_number || "");
+      setPaymentStep("sms");
+    } catch (e) {
+      alert("Xatolik yuz berdi. Internetni tekshiring.");
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  // 2-qadam: SMS kodni tasdiqlash
+  const handleVerifySms = async () => {
+    if (!cardToken || !smsCode) return;
+    setProcessing(true);
+    try {
+      const res = await fetch(API + "/payments/click/verify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ cardLast4: last4 }),
+        body: JSON.stringify({ cardToken, smsCode }),
       }).then(r => r.json());
 
-      setPaymentResult(result);
-      setSubscription(result.subscription);
+      if (!res.success) {
+        alert(res.error || "SMS kod noto'g'ri. Qaytadan urinib ko'ring.");
+        return;
+      }
+
+      // 3-qadam: Token orqali to'lov
+      setPaymentStep("paying");
+      const last4 = res.card_number ? res.card_number.slice(-4) : cardNumber.replace(/\s/g, "").slice(-4);
+
+      const payRes = await fetch(API + "/payments/click/pay", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          telegramId: parseInt(userId!),
+          planId: selectedPlan!.id,
+          cardToken,
+          cardLast4: last4,
+        }),
+      }).then(r => r.json());
+
+      if (!payRes.success) {
+        alert(payRes.error || "To'lov amalga oshmadi.");
+        setPaymentStep("card");
+        return;
+      }
+
+      setPaymentResult(payRes);
+      setSubscription(payRes.subscription);
       setScreen("success");
 
       try {
         if ((window as any).Telegram?.WebApp) {
           (window as any).Telegram.WebApp.sendData(JSON.stringify({
             action: "payment_success",
-            planId: selectedPlan.id,
+            planId: selectedPlan!.id,
             cardLast4: last4,
           }));
         }
       } catch (e) {}
     } catch (e) {
       alert("To'lovda xatolik yuz berdi. Qaytadan urinib ko'ring.");
+      setPaymentStep("card");
     } finally {
       setProcessing(false);
     }
@@ -643,27 +701,75 @@ function MiniAppInner() {
     return (
       <div className="min-h-screen bg-gradient-to-b from-[#0f0a2a] via-[#1a1145] to-[#0f0a2a] p-5 flex flex-col">
         <div className="mb-6 scale-in">
-          <button onClick={() => setScreen("subscribe")} className="flex items-center gap-1.5 text-indigo-300/50 text-sm mb-4 active:text-indigo-200 transition-colors"><svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>Orqaga</button>
-          <h1 className="text-2xl font-bold text-white">Karta ma{"'"}lumotlari</h1>
-          <p className="text-sm text-indigo-300/50 mt-1">Xavfsiz to{"'"}lov</p>
+          <button onClick={() => { if (paymentStep === "sms") { setPaymentStep("card"); } else { setScreen("subscribe"); } }} className="flex items-center gap-1.5 text-indigo-300/50 text-sm mb-4 active:text-indigo-200 transition-colors"><svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>Orqaga</button>
+          <h1 className="text-2xl font-bold text-white">{paymentStep === "card" ? "Karta ma'lumotlari" : paymentStep === "sms" ? "SMS tasdiqlash" : "To'lov"}</h1>
+          <p className="text-sm text-indigo-300/50 mt-1">{paymentStep === "card" ? "Click orqali xavfsiz to'lov" : paymentStep === "sms" ? `Kod ${maskedPhone} raqamiga yuborildi` : "To'lov amalga oshirilmoqda..."}</p>
         </div>
-        <div className="space-y-3 mb-6 fade-in-up stagger-1">
-          <div><label className="text-xs font-medium text-indigo-300/50 uppercase tracking-wider mb-1.5 block">Karta raqami</label><input type="text" value={cardNumber} onChange={(e) => { const v = e.target.value.replace(/\D/g, "").slice(0, 16); setCardNumber(v.replace(/(\d{4})(?=\d)/g, "$1 ")); }} placeholder="0000 0000 0000 0000" className="w-full px-4 py-3.5 bg-white/[0.07] border border-white/[0.1] rounded-2xl text-base font-medium focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/20 outline-none text-white placeholder-indigo-300/30 transition-all" /></div>
-          <div><label className="text-xs font-medium text-indigo-300/50 uppercase tracking-wider mb-1.5 block">Amal qilish muddati</label><input type="text" value={cardExpiry} onChange={(e) => { let v = e.target.value.replace(/\D/g, "").slice(0, 4); if (v.length > 2) v = v.slice(0, 2) + "/" + v.slice(2); setCardExpiry(v); }} placeholder="MM/YY" className="w-full px-4 py-3.5 bg-white/[0.07] border border-white/[0.1] rounded-2xl text-base font-medium focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/20 outline-none text-white placeholder-indigo-300/30 transition-all" /></div>
+
+        {/* Bosqich indikator */}
+        <div className="flex items-center gap-2 mb-6 fade-in-up">
+          <div className={`flex-1 h-1 rounded-full ${paymentStep === "card" || paymentStep === "sms" || paymentStep === "paying" ? "bg-indigo-500" : "bg-white/10"}`} />
+          <div className={`flex-1 h-1 rounded-full ${paymentStep === "sms" || paymentStep === "paying" ? "bg-indigo-500" : "bg-white/10"}`} />
+          <div className={`flex-1 h-1 rounded-full ${paymentStep === "paying" ? "bg-emerald-500" : "bg-white/10"}`} />
         </div>
-        <div className="bg-white/[0.07] rounded-2xl p-5 border border-white/[0.08] mb-6 fade-in-up stagger-2">
-          <div className="flex items-center gap-2.5 mb-3"><div className="w-8 h-8 bg-amber-500/15 rounded-xl flex items-center justify-center"><svg className="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></div><p className="font-semibold text-white text-sm">Karta ulanmayaptimi?</p></div>
-          <div className="space-y-1.5 pl-[42px]"><p className="text-xs text-indigo-300/40">1. Payme yoki Click ilovasini o{"'"}rnating</p><p className="text-xs text-indigo-300/40">2. Ilovada kartangizni qo{"'"}shing</p><p className="text-xs text-indigo-300/40">3. Bu sahifada karta raqamini kiriting</p></div>
-        </div>
-        <div className="text-center mb-4 fade-in-up stagger-3">
-          <button onClick={() => { setPrevScreen("payment"); setScreen("terms"); }} className="text-indigo-400/60 text-xs underline underline-offset-2 mb-3 active:text-indigo-300 transition-colors flex items-center gap-1.5 mx-auto"><svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" /></svg> Ommaviy oferta shartlari</button>
-          <div className="flex items-center justify-center gap-3 text-xs text-indigo-300/30"><svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg><span>Xavfsiz to{"'"}lov</span><img src="/payme-01.png" alt="Payme" className="h-5 opacity-40 object-contain" /><img src="/click-01.png" alt="Click" className="h-5 opacity-40 object-contain" /></div>
-        </div>
-        <div className="mt-auto fade-in-up stagger-3">
-          <button onClick={handlePayment} disabled={processing || !cardNumber || !cardExpiry} className="w-full py-4 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-2xl font-bold text-base shadow-lg shadow-indigo-900/30 active:scale-[0.98] transition-transform disabled:opacity-40 disabled:shadow-none">
-            {processing ? (<span className="flex items-center justify-center gap-2"><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full logo-ring-spin" />To{"'"}lov amalga oshirilmoqda...</span>) : "Kodni olish"}
-          </button>
-        </div>
+
+        {paymentStep === "card" && (
+          <>
+            <div className="space-y-3 mb-6 fade-in-up stagger-1">
+              <div><label className="text-xs font-medium text-indigo-300/50 uppercase tracking-wider mb-1.5 block">Karta raqami</label><input type="text" inputMode="numeric" value={cardNumber} onChange={(e) => { const v = e.target.value.replace(/\D/g, "").slice(0, 16); setCardNumber(v.replace(/(\d{4})(?=\d)/g, "$1 ")); }} placeholder="0000 0000 0000 0000" className="w-full px-4 py-3.5 bg-white/[0.07] border border-white/[0.1] rounded-2xl text-base font-medium focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/20 outline-none text-white placeholder-indigo-300/30 transition-all" /></div>
+              <div><label className="text-xs font-medium text-indigo-300/50 uppercase tracking-wider mb-1.5 block">Amal qilish muddati</label><input type="text" inputMode="numeric" value={cardExpiry} onChange={(e) => { let v = e.target.value.replace(/\D/g, "").slice(0, 4); if (v.length > 2) v = v.slice(0, 2) + "/" + v.slice(2); setCardExpiry(v); }} placeholder="MM/YY" className="w-full px-4 py-3.5 bg-white/[0.07] border border-white/[0.1] rounded-2xl text-base font-medium focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/20 outline-none text-white placeholder-indigo-300/30 transition-all" /></div>
+            </div>
+            {selectedPlan && (
+              <div className="bg-white/[0.07] rounded-2xl p-4 border border-white/[0.08] mb-6 fade-in-up stagger-2">
+                <div className="flex justify-between items-center">
+                  <span className="text-indigo-300/60 text-sm">{selectedPlan.name}</span>
+                  <span className="text-white font-bold text-lg">{formatPrice(selectedPlan.price)} so{"'"}m</span>
+                </div>
+              </div>
+            )}
+            <div className="text-center mb-4 fade-in-up stagger-3">
+              <button onClick={() => { setPrevScreen("payment"); setScreen("terms"); }} className="text-indigo-400/60 text-xs underline underline-offset-2 mb-3 active:text-indigo-300 transition-colors flex items-center gap-1.5 mx-auto"><svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" /></svg> Ommaviy oferta shartlari</button>
+              <div className="flex items-center justify-center gap-3 text-xs text-indigo-300/30"><svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg><span>Click xavfsiz to{"'"}lov</span><img src="/click-01.png" alt="Click" className="h-5 opacity-40 object-contain" /></div>
+            </div>
+            <div className="mt-auto fade-in-up stagger-3">
+              <button onClick={handleRequestToken} disabled={processing || !cardNumber || cardNumber.replace(/\s/g, "").length < 16 || !cardExpiry || cardExpiry.replace("/", "").length < 4} className="w-full py-4 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-2xl font-bold text-base shadow-lg shadow-indigo-900/30 active:scale-[0.98] transition-transform disabled:opacity-40 disabled:shadow-none">
+                {processing ? (<span className="flex items-center justify-center gap-2"><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full logo-ring-spin" />SMS kod yuborilmoqda...</span>) : "SMS kod olish"}
+              </button>
+            </div>
+          </>
+        )}
+
+        {paymentStep === "sms" && (
+          <>
+            <div className="space-y-4 mb-6 fade-in-up">
+              <div className="bg-white/[0.07] rounded-2xl p-5 border border-white/[0.08] text-center">
+                <div className="w-16 h-16 bg-indigo-500/15 rounded-2xl flex items-center justify-center mx-auto mb-4"><svg className="w-8 h-8 text-indigo-400" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M8.625 9.75a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375m-13.5 3.01c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.184-4.183a1.14 1.14 0 01.778-.332 48.294 48.294 0 005.83-.498c1.585-.233 2.708-1.626 2.708-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z" /></svg></div>
+                <p className="text-white font-semibold mb-1">SMS kod yuborildi</p>
+                <p className="text-indigo-300/50 text-xs">{maskedPhone ? `${maskedPhone} raqamiga` : "Telefon raqamingizga"} 6 xonali kod yuborildi</p>
+              </div>
+              <div>
+                <label className="text-xs font-medium text-indigo-300/50 uppercase tracking-wider mb-1.5 block">SMS kod</label>
+                <input type="text" inputMode="numeric" value={smsCode} onChange={(e) => setSmsCode(e.target.value.replace(/\D/g, "").slice(0, 6))} placeholder="000000" maxLength={6} className="w-full px-4 py-4 bg-white/[0.07] border border-white/[0.1] rounded-2xl text-2xl font-bold text-center tracking-[0.5em] focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/20 outline-none text-white placeholder-indigo-300/30 transition-all" autoFocus />
+              </div>
+            </div>
+            <div className="text-center mb-4">
+              <button onClick={() => { setPaymentStep("card"); setSmsCode(""); setCardToken(""); }} className="text-indigo-400/60 text-xs underline underline-offset-2 active:text-indigo-300 transition-colors">Boshqa karta kiritish</button>
+            </div>
+            <div className="mt-auto fade-in-up">
+              <button onClick={handleVerifySms} disabled={processing || smsCode.length < 4} className="w-full py-4 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-2xl font-bold text-base shadow-lg shadow-indigo-900/30 active:scale-[0.98] transition-transform disabled:opacity-40 disabled:shadow-none">
+                {processing ? (<span className="flex items-center justify-center gap-2"><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full logo-ring-spin" />Tekshirilmoqda...</span>) : `${selectedPlan ? formatPrice(selectedPlan.price) + " so'm" : ""} to'lash`}
+              </button>
+            </div>
+          </>
+        )}
+
+        {paymentStep === "paying" && (
+          <div className="flex-1 flex flex-col items-center justify-center fade-in-up">
+            <div className="w-16 h-16 border-4 border-indigo-500/20 border-t-indigo-400 rounded-full logo-ring-spin mb-6" />
+            <p className="text-white font-semibold text-lg mb-2">To{"'"}lov amalga oshirilmoqda</p>
+            <p className="text-indigo-300/50 text-sm text-center">Iltimos kutib turing, bu bir necha soniya olishi mumkin...</p>
+          </div>
+        )}
       </div>
     );
   }
