@@ -94,6 +94,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     getMe()
       .then((u) => {
         if (u && u.isAdmin) {
+          // photoUrl ni proxy URL ga almashtirish (Telegram file URL vaqtinchalik)
+          if (u.telegramId) u.photoUrl = `/api/users/photo/${u.telegramId}`;
           setUser(u);
         } else if (u && !u.isAdmin) {
           localStorage.clear(); router.push("/");
@@ -101,7 +103,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           // null qaytdi — tokendan user data olish
           try {
             const payload = JSON.parse(atob(token.split(".")[1]));
-            setUser({ firstName: payload.firstName, telegramId: payload.telegramId, isAdmin: true, photoUrl: payload.photoUrl || null });
+            const proxyPhoto = payload.telegramId ? `/api/users/photo/${payload.telegramId}` : null;
+            setUser({ firstName: payload.firstName, telegramId: payload.telegramId, isAdmin: true, photoUrl: proxyPhoto });
           } catch {
             localStorage.clear(); router.push("/");
           }
@@ -111,7 +114,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         // Network xato — tokendan user data olish
         try {
           const payload = JSON.parse(atob(token.split(".")[1]));
-          setUser({ firstName: payload.firstName, telegramId: payload.telegramId, isAdmin: true, photoUrl: payload.photoUrl || null });
+          const proxyPhoto = payload.telegramId ? `/api/users/photo/${payload.telegramId}` : null;
+          setUser({ firstName: payload.firstName, telegramId: payload.telegramId, isAdmin: true, photoUrl: proxyPhoto });
         } catch {
           localStorage.clear(); router.push("/");
         }

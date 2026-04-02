@@ -32,13 +32,16 @@ export class UsersController {
   @Get("photo/:telegramId")
   async getPhoto(@Param("telegramId") telegramId: string, @Res() res: Response) {
     try {
-      const tid = BigInt(telegramId);
-      const user = await this.prisma.user.findUnique({
-        where: { telegramId: tid },
-        select: { photoUrl: true },
-      });
-      if (user?.photoUrl) {
-        return res.redirect(user.photoUrl);
+      const tid = Number(telegramId);
+      // Har safar yangi URL olish (Telegram file URL vaqtinchalik)
+      const freshUrl = await this.usersService.fetchTelegramPhoto(tid);
+      if (freshUrl) {
+        // DB ni ham yangilash
+        await this.prisma.user.updateMany({
+          where: { telegramId: BigInt(tid) },
+          data: { photoUrl: freshUrl },
+        });
+        return res.redirect(freshUrl);
       }
       return res.status(HttpStatus.NOT_FOUND).json({ error: "Photo not found" });
     } catch {
