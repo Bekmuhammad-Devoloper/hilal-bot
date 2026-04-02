@@ -122,7 +122,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center bg-slate-50">
       <div className="flex flex-col items-center gap-5">
-        <img src="/logo.jpg" alt="Hilal Bot" className="w-20 h-20 rounded-2xl object-cover shadow-lg logo-pulse" />
+        <img src="/logo.png" alt="Hilal Bot" className="w-20 h-20 rounded-2xl object-cover shadow-lg logo-pulse" />
         <div className="text-center">
           <h2 className="text-lg font-bold text-slate-800 tracking-tight">Hilal Bot</h2>
           <p className="text-[12px] text-slate-400 font-medium mt-0.5">Admin Panel yuklanmoqda...</p>
@@ -139,7 +139,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const Sidebar = ({ mobile = false }: { mobile?: boolean }) => (
     <aside className={`${mobile ? "w-[280px]" : open ? "w-[260px]" : "w-[76px]"} bg-white flex flex-col h-full transition-all duration-300 border-r border-slate-100`}>
       <div className="px-5 py-5 flex items-center gap-3">
-        <img src="/logo.jpg" alt="Hilal Bot" className="w-11 h-11 rounded-xl object-cover flex-shrink-0 shadow-md" />
+        <img src="/logo.png" alt="Hilal Bot" className="w-11 h-11 rounded-xl object-cover flex-shrink-0 shadow-md" />
         {(open || mobile) && (
           <div className="overflow-hidden">
             <h2 className="font-bold text-slate-900 text-[15px] leading-tight">Hilal Bot</h2>

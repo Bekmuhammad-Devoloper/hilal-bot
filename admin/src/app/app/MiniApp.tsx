@@ -289,7 +289,7 @@ function MiniAppInner() {
               style={{ width: 120, height: 120 }}
             />
             <img
-              src="/logo.jpg"
+              src="/logo.png"
               alt="Hilal Bot"
               className="rounded-full object-cover logo-pulse shadow-lg shadow-indigo-900/50"
               style={{ width: 96, height: 96 }}
@@ -309,7 +309,7 @@ function MiniAppInner() {
         <div className="flex-1 flex flex-col items-center justify-center px-6 pt-10 pb-6">
           <div className="relative mb-6 scale-in">
             <div className="absolute -inset-3 bg-indigo-500/20 rounded-full blur-xl" />
-            <img src="/logo.jpg" alt="Hilal Bot" className="relative w-28 h-28 rounded-full object-cover border-4 border-white/10 shadow-2xl shadow-indigo-900/50" />
+            <img src="/logo.png" alt="Hilal Bot" className="relative w-28 h-28 rounded-full object-cover border-4 border-white/10 shadow-2xl shadow-indigo-900/50" />
           </div>
           <h1 className="text-2xl font-black text-white text-center mb-2 fade-in-up">Hilal Edu ga xush kelibsiz!</h1>
           <p className="text-sm text-indigo-300/60 text-center mb-8 fade-in-up" style={{ animationDelay: "0.1s" }}>Turk tilini oson va samarali o{"'"}rganing</p>
@@ -349,7 +349,7 @@ function MiniAppInner() {
             <div className="absolute -bottom-4 -left-4 w-24 h-24 bg-purple-500/10 rounded-full" />
             <div className="relative z-10">
               <div className="flex items-center gap-3 mb-4">
-                <img src="/logo.jpg" alt="" className="w-10 h-10 rounded-full border-2 border-white/20" />
+                <img src="/logo.png" alt="" className="w-10 h-10 rounded-full border-2 border-white/20" />
                 <div>
                   <p className="font-bold text-base text-white">{hasSub ? (subscription?.plan?.name || "Oson Turk Tili") : "Hilal Edu"}</p>
                   <p className="text-indigo-300/70 text-xs">{isAdmin && !hasSub ? "👑 Admin" : hasSub ? "Faol obuna" : "Obuna faol emas"}</p>
@@ -797,7 +797,7 @@ export default function MiniAppClient() {
           <div className="flex flex-col items-center fade-in-up">
             <div className="relative flex items-center justify-center" style={{ width: 120, height: 120 }}>
               <div className="absolute rounded-full border-[3px] border-indigo-800/40 border-t-indigo-400 logo-ring-spin" style={{ width: 120, height: 120 }} />
-              <img src="/logo.jpg" alt="Hilal Bot" className="rounded-full object-cover logo-pulse shadow-lg shadow-indigo-900/50" style={{ width: 96, height: 96 }} />
+              <img src="/logo.png" alt="Hilal Bot" className="rounded-full object-cover logo-pulse shadow-lg shadow-indigo-900/50" style={{ width: 96, height: 96 }} />
             </div>
             <h2 className="text-xl font-bold text-white mt-5 mb-1">Hilal Bot</h2>
             <p className="text-sm text-indigo-300/60">Yuklanmoqda...</p>

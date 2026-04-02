@@ -41,7 +41,7 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="bg-white rounded-2xl shadow-sm border p-8 w-full max-w-md">
         <div className="text-center mb-8">
-          <img src="/logo.jpg" alt="Hilal Bot" className="w-20 h-20 rounded-full object-cover mx-auto mb-4 shadow-md" />
+          <img src="/logo.png" alt="Hilal Bot" className="w-20 h-20 rounded-full object-cover mx-auto mb-4 shadow-md" />
           <h1 className="text-2xl font-bold text-gray-900">Hilal Bot</h1>
           <p className="text-gray-400 mt-1">Admin Panel</p>
         </div>

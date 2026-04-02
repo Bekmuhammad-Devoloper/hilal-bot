@@ -40,7 +40,7 @@ function AuthCallbackInner() {
           <>
             <div className="relative w-20 h-20 mx-auto mb-5">
               <div className="absolute inset-0 rounded-full border-[3px] border-gray-100 border-t-indigo-900 logo-ring-spin" />
-              <img src="/logo.jpg" alt="Hilal Bot" className="w-16 h-16 rounded-full object-cover absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+              <img src="/logo.png" alt="Hilal Bot" className="w-16 h-16 rounded-full object-cover absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
             </div>
             <p className="text-gray-500">Tekshirilmoqda...</p>
           </>
@@ -77,7 +77,7 @@ export default function AuthCallback() {
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="relative w-20 h-20">
           <div className="absolute inset-0 rounded-full border-[3px] border-gray-100 border-t-indigo-900 logo-ring-spin" />
-          <img src="/logo.jpg" alt="Hilal Bot" className="w-16 h-16 rounded-full object-cover absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+          <img src="/logo.png" alt="Hilal Bot" className="w-16 h-16 rounded-full object-cover absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
         </div>
       </div>
     }>
