@@ -418,6 +418,45 @@ export class PaymentService {
     };
   }
 
+  // Telegram Bot API orqali invoice link yaratish (WebApp uchun)
+  async createTelegramInvoiceLink(telegramId: number, planId: number) {
+    const plan = await this.prisma.plan.findUnique({ where: { id: planId } });
+    if (!plan) throw new Error("Plan topilmadi");
+
+    const botToken = process.env.BOT_TOKEN;
+    const providerToken = process.env.CLICK_PROVIDER_TOKEN;
+    if (!botToken || !providerToken) throw new Error("Bot yoki provider token sozlanmagan");
+
+    const payload = JSON.stringify({
+      planId: plan.id,
+      telegramId,
+      planName: plan.name,
+    });
+
+    const res = await axios.post(
+      `https://api.telegram.org/bot${botToken}/createInvoiceLink`,
+      {
+        title: `${plan.name} — Hilal Edu obuna`,
+        description: `${plan.name} (${plan.duration} kun) — Hilal Edu ta'lim platformasi obunasi. To'lovdan keyin maxsus kanalga kirish huquqi ochiladi.`,
+        payload,
+        provider_token: providerToken,
+        currency: "UZS",
+        prices: [{ label: plan.name, amount: plan.price * 100 }],
+        need_phone_number: true,
+        need_name: false,
+        need_email: false,
+        need_shipping_address: false,
+        photo_url: "https://hilal-bot.bekmuhammad.uz/logo.png",
+        photo_width: 512,
+        photo_height: 512,
+      },
+    );
+
+    if (!res.data.ok) throw new Error(res.data.description || "Invoice yaratishda xatolik");
+
+    return { invoiceLink: res.data.result };
+  }
+
   async getRecentPayments(limit = 5) {
     const payments = await this.prisma.payment.findMany({
       take: limit,

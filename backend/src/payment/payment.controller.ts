@@ -78,6 +78,21 @@ export class PaymentController {
     }
   }
 
+  // ========== TELEGRAM INVOICE LINK ==========
+
+  // WebApp uchun Telegram Invoice link yaratish
+  @Post("create-invoice")
+  async createInvoiceLink(
+    @Body() body: { telegramId: number; planId: number },
+  ) {
+    try {
+      const result = await this.paymentService.createTelegramInvoiceLink(body.telegramId, body.planId);
+      return { success: true, ...result };
+    } catch (e: any) {
+      return { success: false, error: e.message };
+    }
+  }
+
   // ========== ESKI ENDPOINT LAR ==========
 
   // To'lov yaratish
