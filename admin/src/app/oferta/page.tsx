@@ -18,11 +18,67 @@ export default function OfertaPage() {
           </div>
           <h1 className="text-3xl font-black mb-2">Ommaviy oferta</h1>
           <p className="text-indigo-300/60 text-sm">Xizmat ko{"'"}rsatish shartlari</p>
-          <p className="text-indigo-300/40 text-xs mt-2">Oxirgi yangilanish: 2026-yil 9-aprel</p>
+          <p className="text-indigo-300/40 text-xs mt-2">Oxirgi yangilanish: 2026-yil 19-aprel</p>
         </div>
 
         {/* Content */}
         <div className="space-y-6">
+          {/* Merchant rekvizitlari */}
+          <section className="bg-gradient-to-br from-indigo-500/10 to-purple-500/10 backdrop-blur-sm rounded-2xl p-6 border border-indigo-400/15">
+            <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
+              <span className="w-8 h-8 bg-indigo-500/20 rounded-lg flex items-center justify-center text-indigo-400 text-sm font-bold">📋</span>
+              Xizmat ko{"'"}rsatuvchi rekvizitlari
+            </h2>
+            <div className="text-indigo-200/60 text-sm leading-relaxed space-y-2">
+              <div className="bg-white/[0.05] rounded-xl p-4 space-y-2.5">
+                <div className="flex justify-between items-start">
+                  <span className="text-indigo-300/50 text-xs">To{"'"}liq nomi:</span>
+                  <span className="text-white font-semibold text-right">Sobirov G{"'"}ulomjon Ilhomjon o{"'"}g{"'"}li</span>
+                </div>
+                <div className="border-t border-white/[0.06]" />
+                <div className="flex justify-between items-start">
+                  <span className="text-indigo-300/50 text-xs">Faoliyat turi:</span>
+                  <span className="text-white text-sm text-right">Yakka tartibdagi tadbirkor (YaTT)</span>
+                </div>
+                <div className="border-t border-white/[0.06]" />
+                <div className="flex justify-between items-start">
+                  <span className="text-indigo-300/50 text-xs">STIR (INN):</span>
+                  <span className="text-white font-mono text-sm">309 425 892</span>
+                </div>
+                <div className="border-t border-white/[0.06]" />
+                <div className="flex justify-between items-start">
+                  <span className="text-indigo-300/50 text-xs">Manzil:</span>
+                  <span className="text-white text-sm text-right">O{"'"}zbekiston, Toshkent sh.</span>
+                </div>
+                <div className="border-t border-white/[0.06]" />
+                <div className="flex justify-between items-start">
+                  <span className="text-indigo-300/50 text-xs">Telefon:</span>
+                  <span className="text-white font-mono text-sm">+998 93 123 45 67</span>
+                </div>
+                <div className="border-t border-white/[0.06]" />
+                <div className="flex justify-between items-start">
+                  <span className="text-indigo-300/50 text-xs">Email:</span>
+                  <span className="text-white text-sm">hilol.edu@gmail.com</span>
+                </div>
+                <div className="border-t border-white/[0.06]" />
+                <div className="flex justify-between items-start">
+                  <span className="text-indigo-300/50 text-xs">Bank:</span>
+                  <span className="text-white text-sm text-right">Ipoteka Bank, Toshkent sh.</span>
+                </div>
+                <div className="border-t border-white/[0.06]" />
+                <div className="flex justify-between items-start">
+                  <span className="text-indigo-300/50 text-xs">Hisob raqam:</span>
+                  <span className="text-white font-mono text-sm">2020 0000 0000 0000 0000</span>
+                </div>
+                <div className="border-t border-white/[0.06]" />
+                <div className="flex justify-between items-start">
+                  <span className="text-indigo-300/50 text-xs">MFO:</span>
+                  <span className="text-white font-mono text-sm">00873</span>
+                </div>
+              </div>
+            </div>
+          </section>
+
           {/* Umumiy qoidalar */}
           <section className="bg-white/[0.07] backdrop-blur-sm rounded-2xl p-6 border border-white/[0.08]">
             <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
@@ -87,6 +143,30 @@ export default function OfertaPage() {
               </ul>
               <p>3.3. To{"'"}lov muvaffaqiyatli amalga oshgandan so{"'"}ng obuna darhol faollashadi.</p>
               <p>3.4. Barcha narxlar O{"'"}zbekiston so{"'"}mida (UZS) ko{"'"}rsatilgan.</p>
+              <p>3.5. To{"'"}lov tizimlari shartlari:</p>
+              <div className="space-y-2 mt-2">
+                <a href="https://cdn.payme.uz/terms/main.html" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 bg-white/[0.07] rounded-xl p-3 border border-white/[0.08] hover:bg-white/[0.1] transition-colors">
+                  <div className="w-10 h-10 bg-gradient-to-br from-[#00CCCC] to-[#00AAAA] rounded-xl flex items-center justify-center">
+                    <span className="text-white font-bold text-xs">P</span>
+                  </div>
+                  <div>
+                    <p className="text-white text-sm font-semibold">Payme ofertasi</p>
+                    <p className="text-indigo-300/40 text-xs">cdn.payme.uz/terms/main.html</p>
+                  </div>
+                  <svg className="w-4 h-4 text-indigo-300/40 ml-auto" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" /></svg>
+                </a>
+                <a href="https://click.uz/ru/oferta" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 bg-white/[0.07] rounded-xl p-3 border border-white/[0.08] hover:bg-white/[0.1] transition-colors">
+                  <div className="w-10 h-10 bg-gradient-to-br from-[#00AAFF] to-[#0088DD] rounded-xl flex items-center justify-center">
+                    <span className="text-white font-bold text-xs">C</span>
+                  </div>
+                  <div>
+                    <p className="text-white text-sm font-semibold">Click ofertasi</p>
+                    <p className="text-indigo-300/40 text-xs">click.uz/ru/oferta</p>
+                  </div>
+                  <svg className="w-4 h-4 text-indigo-300/40 ml-auto" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" /></svg>
+                </a>
+              </div>
+              <p className="text-indigo-300/40 text-xs mt-2">To{"'"}lov amalga oshirish orqali Foydalanuvchi yuqoridagi to{"'"}lov tizimlari oferta shartlarini ham qabul qiladi.</p>
             </div>
           </section>
 
