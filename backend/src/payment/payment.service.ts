@@ -197,6 +197,62 @@ export class PaymentService {
     return { payment: updatedPayment, subscription, inviteLink };
   }
 
+  // Telegram Payments API orqali to'lovni tasdiqlash
+  async confirmTelegramPayment(
+    telegramId: number,
+    planId: number,
+    amount: number,
+    currency: string,
+    telegramPaymentChargeId: string,
+    providerPaymentChargeId: string,
+  ) {
+    const user = await this.prisma.user.findUnique({
+      where: { telegramId: BigInt(telegramId) },
+    });
+    if (!user) throw new Error("User topilmadi");
+
+    const plan = await this.prisma.plan.findUnique({ where: { id: planId } });
+    if (!plan) throw new Error("Plan topilmadi");
+
+    // DB da payment yaratish
+    const payment = await this.prisma.payment.create({
+      data: {
+        userId: user.id,
+        planId: plan.id,
+        amount: amount,
+        method: "click-telegram",
+        status: "completed",
+        transactionId: telegramPaymentChargeId,
+        cardLast4: providerPaymentChargeId.substring(0, 10),
+        metadata: JSON.stringify({
+          currency,
+          telegramPaymentChargeId,
+          providerPaymentChargeId,
+          paidAt: new Date().toISOString(),
+        }),
+      },
+      include: { user: true, plan: true },
+    });
+
+    // Obuna yaratish
+    const subscription = await this.subService.createSubscription(
+      telegramId,
+      planId,
+    );
+
+    // Kanal invite link yaratish
+    let inviteLink: string | null = null;
+    try {
+      inviteLink = await this.subService.createChannelInviteLink(telegramId);
+    } catch (e: any) {
+      console.error("createChannelInviteLink error:", e.message);
+    }
+
+    console.log(`[TelegramPayment] Confirmed: user=${telegramId}, plan=${planId}, amount=${amount} ${currency}, txn=${telegramPaymentChargeId}`);
+
+    return { payment, subscription, inviteLink };
+  }
+
   // Eski confirmPayment (fallback)
   async confirmPayment(paymentId: number, cardLast4?: string, transactionId?: string) {
     const payment = await this.prisma.payment.update({

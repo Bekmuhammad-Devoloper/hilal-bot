@@ -7,4 +7,5 @@ export const config = {
   webAppUrl: process.env.WEBAPP_URL || "http://localhost:8888",
   channelId: process.env.CHANNEL_ID || "@gulomjonhoca",
   adminIds: (process.env.ADMIN_IDS || "").split(",").map(Number).filter(Boolean),
+  clickProviderToken: process.env.CLICK_PROVIDER_TOKEN || "",
 };

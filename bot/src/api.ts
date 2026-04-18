@@ -101,3 +101,29 @@ export async function generateAuthCode(telegramId: number) {
   const { data } = await api.post("/auth/generate-code", { telegramId });
   return data;
 }
+
+// ============ USER PHONE ============
+export async function updatePhone(telegramId: number, phone: string) {
+  const { data } = await api.patch(`/users/telegram/${telegramId}/phone`, { phone });
+  return data;
+}
+
+// ============ TELEGRAM PAYMENTS ============
+export async function confirmTelegramPayment(
+  telegramId: number,
+  planId: number,
+  amount: number,
+  currency: string,
+  telegramPaymentChargeId: string,
+  providerPaymentChargeId: string,
+) {
+  const { data } = await api.post("/payments/telegram-payment", {
+    telegramId,
+    planId,
+    amount,
+    currency,
+    telegramPaymentChargeId,
+    providerPaymentChargeId,
+  });
+  return data;
+}

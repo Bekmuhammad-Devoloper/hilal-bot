@@ -49,6 +49,35 @@ export class PaymentController {
     }
   }
 
+  // ========== TELEGRAM PAYMENTS API ==========
+
+  // Telegram Payments orqali to'lovni tasdiqlash
+  @Post("telegram-payment")
+  async confirmTelegramPayment(
+    @Body() body: {
+      telegramId: number;
+      planId: number;
+      amount: number;
+      currency: string;
+      telegramPaymentChargeId: string;
+      providerPaymentChargeId: string;
+    },
+  ) {
+    try {
+      const result = await this.paymentService.confirmTelegramPayment(
+        body.telegramId,
+        body.planId,
+        body.amount,
+        body.currency,
+        body.telegramPaymentChargeId,
+        body.providerPaymentChargeId,
+      );
+      return { success: true, ...result };
+    } catch (e: any) {
+      return { success: false, error: e.message };
+    }
+  }
+
   // ========== ESKI ENDPOINT LAR ==========
 
   // To'lov yaratish

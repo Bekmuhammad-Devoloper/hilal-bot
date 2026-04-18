@@ -106,4 +106,16 @@ export class UsersController {
   async blockUser(@Param("id") id: string, @Body() body: { isBlocked: boolean }) {
     return this.usersService.blockUser(parseInt(id), body.isBlocked);
   }
+
+  @Patch("telegram/:telegramId/phone")
+  async updatePhone(
+    @Param("telegramId") telegramId: string,
+    @Body() body: { phone: string },
+  ) {
+    const user = await this.prisma.user.updateMany({
+      where: { telegramId: BigInt(telegramId) },
+      data: { phone: body.phone },
+    });
+    return { success: true, updated: user.count };
+  }
 }
