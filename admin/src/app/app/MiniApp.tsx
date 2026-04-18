@@ -677,6 +677,7 @@ function MiniAppInner() {
         <button onClick={() => setScreen("subscribe")} className="mt-8 text-indigo-400/60 text-sm underline underline-offset-2 active:text-indigo-300 transition-colors">Bekor qilish</button>
       </div>
     );
+  }
   // ========== SUCCESS ==========
   if (screen === "success") {
     return (
