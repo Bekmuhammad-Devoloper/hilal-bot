@@ -22,7 +22,7 @@ async function loadPlans() {
 // =============================================
 bot.command("start", async (ctx) => {
   // Royxatdan otkazish (profil rasm bilan)
-  let isNewUser = false;
+  let hasPhone = true;
   try {
     let photoUrl: string | undefined;
     try {
@@ -40,9 +40,8 @@ bot.command("start", async (ctx) => {
       ctx.from!.last_name || "",
       photoUrl,
     );
-    // Agar telefon yo'q bo'lsa — yangi user
     if (result && !result.phone) {
-      isNewUser = true;
+      hasPhone = false;
     }
   } catch (e) {}
 
@@ -67,24 +66,7 @@ bot.command("start", async (ctx) => {
     }
   } catch (e) {}
 
-  // Agar yangi foydalanuvchi — telefon so'rash
-  if (isNewUser) {
-    awaitingPhone.add(ctx.from!.id);
-    const keyboard = new Keyboard()
-      .requestContact("📱 Telefon raqamni yuborish")
-      .resized()
-      .oneTime();
-
-    await ctx.reply(
-      `Hilal Edu ga xush kelibsiz! 👋\n\n` +
-      `Ro'yxatdan o'tish uchun telefon raqamingizni yuboring.\n` +
-      `Pastdagi tugmani bosing 👇`,
-      { reply_markup: keyboard },
-    );
-    return;
-  }
-
-  // Har doim asosiy sahifaga yo'naltirish (obuna bor/yo'q farqi yo'q)
+  // Aktiv obuna bor bo'lsa — kanal linki bilan ko'rsat
   if (sub && sub.endDate) {
     const endDate = new Date(sub.endDate);
     const now = new Date();
@@ -92,7 +74,6 @@ bot.command("start", async (ctx) => {
     if (!isNaN(endDate.getTime())) {
       const daysLeft = Math.max(0, Math.ceil((endDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)));
 
-      // Obuna bor — kanal linkini ham ko'rsat
       const keyboard = new InlineKeyboard()
         .webApp("📱 Ishga tushirish", `${config.webAppUrl}/app?user=${ctx.from!.id}`)
         .row()
@@ -110,13 +91,15 @@ bot.command("start", async (ctx) => {
     }
   }
 
-  // Obuna yo'q — WebApp + To'lov tugmalarini ko'rsat
+  // Obuna yo'q — har doim asosiy menyu (telefon bor-yo'qligi muhim emas)
+  // Telefon yo'q bo'lsa, kontaktni so'raymiz lekin obuna sahifasi BLOKLANMAYDI
   const keyboard = new InlineKeyboard()
-    .text("💳 Obuna sotib olish (Click)", "show_plans")
+    .text("💳 Obuna sotib olish", "show_plans")
     .row()
-    .webApp("📱 Ishga tushirish", `${config.webAppUrl}/app?user=${ctx.from!.id}`)
+    .webApp("📱 Mini-ilova", `${config.webAppUrl}/app?user=${ctx.from!.id}`)
     .row()
-    .url("📜 Oferta", `${config.webAppUrl}/oferta`);
+    .url("📜 Oferta", `${config.webAppUrl}/oferta`)
+    .text("🆘 Yordam", "help_menu");
 
   await ctx.reply(
     `Hilal Edu ga xush kelibsiz! 👋\n\n` +
@@ -128,6 +111,22 @@ bot.command("start", async (ctx) => {
     `\nObuna sotib olish uchun "💳 Obuna sotib olish" tugmasini bosing 👇`,
     { reply_markup: keyboard },
   );
+
+  // Agar telefon raqami yo'q bo'lsa — alohida xabar bilan kontaktni so'raymiz (ixtiyoriy)
+  if (!hasPhone) {
+    awaitingPhone.add(ctx.from!.id);
+    const phoneKb = new Keyboard()
+      .requestContact("📱 Telefon raqamni ulashish")
+      .resized()
+      .oneTime();
+    try {
+      await ctx.reply(
+        `ℹ️ Telefon raqamingizni qo'shsangiz, to'lov va qo'llab-quvvatlash xizmatlari yanada qulay bo'ladi.\n\n` +
+        `Bu ixtiyoriy — obuna sotib olish uchun shart emas.`,
+        { reply_markup: phoneKb },
+      );
+    } catch (e) {}
+  }
 });
 
 // =============================================
@@ -162,11 +161,12 @@ bot.on("message:contact", async (ctx) => {
   } catch (e) {}
 
   const keyboard = new InlineKeyboard()
-    .text("💳 Obuna sotib olish (Click)", "show_plans")
+    .text("💳 Obuna sotib olish", "show_plans")
     .row()
-    .webApp("📱 Ishga tushirish", `${config.webAppUrl}/app?user=${userId}`)
+    .webApp("📱 Mini-ilova", `${config.webAppUrl}/app?user=${userId}`)
     .row()
-    .url("📜 Oferta", `${config.webAppUrl}/oferta`);
+    .url("📜 Oferta", `${config.webAppUrl}/oferta`)
+    .text("🆘 Yordam", "help_menu");
 
   await ctx.reply(
     `✅ Ro'yxatdan o'tish muvaffaqiyatli!\n\n` +
@@ -204,8 +204,9 @@ async function showPlanSelection(ctx: any) {
 
     await ctx.reply(
       `💳 Obuna rejasini tanlang:\n\n` +
-      `To'lov Click orqali Telegram ichida amalga oshiriladi.\n` +
-      `Karta ma'lumotlaringizni Telegram himoya qiladi 🔒`,
+      `To'lov Telegram ichida (Payme yoki Click) xavfsiz amalga oshiriladi.\n` +
+      `Karta ma'lumotlaringizni Telegram himoya qiladi 🔒\n\n` +
+      `📜 Davom etish orqali siz Ommaviy Oferta (${config.webAppUrl}/oferta) shartlarini qabul qilasiz.`,
       { reply_markup: keyboard },
     );
   } catch (e) {
@@ -382,6 +383,28 @@ bot.on("callback_query:data", async (ctx) => {
   if (data === "show_plans") {
     await ctx.answerCallbackQuery();
     await showPlanSelection(ctx);
+    return;
+  }
+
+  // Yordam menyusi
+  if (data === "help_menu") {
+    await ctx.answerCallbackQuery();
+    const kb = new InlineKeyboard()
+      .url("📜 Oferta", `${config.webAppUrl}/oferta`)
+      .row()
+      .url("💬 Aloqa", "https://t.me/HilalEdu");
+    await ctx.reply(
+      `🆘 Qo'llab-quvvatlash\n\n` +
+      `📋 Buyruqlar:\n` +
+      `/start — Botni boshlash\n` +
+      `/pay — Obuna sotib olish\n` +
+      `/status — Obuna holati\n` +
+      `/oferta — Xizmat shartlari\n` +
+      `/support — Qo'llab-quvvatlash\n\n` +
+      `📧 Email: hilol.edu@gmail.com\n` +
+      `💬 Telegram: @HilalEdu`,
+      { reply_markup: kb },
+    );
     return;
   }
 
