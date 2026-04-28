@@ -33,72 +33,47 @@ export default function OfertaPage() {
               <div className="bg-white/[0.05] rounded-xl p-4 space-y-2.5">
                 <div className="flex justify-between items-start gap-3">
                   <span className="text-indigo-300/50 text-xs flex-shrink-0">Tashkiliy-huquqiy shakli:</span>
-                  <span className="text-white text-sm text-right">Yakka tartibdagi tadbirkor (YaTT)</span>
+                  <span className="text-white text-sm text-right">Mas{"'"}uliyati cheklangan jamiyat (MCHJ)</span>
                 </div>
                 <div className="border-t border-white/[0.06]" />
                 <div className="flex justify-between items-start gap-3">
-                  <span className="text-indigo-300/50 text-xs flex-shrink-0">To{"'"}liq nomi (F.I.Sh.):</span>
-                  <span className="text-white font-semibold text-right">Sobirov G{"'"}ulomjon Ilhomjon o{"'"}g{"'"}li</span>
+                  <span className="text-indigo-300/50 text-xs flex-shrink-0">To{"'"}liq nomi:</span>
+                  <span className="text-white font-semibold text-right">{'"'}Hilol Edu{'"'} MCHJ</span>
                 </div>
                 <div className="border-t border-white/[0.06]" />
                 <div className="flex justify-between items-start gap-3">
-                  <span className="text-indigo-300/50 text-xs flex-shrink-0">Brend nomi:</span>
-                  <span className="text-white text-sm text-right">Hilal Edu</span>
+                  <span className="text-indigo-300/50 text-xs flex-shrink-0">Direktor:</span>
+                  <span className="text-white text-sm text-right">Umarjon Sobirov</span>
                 </div>
                 <div className="border-t border-white/[0.06]" />
                 <div className="flex justify-between items-start gap-3">
-                  <span className="text-indigo-300/50 text-xs flex-shrink-0">STIR (INN):</span>
-                  <span className="text-white font-mono text-sm">309 425 892</span>
-                </div>
-                <div className="border-t border-white/[0.06]" />
-                <div className="flex justify-between items-start gap-3">
-                  <span className="text-indigo-300/50 text-xs flex-shrink-0">Davlat ro{"'"}yxatdan o{"'"}tish raqami:</span>
-                  <span className="text-white font-mono text-sm text-right">№ 0309425892</span>
-                </div>
-                <div className="border-t border-white/[0.06]" />
-                <div className="flex justify-between items-start gap-3">
-                  <span className="text-indigo-300/50 text-xs flex-shrink-0">Ro{"'"}yxatdan o{"'"}tgan sana:</span>
-                  <span className="text-white text-sm text-right">15.01.2024</span>
-                </div>
-                <div className="border-t border-white/[0.06]" />
-                <div className="flex justify-between items-start gap-3">
-                  <span className="text-indigo-300/50 text-xs flex-shrink-0">Ro{"'"}yxatdan o{"'"}tkazgan organ:</span>
-                  <span className="text-white text-sm text-right">Toshkent sh. Davlat xizmatlari markazi</span>
-                </div>
-                <div className="border-t border-white/[0.06]" />
-                <div className="flex justify-between items-start gap-3">
-                  <span className="text-indigo-300/50 text-xs flex-shrink-0">Faoliyat turi (OKED):</span>
-                  <span className="text-white font-mono text-sm text-right">85.59 — Boshqa ta{"'"}lim turlari</span>
+                  <span className="text-indigo-300/50 text-xs flex-shrink-0">INN (STIR):</span>
+                  <span className="text-white font-mono text-sm">307 893 009</span>
                 </div>
                 <div className="border-t border-white/[0.06]" />
                 <div className="flex justify-between items-start gap-3">
                   <span className="text-indigo-300/50 text-xs flex-shrink-0">Yuridik manzil:</span>
-                  <span className="text-white text-sm text-right">100000, O{"'"}zbekiston Respublikasi, Toshkent sh., Yunusobod tumani, Amir Temur ko{"'"}chasi, 1-uy</span>
+                  <span className="text-white text-sm text-right">Toshkent shahri, Chilonzor tumani, Muqimiy ko{"'"}chasi, 142/1</span>
                 </div>
                 <div className="border-t border-white/[0.06]" />
                 <div className="flex justify-between items-start gap-3">
                   <span className="text-indigo-300/50 text-xs flex-shrink-0">Telefon:</span>
-                  <span className="text-white font-mono text-sm">+998 90 000 00 00</span>
-                </div>
-                <div className="border-t border-white/[0.06]" />
-                <div className="flex justify-between items-start gap-3">
-                  <span className="text-indigo-300/50 text-xs flex-shrink-0">Email:</span>
-                  <span className="text-white text-sm">hilol.edu@gmail.com</span>
+                  <span className="text-white font-mono text-sm">+998 (55) 519-78-78</span>
                 </div>
                 <div className="border-t border-white/[0.06]" />
                 <div className="flex justify-between items-start gap-3">
                   <span className="text-indigo-300/50 text-xs flex-shrink-0">Bank:</span>
-                  <span className="text-white text-sm text-right">{"\""}Ipoteka-bank{"\""} ATIB, Toshkent sh. filiali</span>
+                  <span className="text-white text-sm text-right">{'"'}Orient Finans{'"'} HATB Chilonzor BXM</span>
                 </div>
                 <div className="border-t border-white/[0.06]" />
                 <div className="flex justify-between items-start gap-3">
-                  <span className="text-indigo-300/50 text-xs flex-shrink-0">Hisob raqam (h/r):</span>
-                  <span className="text-white font-mono text-sm text-right">2020 8000 0000 0000 0000</span>
+                  <span className="text-indigo-300/50 text-xs flex-shrink-0">Hisob raqam (x/r):</span>
+                  <span className="text-white font-mono text-sm text-right">2020 8000 2053 0419 2003</span>
                 </div>
                 <div className="border-t border-white/[0.06]" />
                 <div className="flex justify-between items-start gap-3">
                   <span className="text-indigo-300/50 text-xs flex-shrink-0">MFO bank kodi:</span>
-                  <span className="text-white font-mono text-sm">01183</span>
+                  <span className="text-white font-mono text-sm">01071</span>
                 </div>
                 <div className="border-t border-white/[0.06]" />
                 <div className="flex justify-between items-start gap-3">
@@ -125,8 +100,8 @@ export default function OfertaPage() {
               Umumiy qoidalar
             </h2>
             <div className="text-indigo-200/60 text-sm leading-relaxed space-y-3">
-              <p>1.1. Ushbu ommaviy oferta (bundan buyon — &quot;Oferta&quot;) <strong className="text-white">Yakka tartibdagi tadbirkor Sobirov G{"'"}ulomjon Ilhomjon o{"'"}g{"'"}li</strong> (STIR: 309 425 892, bundan buyon — &quot;Xizmat ko{"'"}rsatuvchi&quot;) tomonidan O{"'"}zbekiston Respublikasi Fuqarolik kodeksining 367-, 369-, 370-moddalariga muvofiq jismoniy shaxslarga (bundan buyon — &quot;Foydalanuvchi&quot;) taqdim etiladigan ta{"'"}limiy xizmatlar shartlarini belgilaydi.</p>
-              <p>1.2. Xizmat ko{"'"}rsatuvchining brend nomi — <strong className="text-white">Hilal Edu</strong>. Tijoriy nom &quot;Oson Turk Tili&quot; loyihasi asosida faoliyat yuritadi.</p>
+              <p>1.1. Ushbu ommaviy oferta (bundan buyon — &quot;Oferta&quot;) <strong className="text-white">&quot;Hilol Edu&quot; MCHJ</strong> (INN: 307 893 009, bundan buyon — &quot;Xizmat ko{"'"}rsatuvchi&quot;) tomonidan O{"'"}zbekiston Respublikasi Fuqarolik kodeksining 367-, 369-, 370-moddalariga muvofiq jismoniy shaxslarga (bundan buyon — &quot;Foydalanuvchi&quot;) taqdim etiladigan ta{"'"}limiy xizmatlar shartlarini belgilaydi.</p>
+              <p>1.2. Xizmat ko{"'"}rsatuvchining tijoriy nomi — <strong className="text-white">Hilal Edu</strong>. Loyiha &quot;Oson Turk Tili&quot; nomi ostida faoliyat yuritadi.</p>
               <p>1.3. Platformada ro{"'"}yxatdan o{"'"}tish yoki to{"'"}lov amalga oshirish (aksept) orqali Foydalanuvchi ushbu Oferta shartlarini to{"'"}liq va so{"'"}zsiz qabul qiladi (FK 370-modda 3-band).</p>
               <p>1.4. Xizmat Telegram bot (<strong className="text-white">@oson_turktili_bot</strong>) va bog{"'"}liq web-ilova (Mini App) orqali ko{"'"}rsatiladi.</p>
               <p>1.5. Foydalanuvchi 18 yoshga to{"'"}lgan va to{"'"}lovni mustaqil amalga oshirish huquqiga ega bo{"'"}lishi shart. Voyaga yetmaganlar ota-onasi yoki vasiysi roziligi bilan foydalanishlari mumkin.</p>
