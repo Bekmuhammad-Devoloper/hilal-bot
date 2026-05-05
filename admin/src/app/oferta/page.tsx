@@ -161,8 +161,8 @@ export default function OfertaPage() {
               <p>3.5. To{"'"}lov tizimlari shartlari:</p>
               <div className="space-y-2 mt-2">
                 <a href="https://cdn.payme.uz/terms/ru/main.html?v=0426" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 bg-white/[0.07] rounded-xl p-3 border border-white/[0.08] hover:bg-white/[0.1] transition-colors">
-                  <div className="w-10 h-10 bg-gradient-to-br from-[#00CCCC] to-[#00AAAA] rounded-xl flex items-center justify-center">
-                    <span className="text-white font-bold text-xs">P</span>
+                  <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center flex-shrink-0">
+                    <img src="/payme-01.png" alt="Payme" className="w-7 h-7 object-contain" />
                   </div>
                   <div>
                     <p className="text-white text-sm font-semibold">Payme ommaviy oferta</p>
@@ -171,8 +171,8 @@ export default function OfertaPage() {
                   <svg className="w-4 h-4 text-indigo-300/40 ml-auto" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" /></svg>
                 </a>
                 <a href="https://click.uz/ru/oferta" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 bg-white/[0.07] rounded-xl p-3 border border-white/[0.08] hover:bg-white/[0.1] transition-colors">
-                  <div className="w-10 h-10 bg-gradient-to-br from-[#00AAFF] to-[#0088DD] rounded-xl flex items-center justify-center">
-                    <span className="text-white font-bold text-xs">C</span>
+                  <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center flex-shrink-0">
+                    <img src="/click-01.png" alt="Click" className="w-7 h-7 object-contain" />
                   </div>
                   <div>
                     <p className="text-white text-sm font-semibold">Click ofertasi</p>
