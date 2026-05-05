@@ -1,5 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  async redirects() {
+    return [
+      { source: "/admin", destination: "/", permanent: false },
+      { source: "/admin/:path*", destination: "/dashboard/:path*", permanent: false },
+    ];
+  },
   async rewrites() {
     return [
       {
