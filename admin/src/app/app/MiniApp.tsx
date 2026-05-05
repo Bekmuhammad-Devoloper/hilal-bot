@@ -511,47 +511,141 @@ function MiniAppInner() {
 
   // ========== TERMS ==========
   if (screen === "terms") {
+    const openExternal = (url: string) => {
+      try {
+        const tg = (window as any).Telegram?.WebApp;
+        if (tg && tg.openLink) tg.openLink(url);
+        else window.open(url, "_blank");
+      } catch { window.open(url, "_blank"); }
+    };
     return (
       <div className="min-h-screen bg-gradient-to-b from-[#0f0a2a] via-[#1a1145] to-[#0f0a2a] p-5 pb-10">
         <div className="mb-6 scale-in">
           <button onClick={() => { setScreen(prevScreen as any); setPrevScreen("manage"); }} className="flex items-center gap-1.5 text-indigo-300/50 text-sm mb-4 active:text-indigo-200 transition-colors"><svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>Orqaga</button>
           <h1 className="text-2xl font-bold text-white">Ommaviy oferta</h1>
           <p className="text-sm text-indigo-300/50 mt-1">Xizmat ko{"'"}rsatish shartlari</p>
+          <p className="text-xs text-indigo-300/30 mt-1">Oxirgi yangilanish: 2026-yil 5-may</p>
         </div>
-        <div className="space-y-4 fade-in-up">
-          {[
-            { iconSvg: <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z" /></svg>, title: "1. Obuna narxi va to'lov", text: "Kanalga kirish oylik obuna asosida ishlaydi. To'lov har 30 kunda avtomatik ravishda yechib olinadi. To'lov Payme yoki Click orqali amalga oshiriladi.", gradient: "from-amber-500 to-orange-500", bg: "from-amber-500/15 to-orange-500/15", border: "border-amber-500/20" },
-            { iconSvg: <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182" /></svg>, title: "2. Avtomatik yechib olish", text: "Har oy belgilangan summa avtomatik ravishda kartangizdan yechib olinadi. Obuna faol bo'lgan davr mobaynida to'lov avtomatik davom etadi.", gradient: "from-cyan-500 to-teal-500", bg: "from-cyan-500/15 to-teal-500/15", border: "border-cyan-500/20" },
-            { iconSvg: <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>, title: "3. Bekor qilish tartibi", text: "Obunani istalgan vaqtda bekor qilish mumkin. Bekor qilish keyingi to'lov davridan kuchga kiradi. Joriy davr oxirigacha kanaldan foydalanish mumkin.", gradient: "from-rose-500 to-pink-500", bg: "from-rose-500/15 to-pink-500/15", border: "border-rose-500/20" },
-            { iconSvg: <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>, title: "4. Pulni qaytarish", text: "Foydalanilgan davr uchun to'lov qaytarilmaydi. Obuna bekor qilinsa, joriy oylik davr tugaguncha xizmatdan foydalanishingiz mumkin.", gradient: "from-emerald-500 to-green-500", bg: "from-emerald-500/15 to-green-500/15", border: "border-emerald-500/20" },
-            { iconSvg: <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" /></svg>, title: "5. Kanal kontenti", text: "Kanaldagi barcha materiallar mualliflik huquqi bilan himoyalangan. Kontentni uchinchi shaxslarga tarqatish, nusxalash yoki qayta nashr qilish qat'iyan taqiqlanadi.", gradient: "from-violet-500 to-purple-500", bg: "from-violet-500/15 to-purple-500/15", border: "border-violet-500/20" },
-            { iconSvg: <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" /></svg>, title: "6. Qoidabuzarlik", text: "Shartlarni buzgan foydalanuvchilarning obunasi ogohlantirishsiz bekor qilinishi mumkin. Bunday hollarda to'lov qaytarilmaydi.", gradient: "from-orange-500 to-red-500", bg: "from-orange-500/15 to-red-500/15", border: "border-orange-500/20" },
-            { iconSvg: <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" /></svg>, title: "7. O'zgarishlar", text: "Ma'muriyat istalgan vaqtda ushbu shartlarni yangilash huquqiga ega. O'zgarishlar haqida foydalanuvchilarga oldindan xabar beriladi.", gradient: "from-blue-500 to-indigo-500", bg: "from-blue-500/15 to-indigo-500/15", border: "border-blue-500/20" },
-            { iconSvg: <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 01-.825-.242m9.345-8.334a2.126 2.126 0 00-.476-.095 48.64 48.64 0 00-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0011.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155" /></svg>, title: "8. Aloqa", text: "Savollar yoki muammolar bo'lsa, biz bilan bog'laning. Biz sizga yordam berishdan mamnunmiz.", gradient: "from-sky-500 to-blue-500", bg: "from-sky-500/15 to-blue-500/15", border: "border-sky-500/20" },
-          ].map((item, i) => (
-            <div key={i} className={`bg-gradient-to-br ${item.bg} backdrop-blur-sm rounded-2xl p-5 border ${item.border} transition-all`}>
-              <div className="flex items-center gap-3 mb-3">
-                <div className={`w-10 h-10 bg-gradient-to-br ${item.gradient} rounded-xl flex items-center justify-center text-white shadow-lg`}>{item.iconSvg}</div>
-                <h3 className="text-white font-bold text-[15px]">{item.title}</h3>
+
+        {/* Merchant rekvizitlari */}
+        <div className="bg-gradient-to-br from-indigo-500/10 to-purple-500/10 backdrop-blur-sm rounded-2xl p-5 border border-indigo-400/15 mb-4 fade-in-up">
+          <h3 className="text-white font-bold text-[15px] mb-4 flex items-center gap-2">
+            <span className="w-8 h-8 bg-indigo-500/20 rounded-lg flex items-center justify-center text-indigo-400 text-sm">📋</span>
+            Xizmat ko{"'"}rsatuvchi rekvizitlari
+          </h3>
+          <div className="bg-white/[0.05] rounded-xl p-4 space-y-2.5 text-[12.5px]">
+            <div className="flex justify-between items-start gap-3">
+              <span className="text-indigo-300/50 text-[11px] flex-shrink-0">Tashkiliy shakli:</span>
+              <span className="text-white text-right">MCHJ</span>
+            </div>
+            <div className="border-t border-white/[0.06]" />
+            <div className="flex justify-between items-start gap-3">
+              <span className="text-indigo-300/50 text-[11px] flex-shrink-0">To{"'"}liq nomi:</span>
+              <span className="text-white font-semibold text-right">{'"'}Hilol Edu{'"'} MCHJ</span>
+            </div>
+            <div className="border-t border-white/[0.06]" />
+            <div className="flex justify-between items-start gap-3">
+              <span className="text-indigo-300/50 text-[11px] flex-shrink-0">Direktor:</span>
+              <span className="text-white text-right">Umarjon Sobirov</span>
+            </div>
+            <div className="border-t border-white/[0.06]" />
+            <div className="flex justify-between items-start gap-3">
+              <span className="text-indigo-300/50 text-[11px] flex-shrink-0">INN (STIR):</span>
+              <span className="text-white font-mono">307 893 009</span>
+            </div>
+            <div className="border-t border-white/[0.06]" />
+            <div className="flex justify-between items-start gap-3">
+              <span className="text-indigo-300/50 text-[11px] flex-shrink-0">Manzil:</span>
+              <span className="text-white text-right text-[12px]">Toshkent, Chilonzor, Muqimiy 142/1</span>
+            </div>
+            <div className="border-t border-white/[0.06]" />
+            <div className="flex justify-between items-start gap-3">
+              <span className="text-indigo-300/50 text-[11px] flex-shrink-0">Telefon:</span>
+              <span className="text-white font-mono text-[12px]">+998 (55) 519-78-78</span>
+            </div>
+            <div className="border-t border-white/[0.06]" />
+            <div className="flex justify-between items-start gap-3">
+              <span className="text-indigo-300/50 text-[11px] flex-shrink-0">Bank:</span>
+              <span className="text-white text-right text-[12px]">{'"'}Orient Finans{'"'} HATB</span>
+            </div>
+            <div className="border-t border-white/[0.06]" />
+            <div className="flex justify-between items-start gap-3">
+              <span className="text-indigo-300/50 text-[11px] flex-shrink-0">Hisob raqam:</span>
+              <span className="text-white font-mono text-[11.5px] text-right">2020 8000 2053 0419 2003</span>
+            </div>
+            <div className="border-t border-white/[0.06]" />
+            <div className="flex justify-between items-start gap-3">
+              <span className="text-indigo-300/50 text-[11px] flex-shrink-0">MFO:</span>
+              <span className="text-white font-mono">01071</span>
+            </div>
+          </div>
+        </div>
+
+        {/* To'lov tizimlari ofertalari */}
+        <div className="bg-gradient-to-br from-amber-500/10 to-orange-500/10 backdrop-blur-sm rounded-2xl p-5 border border-amber-400/15 mb-4 fade-in-up">
+          <h3 className="text-white font-bold text-[15px] mb-3 flex items-center gap-2">
+            <span className="w-8 h-8 bg-amber-500/20 rounded-lg flex items-center justify-center text-amber-400 text-sm">💳</span>
+            To{"'"}lov tizimlari oferta
+          </h3>
+          <p className="text-indigo-200/50 text-[12px] mb-3">To{"'"}lovni amalga oshirish orqali siz quyidagi to{"'"}lov tizimlari oferta shartlarini ham qabul qilasiz:</p>
+          <div className="space-y-2">
+            <button onClick={() => openExternal("https://cdn.payme.uz/terms/ru/main.html?v=0426")} className="w-full flex items-center gap-3 bg-white/[0.07] rounded-xl p-3 border border-white/[0.08] active:bg-white/[0.12] transition-all">
+              <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center"><img src="/payme-01.png" alt="Payme" className="w-7 h-7 object-contain" /></div>
+              <div className="flex-1 text-left">
+                <p className="text-white text-sm font-semibold">Payme ommaviy oferta</p>
+                <p className="text-indigo-300/40 text-[11px]">cdn.payme.uz/terms/ru/main.html?v=0426</p>
               </div>
-              <p className="text-indigo-200/50 text-[13px] leading-relaxed pl-[52px]">{item.text}</p>
+              <svg className="w-4 h-4 text-indigo-300/40" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" /></svg>
+            </button>
+            <button onClick={() => openExternal("https://click.uz/ru/oferta")} className="w-full flex items-center gap-3 bg-white/[0.07] rounded-xl p-3 border border-white/[0.08] active:bg-white/[0.12] transition-all">
+              <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center"><img src="/click-01.png" alt="Click" className="w-7 h-7 object-contain" /></div>
+              <div className="flex-1 text-left">
+                <p className="text-white text-sm font-semibold">Click ofertasi</p>
+                <p className="text-indigo-300/40 text-[11px]">click.uz/ru/oferta</p>
+              </div>
+              <svg className="w-4 h-4 text-indigo-300/40" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" /></svg>
+            </button>
+          </div>
+        </div>
+
+        {/* Oferta bo'limlari */}
+        <div className="space-y-3 fade-in-up">
+          {[
+            { num: "1", badge: "bg-indigo-500/20 text-indigo-400", title: "Umumiy qoidalar", text: "Ushbu ommaviy oferta \"Hilol Edu\" MCHJ (INN: 307 893 009) tomonidan O'zbekiston Respublikasi Fuqarolik kodeksining 367-, 369-, 370-moddalariga muvofiq jismoniy shaxslarga taqdim etiladigan ta'limiy xizmatlar shartlarini belgilaydi. To'lov amalga oshirish orqali Foydalanuvchi ushbu Oferta shartlarini to'liq va so'zsiz qabul qiladi (FK 370-modda 3-band)." },
+            { num: "2", badge: "bg-emerald-500/20 text-emerald-400", title: "Xizmat tavsifi", text: "Hilal Edu — turk tilini o'rganish bo'yicha ta'limiy kontent platformasi. Obuna orqali eksklyuziv videodarslar, matnli darsliklar, savol-javob mashqlari, maxsus Telegram kanalga kirish va haftada 2 ta yangi dars (dushanba va payshanba) kunlari taqdim etiladi." },
+            { num: "3", badge: "bg-amber-500/20 text-amber-400", title: "Obuna narxi va to'lov tartibi", text: "Oson Turk Tili — 67 000 so'm (30 kun). Premium obuna — 180 000 so'm (90 kun). To'lov Payme yoki Click orqali bank kartasi bilan amalga oshiriladi. To'lov muvaffaqiyatli amalga oshgandan so'ng obuna darhol faollashadi. Barcha narxlar O'zbekiston so'mida (UZS) ko'rsatilgan." },
+            { num: "4", badge: "bg-cyan-500/20 text-cyan-400", title: "Avtomatik to'lov", text: "Har oy belgilangan summa avtomatik ravishda Foydalanuvchining kartasidan yechib olinadi. Avtomatik to'lov obuna faol bo'lgan davr mobaynida davom etadi. Foydalanuvchi avtomatik to'lovni istalgan vaqtda bekor qilishi mumkin." },
+            { num: "5", badge: "bg-rose-500/20 text-rose-400", title: "Obunani bekor qilish", text: "Obunani istalgan vaqtda bekor qilish mumkin. Bekor qilish keyingi to'lov davridan kuchga kiradi. Joriy davr oxirigacha kanaldan foydalanish mumkin bo'lib qoladi. Bekor qilish uchun ilovadagi \"Obunani bekor qilish\" tugmasini bosish yetarli." },
+            { num: "6", badge: "bg-emerald-500/20 text-emerald-400", title: "Pulni qaytarish siyosati", text: "Foydalanilgan davr uchun to'lov qaytarilmaydi. Obuna bekor qilinsa, joriy oylik davr tugaguncha xizmatdan foydalanish mumkin. Texnik nosozlik tufayli xizmat ko'rsatilmagan hollarda to'lov to'liq qaytariladi." },
+            { num: "7", badge: "bg-violet-500/20 text-violet-400", title: "Mualliflik huquqi", text: "Kanaldagi barcha materiallar mualliflik huquqi bilan himoyalangan. Kontentni uchinchi shaxslarga tarqatish, nusxalash yoki qayta nashr qilish qat'iyan taqiqlanadi. Qoidabuzarlik aniqlansa, obuna ogohlantirishsiz bekor qilinadi va to'lov qaytarilmaydi." },
+            { num: "8", badge: "bg-sky-500/20 text-sky-400", title: "Shaxsiy ma'lumotlar", text: "Foydalanuvchining Telegram profil ma'lumotlari (ism, username, ID) xizmat ko'rsatish maqsadida saqlanadi. To'lov ma'lumotlari (karta raqamining oxirgi 4 raqami) faqat to'lov tarixini ko'rsatish uchun ishlatiladi. Shaxsiy ma'lumotlar uchinchi shaxslarga berilmaydi (to'lov tizimlari bundan mustasno)." },
+            { num: "9", badge: "bg-orange-500/20 text-orange-400", title: "O'zgarishlar kiritish", text: "Xizmat ko'rsatuvchi istalgan vaqtda ushbu Oferta shartlarini yangilash huquqiga ega. O'zgarishlar haqida foydalanuvchilarga oldindan bot orqali xabar beriladi. O'zgarishlardan keyin xizmatdan foydalanishni davom ettirish yangi shartlarni qabul qilish hisoblanadi." },
+          ].map((item) => (
+            <div key={item.num} className="bg-white/[0.05] backdrop-blur-sm rounded-2xl p-4 border border-white/[0.07]">
+              <div className="flex items-center gap-3 mb-2">
+                <div className={`w-7 h-7 ${item.badge} rounded-lg flex items-center justify-center text-[13px] font-bold`}>{item.num}</div>
+                <h3 className="text-white font-bold text-[14px]">{item.title}</h3>
+              </div>
+              <p className="text-indigo-200/55 text-[12.5px] leading-relaxed pl-10">{item.text}</p>
             </div>
           ))}
         </div>
-        <div className="mt-6 bg-gradient-to-br from-indigo-500/10 to-purple-500/10 backdrop-blur-sm rounded-2xl p-5 border border-indigo-400/15 fade-in-up">
+
+        {/* Aloqa */}
+        <div className="mt-5 bg-gradient-to-br from-indigo-500/10 to-purple-500/10 backdrop-blur-sm rounded-2xl p-5 border border-indigo-400/15 fade-in-up">
           <h3 className="text-white font-bold text-sm mb-4 text-center">Bog{"'"}lanish uchun</h3>
           <div className="space-y-3">
-            <a href="https://t.me/HilalEdu" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 bg-white/[0.07] rounded-2xl p-4 border border-white/[0.08] active:bg-white/[0.12] transition-all hover:border-sky-500/20">
+            <button onClick={() => openExternal("https://t.me/HilalEdu")} className="w-full flex items-center gap-3 bg-white/[0.07] rounded-2xl p-4 border border-white/[0.08] active:bg-white/[0.12] transition-all">
               <div className="w-11 h-11 bg-gradient-to-br from-[#2AABEE] to-[#229ED9] rounded-xl flex items-center justify-center shadow-lg shadow-sky-500/20">
-                <svg className="w-5.5 h-5.5 text-white" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z" /></svg>
+                <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z" /></svg>
               </div>
-              <div className="flex-1">
+              <div className="flex-1 text-left">
                 <p className="text-white text-sm font-semibold">Telegram</p>
                 <p className="text-indigo-300/50 text-xs mt-0.5">@HilalEdu</p>
               </div>
               <svg className="w-4 h-4 text-indigo-400/30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" /></svg>
-            </a>
-            <a href="mailto:hilol.edu@gmail.com" className="flex items-center gap-3 bg-white/[0.07] rounded-2xl p-4 border border-white/[0.08] active:bg-white/[0.12] transition-all hover:border-emerald-500/20">
+            </button>
+            <a href="mailto:hilol.edu@gmail.com" className="flex items-center gap-3 bg-white/[0.07] rounded-2xl p-4 border border-white/[0.08] active:bg-white/[0.12] transition-all">
               <div className="w-11 h-11 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/20">
                 <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" /></svg>
               </div>
@@ -563,7 +657,7 @@ function MiniAppInner() {
             </a>
           </div>
         </div>
-        <div className="mt-6 text-center"><p className="text-indigo-300/30 text-[10px]">Obunani rasmiylashtirish orqali siz ushbu shartlarga rozilik bildirasiz</p></div>
+        <div className="mt-5 text-center"><p className="text-indigo-300/30 text-[10px]">© 2026 Hilal Edu. Obunani rasmiylashtirish orqali siz ushbu shartlarga rozilik bildirasiz.</p></div>
       </div>
     );
   }
@@ -657,6 +751,19 @@ function MiniAppInner() {
                       </button>
                     );
                   })}
+                </div>
+              </div>
+              <div className="fade-in-up stagger-3 mb-4">
+                <p className="text-[11px] text-indigo-300/50 text-center mb-2.5">{"\""}Davom etish{"\""} orqali siz quyidagi shartlarni qabul qilasiz:</p>
+                <div className="grid grid-cols-2 gap-2">
+                  <button onClick={() => { setPrevScreen("subscribe"); setScreen("terms"); }} className="flex items-center justify-center gap-1.5 px-3 py-2.5 bg-white/[0.05] hover:bg-white/[0.08] active:bg-white/[0.1] rounded-xl border border-white/[0.08] transition-all text-[12px] text-indigo-200">
+                    <svg className="w-3.5 h-3.5 text-indigo-400" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" /></svg>
+                    Hilal Edu oferta
+                  </button>
+                  <button onClick={() => { try { const tg = (window as any).Telegram?.WebApp; if (tg && tg.openLink) tg.openLink("https://cdn.payme.uz/terms/ru/main.html?v=0426"); else window.open("https://cdn.payme.uz/terms/ru/main.html?v=0426", "_blank"); } catch { window.open("https://cdn.payme.uz/terms/ru/main.html?v=0426", "_blank"); } }} className="flex items-center justify-center gap-1.5 px-3 py-2.5 bg-[#00CCCC]/10 hover:bg-[#00CCCC]/15 active:bg-[#00CCCC]/20 rounded-xl border border-[#00CCCC]/25 transition-all text-[12px] text-cyan-100">
+                    <div className="w-4 h-4 bg-white rounded flex items-center justify-center"><img src="/payme-01.png" alt="" className="w-3 h-3 object-contain" /></div>
+                    Payme oferta
+                  </button>
                 </div>
               </div>
               <div className="fade-in-up stagger-3"><button onClick={() => handleSelectPlan(plan)} className="w-full py-4 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-2xl font-bold text-base shadow-lg shadow-indigo-900/30 active:scale-[0.98] transition-transform">Davom etish</button></div>

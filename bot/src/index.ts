@@ -201,12 +201,19 @@ async function showPlanSelection(ctx: any) {
       const price = Number(plan.price).toLocaleString("uz-UZ");
       keyboard.text(`${plan.name} — ${price} so'm`, `buy_plan_${plan.id}`).row();
     }
+    keyboard
+      .url("📜 Hilal Edu oferta", `${config.webAppUrl}/oferta`)
+      .url("💳 Payme oferta", "https://cdn.payme.uz/terms/ru/main.html?v=0426")
+      .row();
 
     await ctx.reply(
       `💳 Obuna rejasini tanlang:\n\n` +
       `To'lov Telegram ichida (Payme yoki Click) xavfsiz amalga oshiriladi.\n` +
       `Karta ma'lumotlaringizni Telegram himoya qiladi 🔒\n\n` +
-      `📜 Davom etish orqali siz Ommaviy Oferta (${config.webAppUrl}/oferta) shartlarini qabul qilasiz.`,
+      `📜 Davom etish orqali siz quyidagi shartlarni qabul qilasiz:\n` +
+      `  • Hilal Edu Ommaviy ofertasi\n` +
+      `  • Payme to'lov tizimi ofertasi\n` +
+      `  • Click to'lov tizimi ofertasi`,
       { reply_markup: keyboard },
     );
   } catch (e) {
@@ -220,7 +227,10 @@ async function showPlanSelection(ctx: any) {
 // =============================================
 bot.command("oferta", async (ctx) => {
   const keyboard = new InlineKeyboard()
-    .url("📜 Oferta bilan tanishish", `${config.webAppUrl}/oferta`);
+    .url("📜 Hilal Edu oferta", `${config.webAppUrl}/oferta`)
+    .row()
+    .url("💳 Payme oferta", "https://cdn.payme.uz/terms/ru/main.html?v=0426")
+    .url("🔵 Click oferta", "https://click.uz/ru/oferta");
 
   await ctx.reply(
     `📜 Ommaviy oferta\n\n` +
@@ -229,7 +239,8 @@ bot.command("oferta", async (ctx) => {
     `• To'lov usullari (Payme, Click)\n` +
     `• Bekor qilish va pul qaytarish\n` +
     `• Mualliflik huquqi\n\n` +
-    `Batafsil o'qish uchun quyidagi tugmani bosing 👇`,
+    `To'lov amalga oshirish orqali siz Hilal Edu ofertasi va to'lov tizimlari (Payme, Click) ofertalari shartlarini qabul qilasiz.\n\n` +
+    `Batafsil o'qish uchun quyidagi tugmalarni bosing 👇`,
     { reply_markup: keyboard },
   );
 });
