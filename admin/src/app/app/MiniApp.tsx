@@ -760,10 +760,17 @@ function MiniAppInner() {
                     <svg className="w-3.5 h-3.5 text-indigo-400" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" /></svg>
                     Hilal Edu oferta
                   </button>
-                  <button onClick={() => { try { const tg = (window as any).Telegram?.WebApp; if (tg && tg.openLink) tg.openLink("https://cdn.payme.uz/terms/ru/main.html?v=0426"); else window.open("https://cdn.payme.uz/terms/ru/main.html?v=0426", "_blank"); } catch { window.open("https://cdn.payme.uz/terms/ru/main.html?v=0426", "_blank"); } }} className="flex items-center justify-center gap-1.5 px-3 py-2.5 bg-[#00CCCC]/10 hover:bg-[#00CCCC]/15 active:bg-[#00CCCC]/20 rounded-xl border border-[#00CCCC]/25 transition-all text-[12px] text-cyan-100">
-                    <div className="w-4 h-4 bg-white rounded flex items-center justify-center"><img src="/payme-01.png" alt="" className="w-3 h-3 object-contain" /></div>
-                    Payme oferta
-                  </button>
+                  {paymentMethod === "payme" ? (
+                    <button onClick={() => { const url = "https://cdn.payme.uz/terms/ru/main.html?v=0426"; try { const tg = (window as any).Telegram?.WebApp; if (tg && tg.openLink) tg.openLink(url); else window.open(url, "_blank"); } catch { window.open(url, "_blank"); } }} className="flex items-center justify-center gap-1.5 px-3 py-2.5 bg-[#00CCCC]/10 hover:bg-[#00CCCC]/15 active:bg-[#00CCCC]/20 rounded-xl border border-[#00CCCC]/25 transition-all text-[12px] text-cyan-100">
+                      <div className="w-4 h-4 bg-white rounded flex items-center justify-center"><img src="/payme-01.png" alt="" className="w-3 h-3 object-contain" /></div>
+                      Payme oferta
+                    </button>
+                  ) : (
+                    <button onClick={() => { const url = "https://click.uz/ru/oferta"; try { const tg = (window as any).Telegram?.WebApp; if (tg && tg.openLink) tg.openLink(url); else window.open(url, "_blank"); } catch { window.open(url, "_blank"); } }} className="flex items-center justify-center gap-1.5 px-3 py-2.5 bg-[#00B4FF]/10 hover:bg-[#00B4FF]/15 active:bg-[#00B4FF]/20 rounded-xl border border-[#00B4FF]/25 transition-all text-[12px] text-sky-100">
+                      <div className="w-4 h-4 bg-white rounded flex items-center justify-center"><img src="/click-01.png" alt="" className="w-3 h-3 object-contain" /></div>
+                      Click oferta
+                    </button>
+                  )}
                 </div>
               </div>
               <div className="fade-in-up stagger-3"><button onClick={() => handleSelectPlan(plan)} className="w-full py-4 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-2xl font-bold text-base shadow-lg shadow-indigo-900/30 active:scale-[0.98] transition-transform">Davom etish</button></div>
