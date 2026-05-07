@@ -140,66 +140,92 @@ function MiniAppInner() {
 
   const handleSelectPlan = async (plan: any) => {
     setSelectedPlan(plan);
-    setProcessing(true);
-    setPaymentStep("paying");
+    setCardNumber("");
+    setCardExpiry("");
+    setSmsCode("");
+    setCardToken("");
+    setMaskedPhone("");
+    setPaymentStep("card");
+    setProcessing(false);
     setScreen("payment");
+  };
 
+  // Karta tokenini so'rash (Click API) — SMS yuboriladi
+  const handleRequestToken = async () => {
+    const digits = cardNumber.replace(/\s/g, "");
+    if (digits.length < 16) { alert("Karta raqamini to'liq kiriting"); return; }
+    const exp = cardExpiry.replace(/\D/g, "");
+    if (exp.length !== 4) { alert("Amal qilish muddatini MM/YY shaklida kiriting"); return; }
+    // MM/YY -> MMYY (Click formatida MMYY kerak)
+    const expireDate = exp; // already MMYY
+    setProcessing(true);
     try {
-      // Backend dan Telegram invoice link olish
-      const res = await fetch(API + "/payments/create-invoice", {
+      const res = await fetch(API + "/payments/click/token", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ telegramId: parseInt(userId!), planId: plan.id }),
+        body: JSON.stringify({ cardNumber: digits, expireDate }),
       }).then(r => r.json());
-
-      if (!res.success || !res.invoiceLink) {
-        alert(res.error || "To'lov yaratishda xatolik. Qayta urinib ko'ring.");
-        setScreen("subscribe");
+      if (!res.success) {
+        alert(res.error || "Karta ma'lumotlari noto'g'ri yoki tizimda xato.");
         setProcessing(false);
         return;
       }
-
-      const tg = (window as any).Telegram?.WebApp;
-      if (tg && tg.openInvoice) {
-        // Telegram WebApp native payment
-        tg.openInvoice(res.invoiceLink, (status: string) => {
-          console.log("[Payment] openInvoice status:", status);
-          if (status === "paid") {
-            // To'lov muvaffaqiyatli — ma'lumotlarni yangilash
-            setTimeout(async () => {
-              try {
-                const subRes = await fetch(API + "/subscriptions/active/" + userId).then(r => r.json());
-                if (subRes && subRes.id) {
-                  setSubscription(subRes);
-                }
-              } catch (e) {}
-              setScreen("success");
-              setProcessing(false);
-            }, 1500);
-          } else if (status === "cancelled" || status === "failed") {
-            setScreen("subscribe");
-            setProcessing(false);
-          } else {
-            setScreen("subscribe");
-            setProcessing(false);
-          }
-        });
-      } else {
-        // Telegram WebApp mavjud emas — linkni ochish
-        window.open(res.invoiceLink, "_blank");
-        setScreen("subscribe");
-        setProcessing(false);
-      }
-    } catch (e) {
-      alert("To'lovda xatolik yuz berdi. Qayta urinib ko'ring.");
-      setScreen("subscribe");
+      setCardToken(res.card_token || "");
+      setMaskedPhone(res.phone_number || "");
+      setPaymentStep("sms");
+      setProcessing(false);
+    } catch (e: any) {
+      alert("Tarmoq xatosi. Qayta urinib ko'ring.");
       setProcessing(false);
     }
   };
 
-  // Eski Click tokenizatsiya funksiyalari (endi ishlatilmaydi, lekin saqlab qolamiz)
-  const handleRequestToken = async () => { return; };
-  const handleVerifySms = async () => { return; };
+  // SMS kodni tasdiqlash + to'lov
+  const handleVerifySms = async () => {
+    if (!smsCode || smsCode.length < 4) { alert("SMS kodni to'liq kiriting"); return; }
+    if (!cardToken || !selectedPlan || !userId) { alert("Sessiya muddati tugagan. Qaytadan urinib ko'ring."); setScreen("subscribe"); return; }
+    setProcessing(true);
+    try {
+      const verifyRes = await fetch(API + "/payments/click/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ cardToken, smsCode }),
+      }).then(r => r.json());
+      if (!verifyRes.success) {
+        alert(verifyRes.error || "SMS kod noto'g'ri.");
+        setProcessing(false);
+        return;
+      }
+      const masked: string = verifyRes.card_number || "";
+      const last4 = masked.replace(/\D/g, "").slice(-4) || "0000";
+      setPaymentStep("paying");
+      const payRes = await fetch(API + "/payments/click/pay", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ telegramId: parseInt(userId), planId: selectedPlan.id, cardToken, cardLast4: last4 }),
+      }).then(r => r.json());
+      if (!payRes.success) {
+        alert(payRes.error || "To'lov amalga oshmadi. Qayta urinib ko'ring.");
+        setPaymentStep("card");
+        setProcessing(false);
+        return;
+      }
+      try {
+        const subRes = await fetch(API + "/subscriptions/active/" + userId).then(r => r.json());
+        if (subRes && subRes.id) setSubscription(subRes);
+      } catch {}
+      try {
+        if ((window as any).Telegram?.WebApp) {
+          (window as any).Telegram.WebApp.sendData(JSON.stringify({ action: "payment_success" }));
+        }
+      } catch {}
+      setProcessing(false);
+      setScreen("success");
+    } catch (e: any) {
+      alert("Tarmoq xatosi. Qayta urinib ko'ring.");
+      setProcessing(false);
+    }
+  };
 
   const handleCancel = async () => {
     if (!userId) return;
@@ -783,12 +809,156 @@ function MiniAppInner() {
 
   // ========== PAYMENT ==========
   if (screen === "payment") {
+    const isPayme = paymentMethod === "payme";
+    const brandColor = isPayme ? "#00CCCC" : "#00B4FF";
+    const brandLogo = isPayme ? "/payme-01.png" : "/click-01.png";
+    const brandName = isPayme ? "Payme" : "Click";
+
+    // Karta raqamini formatlash: 1234 5678 9012 3456
+    const formatCardNumber = (v: string) => {
+      const digits = v.replace(/\D/g, "").slice(0, 19);
+      return digits.replace(/(.{4})/g, "$1 ").trim();
+    };
+    // Amal qilish muddatini formatlash: MM/YY
+    const formatExpiry = (v: string) => {
+      const digits = v.replace(/\D/g, "").slice(0, 4);
+      if (digits.length >= 3) return digits.slice(0, 2) + "/" + digits.slice(2);
+      return digits;
+    };
+
+    // ---- KARTA KIRITISH ----
+    if (paymentStep === "card") {
+      return (
+        <div className="min-h-screen bg-gradient-to-b from-[#0f0a2a] via-[#1a1145] to-[#0f0a2a] p-5">
+          <div className="mb-6 scale-in">
+            <button onClick={() => setScreen("subscribe")} className="flex items-center gap-1.5 text-indigo-300/50 text-sm mb-4 active:text-indigo-200 transition-colors">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
+              Orqaga
+            </button>
+          </div>
+          <div className="bg-white rounded-3xl p-6 shadow-2xl fade-in-up">
+            <div className="flex flex-col items-center mb-6">
+              <div className="w-20 h-20 rounded-2xl bg-white flex items-center justify-center mb-3" style={{ boxShadow: `0 8px 24px ${brandColor}33` }}>
+                <img src={brandLogo} alt={brandName} className="w-14 h-14 object-contain" />
+              </div>
+              <h2 className="text-xl font-bold text-slate-800">{brandName} orqali to{"'"}lov</h2>
+              <p className="text-slate-500 text-sm mt-1">Karta ma{"'"}lumotlarini kiriting</p>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5 block">Karta raqami</label>
+                <input
+                  type="tel"
+                  inputMode="numeric"
+                  autoComplete="cc-number"
+                  value={cardNumber}
+                  onChange={(e) => setCardNumber(formatCardNumber(e.target.value))}
+                  placeholder="0000 0000 0000 0000"
+                  className="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-base font-medium tracking-wider text-slate-800 placeholder-slate-300 outline-none focus:border-slate-400 transition-all"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5 block">Amal qilish muddati</label>
+                <input
+                  type="tel"
+                  inputMode="numeric"
+                  autoComplete="cc-exp"
+                  value={cardExpiry}
+                  onChange={(e) => setCardExpiry(formatExpiry(e.target.value))}
+                  placeholder="MM/YY"
+                  className="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-base font-medium tracking-wider text-slate-800 placeholder-slate-300 outline-none focus:border-slate-400 transition-all"
+                />
+              </div>
+              {selectedPlan && (
+                <div className="bg-slate-50 rounded-2xl p-4 flex items-center justify-between">
+                  <div>
+                    <p className="text-xs text-slate-500">To{"'"}lanadigan summa</p>
+                    <p className="text-slate-800 font-bold text-lg">{formatPrice(selectedPlan.price)} <span className="text-sm font-normal text-slate-500">UZS</span></p>
+                  </div>
+                  <p className="text-[11px] text-slate-400 text-right max-w-[140px] leading-tight">{selectedPlan.name}</p>
+                </div>
+              )}
+              <button
+                onClick={handleRequestToken}
+                disabled={processing || !cardNumber || !cardExpiry}
+                className="w-full py-4 text-white rounded-2xl font-bold text-base shadow-lg active:scale-[0.98] transition-transform disabled:opacity-40"
+                style={{ background: brandColor, boxShadow: `0 8px 20px ${brandColor}55` }}
+              >
+                {processing ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full logo-ring-spin" />
+                    Yuborilmoqda...
+                  </span>
+                ) : "Davom etish"}
+              </button>
+              <p className="text-[11px] text-slate-400 text-center leading-relaxed">
+                {"\""}Davom etish{"\""} orqali siz Hilal Edu va {brandName} oferta shartlarini qabul qilasiz. Karta ma{"'"}lumotlaringiz xavfsiz uzatiladi.
+              </p>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // ---- SMS KOD ----
+    if (paymentStep === "sms") {
+      return (
+        <div className="min-h-screen bg-gradient-to-b from-[#0f0a2a] via-[#1a1145] to-[#0f0a2a] p-5">
+          <div className="mb-6 scale-in">
+            <button onClick={() => { setPaymentStep("card"); setSmsCode(""); }} className="flex items-center gap-1.5 text-indigo-300/50 text-sm mb-4 active:text-indigo-200 transition-colors">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
+              Orqaga
+            </button>
+          </div>
+          <div className="bg-white rounded-3xl p-6 shadow-2xl fade-in-up">
+            <div className="flex flex-col items-center mb-6">
+              <div className="w-20 h-20 rounded-2xl bg-white flex items-center justify-center mb-3" style={{ boxShadow: `0 8px 24px ${brandColor}33` }}>
+                <img src={brandLogo} alt={brandName} className="w-14 h-14 object-contain" />
+              </div>
+              <h2 className="text-xl font-bold text-slate-800">SMS kod</h2>
+              <p className="text-slate-500 text-sm mt-1.5 text-center px-2">{maskedPhone || "Telefon raqamingizga"} raqamiga yuborilgan kodni kiriting</p>
+            </div>
+            <div className="space-y-4">
+              <input
+                type="tel"
+                inputMode="numeric"
+                autoComplete="one-time-code"
+                value={smsCode}
+                onChange={(e) => setSmsCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                placeholder="• • • • • •"
+                className="w-full px-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-2xl font-bold tracking-[0.4em] text-center text-slate-800 placeholder-slate-300 outline-none focus:border-slate-400 transition-all"
+              />
+              <button
+                onClick={handleVerifySms}
+                disabled={processing || smsCode.length < 4}
+                className="w-full py-4 text-white rounded-2xl font-bold text-base shadow-lg active:scale-[0.98] transition-transform disabled:opacity-40"
+                style={{ background: brandColor, boxShadow: `0 8px 20px ${brandColor}55` }}
+              >
+                {processing ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full logo-ring-spin" />
+                    Tekshirilmoqda...
+                  </span>
+                ) : "Tasdiqlash"}
+              </button>
+              <button
+                onClick={() => { setPaymentStep("card"); setSmsCode(""); }}
+                className="w-full py-2 text-slate-500 text-sm active:text-slate-700 transition-colors"
+              >
+                Yangi karta kiritish
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // ---- TO'LOV JARAYONI ----
     return (
       <div className="min-h-screen bg-gradient-to-b from-[#0f0a2a] via-[#1a1145] to-[#0f0a2a] p-5 flex flex-col items-center justify-center">
-        <div className="w-16 h-16 border-4 border-indigo-500/20 border-t-indigo-400 rounded-full logo-ring-spin mb-6" />
-        <p className="text-white font-semibold text-lg mb-2">To{"'"}lov tayyorlanmoqda</p>
-        <p className="text-indigo-300/50 text-sm text-center">Telegram to{"'"}lov oynasi ochilmoqda...</p>
-        <button onClick={() => setScreen("subscribe")} className="mt-8 text-indigo-400/60 text-sm underline underline-offset-2 active:text-indigo-300 transition-colors">Bekor qilish</button>
+        <div className="w-16 h-16 border-4 border-white/20 rounded-full logo-ring-spin mb-6" style={{ borderTopColor: brandColor }} />
+        <p className="text-white font-semibold text-lg mb-2">To{"'"}lov amalga oshirilmoqda</p>
+        <p className="text-indigo-300/50 text-sm text-center">Iltimos, kuting...</p>
       </div>
     );
   }
